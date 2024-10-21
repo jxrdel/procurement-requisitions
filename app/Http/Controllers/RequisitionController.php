@@ -28,6 +28,4 @@ class RequisitionController extends Controller
             })
             ->make(true);
     }
-
-
 }

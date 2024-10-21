@@ -19,10 +19,10 @@
                         type="text"
                         class="form-control"
                         autocomplete="off"
-                        id="floatingInput"
+                        id="detailsInput"
                         placeholder="Details"
-                        aria-describedby="floatingInputHelp" />
-                        <label for="floatingInput">Details</label>
+                        aria-describedby="detailsInputHelp" />
+                        <label for="detailsInput">Details</label>
                     </div>
 
 

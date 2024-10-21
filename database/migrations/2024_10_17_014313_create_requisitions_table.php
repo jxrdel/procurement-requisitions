@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('date_sent_ps')->nullable();
             $table->string('ps_approval');
             $table->date('ps_approval_date')->nullable();
+            $table->boolean('sent_to_dfa')->default(false);
 
             //Cost & Budgeting
             $table->date('date_sent_dfa')->nullable();
@@ -39,6 +40,7 @@ return new class extends Migration
             $table->string('invoice_no')->nullable();
             $table->date('date_invoice_received')->nullable();
             $table->date('date_sent_ap')->nullable();
+            $table->boolean('is_completed_cb')->default(false); //Becomes true when cost budgeting part is completed
 
             //Accounts
             $table->date('date_sent_chequeroom')->nullable();

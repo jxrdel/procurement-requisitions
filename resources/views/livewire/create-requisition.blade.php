@@ -141,7 +141,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                {{-- <div class="row">
 
                     <div class="col">
                         <div class="form-floating form-floating-outline mb-6">
@@ -169,7 +169,7 @@
                             @error('date_sent_dfa')<div class="text-danger"> {{ $message }} </div>@enderror
                         </div>
                     </div>
-                </div>
+                </div> --}}
                     
                 <div class="divider" style="margin-top: 40px">
                     <div class="divider-text">
@@ -257,5 +257,9 @@
                 }
             }, 100); // Adding a small delay (100ms) before scrolling
         });
+
+    $('#addLogModal').on('shown.bs.modal', function () {
+        $('#detailsInput').focus()
+    })
 </script>
 @endscript

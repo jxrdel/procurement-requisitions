@@ -24,7 +24,7 @@ class CreateRequisition extends Component
     public $date_sent_ps;
     public $ps_approval = 'Not Sent';
     public $ps_approval_date;
-    public $sent_to_dfa = 'No';
+    public $sent_to_dfa;
     public $date_sent_dfa;
 
     public $logdetails;
@@ -53,7 +53,6 @@ class CreateRequisition extends Component
         
         
         $newrequisition = Requisition::create([
-            'requisition_status' => $this->requisition_status,
             'requisition_no' => $this->requisition_no,
             'requesting_unit' => $this->requesting_unit,
             'file_number' => $this->file_number,
@@ -63,8 +62,8 @@ class CreateRequisition extends Component
             'date_sent_ps' => $this->date_sent_ps,
             'ps_approval' => $this->ps_approval,
             'ps_approval_date' => $this->ps_approval_date,
-            'sent_to_dfa' => $this->sent_to_dfa,
-            'date_sent_dfa' => $this->date_sent_dfa,
+            // 'sent_to_dfa' => $this->sent_to_dfa,
+            // 'date_sent_dfa' => $this->date_sent_dfa,
         ]);
 
         foreach ($this->logs as $log) {
@@ -88,8 +87,8 @@ class CreateRequisition extends Component
             'assigned_to' => $this->assigned_to,
             'date_sent_ps' => $this->date_sent_ps,
             'ps_approval' => $this->ps_approval,
-            'sent_to_dfa' => $this->sent_to_dfa,
-            'date_sent_dfa' => $this->date_sent_dfa,
+            // 'sent_to_dfa' => $this->sent_to_dfa,
+            // 'date_sent_dfa' => $this->date_sent_dfa,
         ], [
             'requisition_no' => 'required',
             'requesting_unit' => 'required',
@@ -97,7 +96,7 @@ class CreateRequisition extends Component
             'item' => 'required',
             'assigned_to' => 'required',
             'date_sent_ps' => 'nullable|date|before_or_equal:today',
-            'date_sent_dfa' => 'nullable|sometimes|after:date_sent_ps',
+            // 'date_sent_dfa' => 'nullable|sometimes|after:date_sent_ps',
         ])
         ->after(function ($validator) {
             // Ensure 'ps_approval' is not 'Not Sent' if 'date_sent_ps' is populated
@@ -111,9 +110,9 @@ class CreateRequisition extends Component
             }
         
             // Ensure 'date_sent_dfa' is not null if 'sent_to_dfa' is "Yes"
-            if ($this->sent_to_dfa === 'Yes' && $this->date_sent_dfa === null) {
-                $validator->errors()->add('date_sent_dfa', 'Date sent to DFA cannot be null if sent to DFA is "Yes".');
-            }
+            // if ($this->sent_to_dfa === 'Yes' && $this->date_sent_dfa === null) {
+            //     $validator->errors()->add('date_sent_dfa', 'Date sent to DFA cannot be null if sent to DFA is "Yes".');
+            // }
         });
 
         if ($reqvalidator->fails()) {

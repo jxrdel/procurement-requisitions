@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Requisition extends Model
 {
     protected $fillable = [
-        'requuisition_status',
+        'requisition_status',
         'requisition_no',
         'requesting_unit',
         'file_number',
@@ -17,6 +17,7 @@ class Requisition extends Model
         'date_sent_ps',
         'ps_approval',
         'ps_approval_date',
+        'sent_to_dfa',
         'date_sent_dfa',
         'date_sent_request_mof',
         'request_no',
@@ -39,5 +40,25 @@ class Requisition extends Model
     public function statuslogs()
     {
         return $this->hasMany(Status::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'requesting_unit');
+    }
+
+    public function procurement_officer()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function cost_budgeting_requisition()
+    {
+        return $this->hasOne(CBRequisition::class);
+    }
+
+    public function accounts_requisition()
+    {
+        return $this->hasOne(AccountsRequisition::class);
     }
 }
