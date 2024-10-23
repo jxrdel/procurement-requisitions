@@ -113,7 +113,7 @@
             </li>
 
             <li class="menu-header mt-7">
-              <span class="menu-header-text">Accounts</span>
+              <span class="menu-header-text">Cheque Processing</span>
             </li>
             <!-- Apps -->
             <li  @class(['menu-item', 'active' => request()->routeIs('accounts_requisitions.*')])>
@@ -286,6 +286,14 @@
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     
     
+
+        window.addEventListener('show-alert', event => {
+                var message = event.detail.message;
+
+                // Display an alert with the received message
+                alert(message);
+            })
+            
         window.addEventListener('show-message', event => {
     
                     toastr.options = {

@@ -32,7 +32,7 @@
             <div class="modal-footer" style="align-items: center">
                 <div style="margin:auto">
                     <button class="btn btn-primary">Save</button>
-                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </form>

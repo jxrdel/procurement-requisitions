@@ -8,9 +8,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class CreateRequisition extends Component
 {
+    use WithFileUploads;
     
     #[Title('Create Requsition')]
 
@@ -26,6 +28,7 @@ class CreateRequisition extends Component
     public $ps_approval_date;
     public $sent_to_dfa;
     public $date_sent_dfa;
+    public $uploads;
 
     public $logdetails;
 
@@ -50,9 +53,22 @@ class CreateRequisition extends Component
         if (!$this->validateForm()) {
             return;  // Stop execution if form validation fails
         }
+
+        if($this->ps_approval === 'Not Sent' || $this->ps_approval === 'Pending'){
+            $this->requisition_status = 'Pending PS Approval';
+        }
+
+        if($this->ps_approval === 'Approval Denied'){
+            $this->requisition_status = 'Denied by PS';
+        }
+
+        if($this->ps_approval === 'Approved'){
+            $this->requisition_status = 'Approved by PS';
+        }
         
         
         $newrequisition = Requisition::create([
+            'requisition_status' => $this->requisition_status,
             'requisition_no' => $this->requisition_no,
             'requesting_unit' => $this->requesting_unit,
             'file_number' => $this->file_number,
@@ -71,6 +87,19 @@ class CreateRequisition extends Component
                 'details' => $log,
                 // 'date' => now(),
             ]);
+        }
+        
+
+        if (!is_null($this->uploads)) {
+            foreach ($this->uploads as $photo) {
+                $filename = $photo->getClientOriginalName();
+                $path = $photo->store('file_uploads', 'public');
+                $newrequisition->file_uploads()->create([
+                    'file_name' => $filename,
+                    'file_path' => $path,
+                    // 'uploaded_by' => auth()->user()->name,
+                ]);
+            }
         }
 
         return redirect()->route('requisitions.index')->with('success', 'Requisition created successfully');
@@ -137,9 +166,4 @@ class CreateRequisition extends Component
         unset($this->logs[$index]);
     }
 
-    public function updatedDateSentPs($value){
-        if ($value == '') {
-            $this->date_sent_ps = null;
-        }
-    }
 }

@@ -61,4 +61,9 @@ class Requisition extends Model
     {
         return $this->hasOne(AccountsRequisition::class);
     }
+
+    public function file_uploads()
+    {
+        return $this->hasMany(FileUpload::class);
+    }
 }

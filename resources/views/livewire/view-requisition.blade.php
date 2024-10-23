@@ -15,10 +15,13 @@
                     </a>
                     
                     <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
-                        <strong><i class="fa-solid fa-file-signature"></i> &nbsp;View Requisition</strong>
+                        <strong>View Requisition</strong> 
+                        @if ($this->requisition->is_completed)
+                            <span style="background-color: #47a102 !important;" class="badge rounded-pill bg-success fs-5">Completed</span>
+                        @endif
                     </h1>
                 </div>
-                <div class="nav-align-top mb-6">
+                <div class="nav-align-top mb-6" style="min-height: 350px">
                   <ul wire:ignore class="nav nav-tabs mb-4 nav-fill" role="tablist">
                     <li  x-on:click="$wire.active_pane = 'procurement1'" wire:ignore class="nav-item mb-1 mb-sm-0">
                       <button
@@ -65,7 +68,7 @@
                         data-bs-target="#navs-justified-accounts"
                         aria-controls="navs-justified-accounts"
                         aria-selected="false">
-                        <i class="bi bi-4-circle-fill me-1_5"></i> Accounts
+                        <i class="bi bi-4-circle-fill me-1_5"></i> Cheque Dispatch
                       </button>
                     </li>
                   </ul>
@@ -81,16 +84,6 @@
                                         <div x-show="!isEditingProcurement1">
                                             <button type="button" @click="isEditingProcurement1 = ! isEditingProcurement1" class="btn btn-dark waves-effect waves-light" style="width: 100px">
                                                 <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
-                                            </button>
-                                        </div>
-                                        
-                                        <div x-show="isEditingProcurement1">
-                                            <button class="btn btn-primary waves-effect waves-light" style="width: 100px">
-                                                <span class="tf-icons ri-save-3-line me-1_5"></span>Save
-                                            </button>
-                                            &nbsp;
-                                            <button type="button" @click="isEditingProcurement1 = ! isEditingProcurement1" class="btn btn-dark waves-effect waves-light" style="width: 100px">
-                                                <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
                                             </button>
                                         </div>
                                     </div>
@@ -285,42 +278,27 @@
                                             </div>
                                         </div>
                         
-                                        {{-- <div class="row">
-                        
-                                            <div class="col">
-                                                <div class="form-floating form-floating-outline mb-6">
-                                                <select required wire:model="sent_to_dfa" class="form-select" id="exampleFormControlSelect1" aria-label="Default select example">
-                                                    <option value="Yes">Yes</option>
-                                                    <option value="No">No</option>
-                                                </select>
-                                                <label for="exampleFormControlSelect1">Sent to DFA</label>
-                                                </div>
-                                                @error('sent_to_dfa')<div class="text-danger"> {{ $message }} </div>@enderror
+                                        <div class="row text-center">
+                                            
+                                            <div x-show="isEditingProcurement1">
+                                                <button class="btn btn-primary waves-effect waves-light" style="width: 100px">
+                                                    <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                                                </button>
+                                                &nbsp;
+                                                <button type="button" @click="isEditingProcurement1 = ! isEditingProcurement1" class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                                    <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
+                                                </button>
                                             </div>
-                        
-                                            <div class="col">
-                                                <div x-transition x-show="sent_to_dfa === 'Yes'">
-                                                    <div class="form-floating form-floating-outline">
-                                                        <input
-                                                        autocomplete="off"
-                                                        wire:model="date_sent_dfa"
-                                                        type="date"
-                                                        class="form-control @error('date_sent_dfa')is-invalid @enderror"
-                                                        id="floatingInput"
-                                                        aria-describedby="floatingInputHelp" />
-                                                        <label for="floatingInput">Date Sent to DFA</label>
-                                                    </div>
-                                                    @error('date_sent_dfa')<div class="text-danger"> {{ $message }} </div>@enderror
-                                                </div>
-                                            </div>
-                                        </div> --}}
+                                        </div>
                                     </div>
                                 </form>
                                 
                                 
                                 @if (!$this->sent_to_dfa)
                                 <div class="row mt-8" x-show="!isEditingProcurement1">
-                                    <button @disabled($this->isSendCBButtonDisabled) wire:confirm="Are you sure you want to send to cost & budgeting?" wire:loading.attr="disabled"  type="button" wire:click="sendToCB" class="btn btn-success waves-effect waves-light m-auto" style="width: 300px">
+                                    <button @disabled($this->isSendCBButtonDisabled) wire:confirm="Are you sure you want to send to cost & budgeting?" 
+                                        wire:loading.attr="disabled"  type="button" wire:click="sendToCB" class="btn btn-success waves-effect waves-light m-auto" 
+                                        style="width: 300px;">
                                         <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Cost & Budgeting
                 
                                     <div wire:loading class="spinner-border spinner-border-lg text-white mx-2" role="status">
@@ -386,16 +364,6 @@
                                             <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
                                         </button>
                                     </div>
-                                    
-                                    <div x-show="isEditingProcurement2">
-                                        <button class="btn btn-primary waves-effect waves-light" style="width: 100px">
-                                            <span class="tf-icons ri-save-3-line me-1_5"></span>Save
-                                        </button>
-                                        &nbsp;
-                                        <button type="button" @click="isEditingProcurement2 = ! isEditingProcurement2" class="btn btn-dark waves-effect waves-light" style="width: 100px">
-                                            <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
-                                        </button>
-                                    </div>
                                 </div>
         
                                 <div x-transition x-show="!isEditingProcurement2">
@@ -433,16 +401,18 @@
                                         </div>
                                         
                                     </div>
-                                    
-                                    <div class="row mt-8">
-                                        <button @disabled($this->isButtonProcurement2Disabled)  wire:confirm="Are you sure you want to send to accounts?" wire:loading.attr="disabled"  type="button" wire:click="sendToAccounts" class="btn btn-success waves-effect waves-light m-auto" style="width: 300px">
-                                            <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Accounts
-        
-                                        <div wire:loading class="spinner-border spinner-border-lg text-white mx-2" role="status">
-                                            <span class="visually-hidden">Loading...</span>
+
+                                    @if (!$this->requisition->accounts_requisition)
+                                        <div class="row mt-8">
+                                            <button @disabled($this->isButtonProcurement2Disabled)  wire:confirm="Are you sure you want to send to cheque dispatch?" wire:loading.attr="disabled"  type="button" wire:click="sendToAccounts" class="btn btn-success waves-effect waves-light m-auto" style="width: 300px">
+                                                <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Cheque Dispatch
+            
+                                            <div wire:loading class="spinner-border spinner-border-lg text-white mx-2" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            </button>
                                         </div>
-                                        </button>
-                                    </div>
+                                    @endif
                                     
                                 </div>
                                 
@@ -542,6 +512,18 @@
                                         </div>
                                     </div>
         
+                                    <div class="row text-center mt-8">
+                                        
+                                        <div x-show="isEditingProcurement2">
+                                            <button class="btn btn-primary waves-effect waves-light" style="width: 100px">
+                                                <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                                            </button>
+                                            &nbsp;
+                                            <button type="button" @click="isEditingProcurement2 = ! isEditingProcurement2" class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                                <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
                             
@@ -583,9 +565,65 @@
                   </div>
                 </div>
                     
+                <div id="file-uploads">
+                
+                    <div class="divider" style="margin-top: 40px">
+                        <div class="divider-text">
+                            <i class="fa-solid fa-file-arrow-up fs-4"></i>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <h4 class="text-center fw-bold">File Uploads</h4>
+                    </div>
+
+                
+                    <div class="row">
+                        <div class="col" style="text-align: center;padding-bottom:10px">
+                                @error('upload')<div class="text-danger fw-bold"> {{ $message }} </div>@enderror
+                        
+                                <input wire:model="upload" type="file" class="form-control" style="display: inline;width: 400px;height:45px">
+                                <button wire:click.prevent="uploadFile()" class="btn btn-primary" wire:loading.attr="disabled" wire:target="upload" style="width: 8rem"><i class="fas fa-plus me-2"></i> Upload</button>
+                                <span wire:loading wire:target="upload">Uploading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row ">
+
+                        <div class="demo-inline-spacing d-flex justify-content-center align-items-center">
+                            <div class="list-group list-group-flush" style="width: 500px">
+
+                                @forelse ($uploads as $upload)
+
+                                    <div class="list-group list-group-flush list-group-item-action" style="width: 100%;cursor: default;">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center" style="border: none;">
+                                            <a class="text-dark text-decoration-underline" href="{{ Storage::url($upload->file_path) }}" target="_blank">{{$upload->file_name}}</a>
+                                            {{-- <button type="button" class="btn btn-danger">
+                                                <i class="ri-delete-bin-2-line me-1"></i> Delete
+                                            </button> --}}
+                                            <a href="javascript:void(0)" wire:confirm="Are you sure you want to delete this file?" wire:click="deleteFile({{$upload->id}})">
+                                                <i class="ri-close-large-line text-danger fw-bold"></i>
+                                            </a>
+
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="list-group list-group-flush list-group-item-action" style="width: 100%;cursor: default;">
+                                        <div class="list-group-item" style="border: none;">
+                                            <p class="text-center">No files uploaded</p>
+
+                                        </div>
+                                    </div>
+                                @endforelse
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    
                 <div class="divider" style="margin-top: 40px">
                     <div class="divider-text">
-                        <i class="fa-solid fa-file-pen"></i>
+                        <i class="fa-solid fa-file-pen fs-4"></i>
                     </div>
                 </div>
 
@@ -628,6 +666,7 @@
                     </tbody>
                     </table>
                 </div>
+                
             </div>
         </div>
 </div>

@@ -77,12 +77,15 @@ class CostBudgetingRequisition extends Component
     {
         return $this->request_no === null || trim($this->request_no) === '' ||
                $this->release_no === null || trim($this->release_no) === '' ||
-               $this->change_of_vote_no === null || trim($this->change_of_vote_no) === '' ||
                $this->date_sent_request_mof === null || $this->date_sent_request_mof === '' ||
                $this->release_date === null || $this->release_date === '';
     }
 
     public function sendToProcurement(){
+        $this->requisition->update([
+            'requisition_status' => 'Sent to Procurement',
+        ]);
+
         $this->cb_requisition->update([
             'is_completed' => true,
             'date_completed' => Carbon::now(),

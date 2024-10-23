@@ -7,13 +7,18 @@ use App\Models\Department;
 use App\Models\Requisition;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Container\Attributes\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ViewRequisition extends Component
 {
+    use WithFileUploads;
+
     public $isEditingProcurement1 = false;
     public $isEditingProcurement2 = false;
 
@@ -33,6 +38,8 @@ class ViewRequisition extends Component
     public $sent_to_dfa;
     public $date_sent_dfa;
     public $active_pane = 'procurement1';
+    public $uploads;
+    public $upload;
 
     //Cost & Budgeting
 
@@ -66,6 +73,7 @@ class ViewRequisition extends Component
     public function render()
     {
         $this->logs = $this->requisition->statuslogs;
+        $this->uploads = $this->requisition->file_uploads()->get();
         return view('livewire.view-requisition')->title($this->requisition_no . ' | View Requisition');
     }
 
@@ -144,9 +152,11 @@ class ViewRequisition extends Component
             // 'date_sent_dfa' => $this->date_sent_dfa,
         ]);
 
+        $this->setRequisitionStatus();
+
         $this->isEditingProcurement1 = false;
         $this->resetValidation();
-        $this->dispatch('show-message', message: 'requisition edited successfully');
+        $this->dispatch('show-message', message: 'Requisition edited successfully');
         $this->requisition = $this->requisition->fresh();
     }
 
@@ -198,6 +208,73 @@ class ViewRequisition extends Component
         }
     }
 
+    public function setRequisitionStatus(){
+        $status = $this->requisition_status;
+        
+        if ($this->ps_approval === 'Not Sent' || $this->ps_approval === 'Pending') {
+            $status = 'Pending PS Approval';
+        }
+    
+        if ($this->ps_approval === 'Approval Denied') {
+            $status = 'Denied by PS';
+        }
+    
+        if ($this->ps_approval === 'Approved') {
+            $status = 'Approved by PS';
+        }
+    
+        if ($this->requisition->cost_budgeting_requisition) {
+            $status = 'Sent to Cost & Budgeting';
+        }
+    
+        if ($this->requisition->cost_budgeting_requisition && $this->requisition->cost_budgeting_requisition->is_completed) {
+            $status = 'Sent to Procurement';
+        }
+    
+        if ($this->requisition->accounts_requisition) {
+            $status = 'Sent to Cheque Dispatch';
+        }
+    
+        if ($this->requisition->accounts_requisition && $this->requisition->accounts_requisition->is_completed) {
+            $status = 'Completed';
+        }
+
+        $this->requisition->update([
+            'requisition_status' => $status,
+        ]);
+    }
+    
+
+    public function uploadFile(){
+
+        $this->validate([
+            'upload' => 'required|file|max:1024',
+        ], [
+            'upload.required' => 'Please upload a file before proceeding.',
+            'upload.max' => 'The file must not be larger than 1MB.',       
+        ]);
+        $filename = $this->upload->getClientOriginalName();
+        
+        $path = $this->upload->store('file_uploads', 'public');
+        $this->requisition->file_uploads()->create([
+            'file_name' => $filename,
+            'file_path' => $path,
+            // 'uploaded_by' => auth()->user()->name,
+        ]);
+
+        $this->upload = null;
+        $this->requisition = $this->requisition->fresh();
+        $this->dispatch('show-message', message: 'File uploaded successfully');
+    }
+    
+
+    public function deleteFile($id){
+        $upload = $this->requisition->file_uploads->where('id', $id)->first();
+        $upload->delete();
+        Storage::delete('public/' . $upload->file_path);
+        $this->dispatch('show-message', message: 'File deleted successfully');
+    }
+
     public function addLog(){
         
         $this->requisition->statuslogs()->create([
@@ -214,10 +291,9 @@ class ViewRequisition extends Component
                $this->requesting_unit === null || trim($this->requesting_unit) === '' ||
                $this->file_number === null || trim($this->file_number) === '' ||
                $this->item === null || trim($this->item) === '' ||
-               $this->source_of_funds === null || trim($this->source_of_funds) === '' ||
                $this->assigned_to === null || trim($this->assigned_to) === '' ||
                $this->date_sent_ps === null || trim($this->date_sent_ps) === '' ||
-               $this->ps_approval === null || $this->ps_approval === 'Not Sent' || $this->ps_approval === 'Approval Denied';
+               $this->ps_approval === null || $this->ps_approval !== 'Approved';
     }
     
 
@@ -238,6 +314,7 @@ class ViewRequisition extends Component
     public function sendToCB(){
 
         $this->requisition->update([
+            'requisition_status' => $this->requisition_status,
             'sent_to_dfa' => true,
             'date_sent_dfa' => Carbon::now(),
         ]);
@@ -246,9 +323,10 @@ class ViewRequisition extends Component
             'date_received' => Carbon::now(),
         ]);
 
+        $this->setRequisitionStatus();
         //Send email to DFA
 
-        return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('message', 'Requisition sent to Cost & Budgeting');
+        return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
     }
 
     //Cost & Budgeting
@@ -310,6 +388,7 @@ class ViewRequisition extends Component
     public function editProcurement2(){
 
         $this->requisition->update([
+            'requisition_status' => $this->requisition_status,
             'purchase_order_no' => $this->purchase_order_no,
             'eta' => $this->eta,
             'date_sent_commit' => $this->date_sent_commit,
@@ -318,20 +397,28 @@ class ViewRequisition extends Component
             'date_sent_ap' => $this->date_sent_ap,
         ]);
 
+        $this->setRequisitionStatus();
+
         $this->isEditingProcurement2 = false;
         $this->resetValidation();
         $this->dispatch('show-message', message: 'Requisition edited successfully');
     }
 
     public function sendToAccounts(){
+
+        $this->requisition->update([
+            'requisition_status' => $this->requisition_status,
+        ]);
     
-            $this->requisition->accounts_requisition()->create([
-                'date_received' => Carbon::now(),
-            ]);
-    
-            //Send email to Accounts
-    
-            return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('message', 'Requisition sent to Accounts');
+        $this->requisition->accounts_requisition()->create([
+            'date_received' => Carbon::now(),
+        ]);
+        
+        $this->setRequisitionStatus();
+
+        //Send email to Accounts
+
+        return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cheque Dispatch');
     }
 
     //Accounts

@@ -68,6 +68,7 @@ class ViewAccountsRequisition extends Component
 
     public function edit(){
         $this->requisition->update([
+            'requistion_status' => 'Completed',
             'date_sent_chequeroom' => $this->date_sent_chequeroom,
             'date_of_cheque' => $this->date_of_cheque,
             'cheque_no' => $this->cheque_no,
@@ -79,6 +80,19 @@ class ViewAccountsRequisition extends Component
         $this->dispatch('show-message', message: 'Record edited successfully');
         $this->requisition = $this->requisition->fresh();
         $this->accounts_requisition = $this->accounts_requisition->fresh();
+    }
+
+    public function completeRequisition(){
+        $this->accounts_requisition->update([
+            'is_completed' => true,
+        ]);
+
+        $this->requisition->update([
+            'requisition_status' => 'Completed',
+            'is_completed' => true,
+        ]);
+
+        return redirect()->route('accounts_requisitions.index')->with('success', 'Requisition completed successfully');
     }
 
 }

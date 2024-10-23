@@ -121,10 +121,10 @@
                         &nbsp;
                         @if (!$this->accounts_requisition->is_completed)
                         <button @disabled($this->isButtonDisabled) 
-                            wire:confirm="Are you sure you want to send to procurement?"
-                            wire:click="sendToProcurement"
+                            wire:confirm="Are you sure you want to complete the requisition?"
+                            wire:click="completeRequisition"
                             class="btn btn-success waves-effect waves-light" style="width:220px">
-                            <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Procurement
+                            <span class="ri-checkbox-circle-line me-1_5"></span>Complete Requisition
                         </button>
                             
                         @endif

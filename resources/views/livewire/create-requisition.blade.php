@@ -117,7 +117,7 @@
                         <div class="form-floating form-floating-outline">
                             <input
                             autocomplete="off"
-                            wire:model.live="date_sent_ps"
+                            wire:model="date_sent_ps"
                             type="date"
                             class="form-control @error('date_sent_ps')is-invalid @enderror"
                             id="floatingInput"
@@ -140,36 +140,26 @@
                         @error('ps_approval')<div class="text-danger"> {{ $message }} </div>@enderror
                     </div>
                 </div>
-
-                {{-- <div class="row">
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline mb-6">
-                        <select required wire:model="sent_to_dfa" class="form-select" id="exampleFormControlSelect1" aria-label="Default select example">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                        <label for="exampleFormControlSelect1">Sent to DFA</label>
-                        </div>
-                        @error('sent_to_dfa')<div class="text-danger"> {{ $message }} </div>@enderror
+                
+                <div class="divider" style="margin-top: 40px">
+                    <div class="divider-text">
+                        <i class="fa-solid fa-file-arrow-up fs-4"></i>
                     </div>
+                </div>
 
-                    <div class="col">
-                        <div x-transition x-show="sent_to_dfa === 'Yes'">
-                            <div class="form-floating form-floating-outline">
-                                <input
-                                autocomplete="off"
-                                wire:model="date_sent_dfa"
-                                type="date"
-                                class="form-control @error('date_sent_dfa')is-invalid @enderror"
-                                id="floatingInput"
-                                aria-describedby="floatingInputHelp" />
-                                <label for="floatingInput">Date Sent to DFA</label>
-                            </div>
-                            @error('date_sent_dfa')<div class="text-danger"> {{ $message }} </div>@enderror
-                        </div>
+                <div class="row">
+                    <h4 class="text-center fw-bold">File Uploads</h4>
+                </div>
+
+            
+                <div class="row">
+                    <div class="col" style="text-align: center;padding-bottom:10px">
+                            @error('uploads')<div class="text-danger fw-bold"> {{ $message }} </div>@enderror
+                    
+                            <input wire:model="uploads" type="file" multiple class="form-control" style="display: inline;width: 400px;height:45px">
+                            <span wire:loading wire:target="uploads">Uploading...</span>
                     </div>
-                </div> --}}
+                </div>
                     
                 <div class="divider" style="margin-top: 40px">
                     <div class="divider-text">
