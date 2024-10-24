@@ -101,27 +101,32 @@
                 </a>
             </li>
 
-            <li class="menu-header mt-7">
-              <span class="menu-header-text">Cost &amp; Budgeting</span>
-            </li>
-            <!-- Apps -->
-            <li  @class(['menu-item', 'active' => request()->routeIs('cost_and_budgeting.*')])>
-                <a href="{{route('cost_and_budgeting.index')}}" class="menu-link">
-                  <i class="menu-icon ri-file-edit-line"></i>
-                  <div data-i18n="Basic">Requisitions</div>
-                </a>
-            </li>
+            @can('view-cost-budgeting-requisition')
+              <li class="menu-header mt-7">
+                <span class="menu-header-text">Cost &amp; Budgeting</span>
+              </li>
+              <!-- Apps -->
+              <li  @class(['menu-item', 'active' => request()->routeIs('cost_and_budgeting.*')])>
+                  <a href="{{route('cost_and_budgeting.index')}}" class="menu-link">
+                    <i class="menu-icon ri-file-edit-line"></i>
+                    <div data-i18n="Basic">Requisitions</div>
+                  </a>
+              </li>
+            @endcan
 
-            <li class="menu-header mt-7">
-              <span class="menu-header-text">Cheque Processing</span>
-            </li>
-            <!-- Apps -->
-            <li  @class(['menu-item', 'active' => request()->routeIs('accounts_requisitions.*')])>
-                <a href="{{route('accounts_requisitions.index')}}" class="menu-link">
-                  <i class="menu-icon ri-file-edit-line"></i>
-                  <div data-i18n="Basic">Requisitions</div>
-                </a>
-            </li>
+
+            @can('view-cheque-dispatch-requisition')
+              <li class="menu-header mt-7">
+                <span class="menu-header-text">Cheque Processing</span>
+              </li>
+              <!-- Apps -->
+              <li  @class(['menu-item', 'active' => request()->routeIs('accounts_requisitions.*')])>
+                  <a href="{{route('accounts_requisitions.index')}}" class="menu-link">
+                    <i class="menu-icon ri-file-edit-line"></i>
+                    <div data-i18n="Basic">Requisitions</div>
+                  </a>
+              </li>
+            @endcan
               
           </ul>
         </aside>
@@ -164,7 +169,7 @@
                     data-size="large"
                     data-show-count="true"
                     aria-label="Star themeselection/materio-bootstrap-html-admin-template-free on GitHub"
-                    >Guest</a
+                    >{{Auth::user()->name}}</a
                   >
                 </li>
 
@@ -188,45 +193,15 @@
                             </div>
                           </div>
                           <div class="flex-grow-1">
-                            <h6 class="mb-0 small">John Doe</h6>
-                            <small class="text-muted">Admin</small>
+                            <h6 class="mb-0 small">{{Auth::user()->name}}</h6>
+                            <small class="text-muted">{{Auth::user()->department}}</small>
                           </div>
                         </div>
                       </a>
                     </li>
                     <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="ri-user-3-line ri-22px me-2"></i>
-                        <span class="align-middle">My Profile</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="ri-settings-4-line ri-22px me-2"></i>
-                        <span class="align-middle">Settings</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <span class="d-flex align-items-center align-middle">
-                          <i class="flex-shrink-0 ri-file-text-line ri-22px me-3"></i>
-                          <span class="flex-grow-1 align-middle">Billing</span>
-                          <span
-                            class="flex-shrink-0 badge badge-center rounded-pill bg-danger h-px-20 d-flex align-items-center justify-content-center"
-                            >4</span
-                          >
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
                       <div class="d-grid px-4 pt-2 pb-1">
-                        <a class="btn btn-danger d-flex" href="javascript:void(0);">
+                        <a class="btn btn-danger d-flex" href="{{route('logout')}}">
                           <small class="align-middle">Logout</small>
                           <i class="ri-logout-box-r-line ms-2 ri-16px"></i>
                         </a>
