@@ -7,21 +7,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\DataTables;
 
-class AccountsRequisitionController extends Controller
+class VoteControlRequisitionController extends Controller
 {
     public function index()
     {
-        if (Gate::denies('view-cheque-dispatch-requisition')) {
+        if (Gate::denies('view-vote-control-requisitions')) {
             return redirect()->route('/')->with('error', 'You are not authorized to view this page');
         }
-        return view('requisitions.accounts_requisitions');
+        return view('requisitions.vote_control_requisitions');
     }
 
-    public function getAccountsRequisitions()
+    public function getVoteControlRequisitions()
     {
-        $requisitions = Requisition::join('accounts_requisitions', 'requisitions.id', '=', 'accounts_requisitions.requisition_id')
+        $requisitions = Requisition::join('vote_control_requisitions', 'requisitions.id', '=', 'vote_control_requisitions.requisition_id')
             ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
-            ->select('requisitions.*', 'requisitions.item as ItemName', 'departments.name as RequestingUnit', 'accounts_requisitions.id as ar_id', 'accounts_requisitions.is_completed as ar_completed', 'accounts_requisitions.created_at as ar_created_at');
+            ->select('requisitions.*', 'requisitions.item as ItemName', 'departments.name as RequestingUnit', 'vote_control_requisitions.id as ar_id', 'vote_control_requisitions.is_completed as ar_completed', 'vote_control_requisitions.created_at as ar_created_at');
 
         return DataTables::of($requisitions)
             ->filterColumn('RequestingUnit', function ($query, $keyword) {
@@ -33,19 +33,19 @@ class AccountsRequisitionController extends Controller
             ->make(true);
     }
 
-    public function getCompletedAccountsRequisitions()
+    public function getCompletedVoteControlRequisitions()
     {
-        $requisitions = Requisition::join('accounts_requisitions', 'requisitions.id', '=', 'accounts_requisitions.requisition_id')
+        $requisitions = Requisition::join('vote_control_requisitions', 'requisitions.id', '=', 'vote_control_requisitions.requisition_id')
             ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
             ->select(
                 'requisitions.*',
                 'requisitions.item as ItemName',
                 'departments.name as RequestingUnit',
-                'accounts_requisitions.id as ar_id',
-                'accounts_requisitions.is_completed as ar_completed',
-                'accounts_requisitions.created_at as ar_created_at'
+                'vote_control_requisitions.id as ar_id',
+                'vote_control_requisitions.is_completed as ar_completed',
+                'vote_control_requisitions.created_at as ar_created_at'
             )
-            ->where('accounts_requisitions.is_completed', true);
+            ->where('vote_control_requisitions.is_completed', true);
 
         return DataTables::of($requisitions)
             ->filterColumn('RequestingUnit', function ($query, $keyword) {
@@ -57,12 +57,12 @@ class AccountsRequisitionController extends Controller
             ->make(true);
     }
 
-    public function getInProgressAccountsRequisitions()
+    public function getInProgressVoteControlRequisitions()
     {
-        $requisitions = Requisition::join('accounts_requisitions', 'requisitions.id', '=', 'accounts_requisitions.requisition_id')
+        $requisitions = Requisition::join('vote_control_requisitions', 'requisitions.id', '=', 'vote_control_requisitions.requisition_id')
             ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
-            ->select('requisitions.*', 'requisitions.item as ItemName', 'departments.name as RequestingUnit', 'accounts_requisitions.id as ar_id', 'accounts_requisitions.is_completed as ar_completed', 'accounts_requisitions.created_at as ar_created_at')
-            ->where('accounts_requisitions.is_completed', false);
+            ->select('requisitions.*', 'requisitions.item as ItemName', 'departments.name as RequestingUnit', 'vote_control_requisitions.id as ar_id', 'vote_control_requisitions.is_completed as ar_completed', 'vote_control_requisitions.created_at as ar_created_at')
+            ->where('vote_control_requisitions.is_completed', false);
 
         return DataTables::of($requisitions)
             ->filterColumn('RequestingUnit', function ($query, $keyword) {

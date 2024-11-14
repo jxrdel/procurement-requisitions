@@ -12,7 +12,7 @@ class CBRequisitionController extends Controller
 
     public function index()
     {
-        if (Gate::denies('view-cost-budgeting-requisition')) {
+        if (Gate::denies('view-cost-budgeting-requisitions')) {
             return redirect()->route('/')->with('error', 'You are not authorized to view this page');
         }
         return view('requisitions.cost_and_budgeting');

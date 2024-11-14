@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AccountsRequisition extends Model
+class VoteControlRequisition extends Model
 {
+
     protected $fillable = [
         'date_received',
         'date_completed',

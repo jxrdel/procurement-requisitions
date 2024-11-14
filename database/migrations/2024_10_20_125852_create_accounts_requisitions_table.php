@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accounts_requisitions', function (Blueprint $table) {
+        Schema::create('vote_control_requisitions', function (Blueprint $table) {
             $table->id();
             $table->date('date_received');
-            $table->date('date_completed')->nullable();
+            $table->dateTime('date_completed')->nullable();
             $table->boolean('is_completed')->default(false);
             $table->unsignedBigInteger('requisition_id');
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('accounts_requisitions');
+        Schema::dropIfExists('vote_control_requisitions');
     }
 };

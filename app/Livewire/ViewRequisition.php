@@ -2,12 +2,16 @@
 
 namespace App\Livewire;
 
+use App\Mail\NotifyCostBudgeting;
+use App\Mail\NotifyVoteControl;
 use App\Models\CBRequisition;
 use App\Models\Department;
 use App\Models\Requisition;
+use App\Models\Status;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Layout;
@@ -28,15 +32,19 @@ class ViewRequisition extends Component
     public $requisition_status;
     public $requisition_no;
     public $requesting_unit;
-    public $file_number;
+    public $file_no;
     public $item;
     public $source_of_funds;
     public $assigned_to;
-    public $date_sent_ps;
+    public $date_assigned;
+    public $date_sent_dps;
     public $ps_approval;
+    public $vendor_name;
+    public $amount;
+    public $denied_note;
     public $ps_approval_date;
-    public $sent_to_dfa;
-    public $date_sent_dfa;
+    public $sent_to_cb;
+    public $date_sent_cb;
     public $active_pane = 'procurement1';
     public $uploads;
     public $upload;
@@ -58,10 +66,14 @@ class ViewRequisition extends Component
     public $date_sent_ap;
 
     //Accounts
-    public $date_sent_chequeroom;
+    public $batch_no;
+    public $voucher_no;
+    public $date_received_from_vc;
     public $date_of_cheque;
     public $cheque_no;
-    public $date_cheque_forwarded;
+    public $date_sent_chequeprocessing;
+
+    public $date_completed;
 
     public $logdetails;
 
@@ -87,15 +99,20 @@ class ViewRequisition extends Component
         $this->requisition_status = $this->requisition->requisition_status;
         $this->requisition_no = $this->requisition->requisition_no;
         $this->requesting_unit = $this->requisition->requesting_unit;
-        $this->file_number = $this->requisition->file_number;
+        $this->file_no = $this->requisition->file_no;
         $this->item = $this->requisition->item;
         $this->source_of_funds = $this->requisition->source_of_funds;
         $this->assigned_to = $this->requisition->assigned_to;
-        $this->date_sent_ps = $this->requisition->date_sent_ps;
+        $this->date_assigned = $this->requisition->date_assigned;
+        $this->date_sent_dps = $this->requisition->date_sent_dps;
         $this->ps_approval = $this->requisition->ps_approval;
+        $this->vendor_name = $this->requisition->vendor_name;
+        $this->amount = $this->requisition->amount;
+        $this->denied_note = $this->requisition->denied_note;
         $this->ps_approval_date = $this->requisition->ps_approval_date;
-        $this->sent_to_dfa = $this->requisition->sent_to_dfa;
-        $this->date_sent_dfa = $this->requisition->date_sent_dfa;
+        $this->sent_to_cb = $this->requisition->sent_to_cb;
+        $this->date_sent_cb = $this->requisition->date_sent_cb;
+        $this->date_completed = $this->requisition->date_completed;
 
         //Cost & Budgeting
         $this->date_sent_request_mof = $this->requisition->date_sent_request_mof;
@@ -113,10 +130,12 @@ class ViewRequisition extends Component
         $this->date_sent_ap = $this->requisition->date_sent_ap;
 
         //Accounts
-        $this->date_sent_chequeroom = $this->requisition->date_sent_chequeroom;
+        $this->batch_no = $this->requisition->batch_no;
+        $this->voucher_no = $this->requisition->voucher_no;
+        $this->date_received_from_vc = $this->requisition->date_received_from_vc;
         $this->date_of_cheque = $this->requisition->date_of_cheque;
         $this->cheque_no = $this->requisition->cheque_no;
-        $this->date_cheque_forwarded = $this->requisition->date_cheque_forwarded;
+        $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
 
         if ($this->requisition->cost_budgeting_requisition && !$this->requisition->cost_budgeting_requisition->is_completed) {
             $this->active_pane = 'cost_and_budgeting';
@@ -126,8 +145,8 @@ class ViewRequisition extends Component
             $this->active_pane = 'procurement2';
         }
 
-        if ($this->requisition->accounts_requisition) {
-            $this->active_pane = 'accounts';
+        if ($this->requisition->vote_control_requisition) {
+            $this->active_pane = 'votecontrol';
         }
     }
 
@@ -138,20 +157,24 @@ class ViewRequisition extends Component
         }
 
         Requisition::where('id', $this->requisition->id)->update([
-            'requisition_status' => $this->requisition_status,
             'requisition_no' => $this->requisition_no,
             'requesting_unit' => $this->requesting_unit,
-            'file_number' => $this->file_number,
+            'file_no' => $this->file_no,
             'item' => $this->item,
             'source_of_funds' => $this->source_of_funds,
             'assigned_to' => $this->assigned_to,
-            'date_sent_ps' => $this->date_sent_ps,
+            'date_sent_dps' => $this->date_sent_dps,
             'ps_approval' => $this->ps_approval,
             'ps_approval_date' => $this->ps_approval_date,
-            'updated_by' => Auth::user()->name,
+            'vendor_name' => $this->vendor_name,
+            'amount' => $this->amount,
+            'denied_note' => $this->denied_note,
+            'updated_by' => Auth::user()->username,
         ]);
 
-        $this->setRequisitionStatus();
+        if (!$this->requisition->cost_budgeting_requisition) {
+            $this->setRequisitionStatus();
+        }
 
         $this->isEditingProcurement1 = false;
         $this->resetValidation();
@@ -165,36 +188,36 @@ class ViewRequisition extends Component
         $reqvalidator = Validator::make([
             'requisition_no' => $this->requisition_no,
             'requesting_unit' => $this->requesting_unit,
-            'file_number' => $this->file_number,
+            'file_no' => $this->file_no,
             'item' => $this->item,
             'assigned_to' => $this->assigned_to,
-            'date_sent_ps' => $this->date_sent_ps,
+            'date_sent_dps' => $this->date_sent_dps,
             'ps_approval' => $this->ps_approval,
-            // 'sent_to_dfa' => $this->sent_to_dfa,
-            // 'date_sent_dfa' => $this->date_sent_dfa,
+            // 'sent_to_cb' => $this->sent_to_cb,
+            // 'date_sent_cb' => $this->date_sent_cb,
         ], [
             'requisition_no' => 'required',
             'requesting_unit' => 'required',
-            'file_number' => 'required',
+            'file_no' => 'required',
             'item' => 'required',
             'assigned_to' => 'required',
-            'date_sent_ps' => 'nullable|date|before_or_equal:today',
-            // 'date_sent_dfa' => 'nullable|sometimes|after:date_sent_ps',
+            'date_sent_dps' => 'nullable|date|before_or_equal:today',
+            // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
         ])
             ->after(function ($validator) {
-                // Ensure 'ps_approval' is not 'Not Sent' if 'date_sent_ps' is populated
-                if ($this->date_sent_ps !== null && $this->ps_approval === 'Not Sent') {
-                    $validator->errors()->add('ps_approval', 'PS approval cannot be "Not Sent" if the date sent to PS is populated.');
+                // Ensure 'ps_approval' is not 'Not Sent' if 'date_sent_dps' is populated
+                if ($this->date_sent_dps !== null && $this->ps_approval === 'Not Sent') {
+                    $validator->errors()->add('ps_approval', 'PS approval cannot be "Not Sent" if the Date sent to DPS is populated.');
                 }
 
-                // Ensure 'date_sent_ps' is not null if 'ps_approval' is not 'Not Sent'
-                if ($this->ps_approval !== 'Not Sent' && $this->date_sent_ps === null) {
-                    $validator->errors()->add('date_sent_ps', 'Date sent to PS cannot be null if PS Approval is set to ' . $this->ps_approval);
+                // Ensure 'date_sent_dps' is not null if 'ps_approval' is not 'Not Sent'
+                if ($this->ps_approval !== 'Not Sent' && $this->date_sent_dps === null) {
+                    $validator->errors()->add('date_sent_dps', 'Date sent to DPS cannot be null if PS Approval is set to ' . $this->ps_approval);
                 }
 
-                // Ensure 'date_sent_dfa' is not null if 'sent_to_dfa' is "Yes"
-                // if ($this->sent_to_dfa === 'Yes' && $this->date_sent_dfa === null) {
-                //     $validator->errors()->add('date_sent_dfa', 'Date sent to DFA cannot be null if sent to DFA is "Yes".');
+                // Ensure 'date_sent_cb' is not null if 'sent_to_cb' is "Yes"
+                // if ($this->sent_to_cb === 'Yes' && $this->date_sent_cb === null) {
+                //     $validator->errors()->add('date_sent_cb', 'Date sent to DFA cannot be null if sent to DFA is "Yes".');
                 // }
             });
 
@@ -212,7 +235,11 @@ class ViewRequisition extends Component
     {
         $status = $this->requisition_status;
 
-        if ($this->ps_approval === 'Not Sent' || $this->ps_approval === 'Pending') {
+        if ($this->ps_approval === 'Not Sent') {
+            $status = 'To be Sent to DPS';
+        }
+
+        if ($this->ps_approval === 'Pending') {
             $status = 'Pending PS Approval';
         }
 
@@ -225,18 +252,18 @@ class ViewRequisition extends Component
         }
 
         if ($this->requisition->cost_budgeting_requisition) {
-            $status = 'Sent to Cost & Budgeting';
+            $status = 'To Be Sent to MoF';
         }
 
         if ($this->requisition->cost_budgeting_requisition && $this->requisition->cost_budgeting_requisition->is_completed) {
             $status = 'Sent to Procurement';
         }
 
-        if ($this->requisition->accounts_requisition) {
-            $status = 'Sent to Cheque Dispatch';
+        if ($this->requisition->vote_control_requisition) {
+            $status = 'Sent to Vote Control';
         }
 
-        if ($this->requisition->accounts_requisition && $this->requisition->accounts_requisition->is_completed) {
+        if ($this->requisition->vote_control_requisition && $this->requisition->vote_control_requisition->is_completed) {
             $status = 'Completed';
         }
 
@@ -261,7 +288,7 @@ class ViewRequisition extends Component
         $this->requisition->file_uploads()->create([
             'file_name' => $filename,
             'file_path' => $path,
-            'uploaded_by' => Auth::user()->name,
+            'uploaded_by' => Auth::user()->username,
         ]);
 
         $this->upload = null;
@@ -276,6 +303,7 @@ class ViewRequisition extends Component
         $upload->delete();
         Storage::delete('public/' . $upload->file_path);
         $this->dispatch('show-message', message: 'File deleted successfully');
+        $this->dispatch('preserveScroll');
     }
 
     public function addLog()
@@ -283,35 +311,51 @@ class ViewRequisition extends Component
 
         $this->requisition->statuslogs()->create([
             'details' => $this->logdetails,
-            'created_by' => Auth::user()->name,
+            'created_by' => Auth::user()->username,
         ]);
 
         $this->dispatch('close-log-modal');
+        $this->dispatch('preserveScroll');
         $this->dispatch('show-message', message: 'Log added successfully');
+    }
+
+    public function deleteLog($id)
+    {
+        $log = Status::find($id);
+        $log->delete();
+        $this->dispatch('show-message', message: 'Log deleted successfully');
+        $this->dispatch('preserveScroll');
     }
     public function getIsSendCBButtonDisabledProperty()
     {
         return $this->requisition_no === null || trim($this->requisition_no) === '' ||
             $this->requesting_unit === null || trim($this->requesting_unit) === '' ||
-            $this->file_number === null || trim($this->file_number) === '' ||
+            $this->file_no === null || trim($this->file_no) === '' ||
             $this->item === null || trim($this->item) === '' ||
             $this->assigned_to === null || trim($this->assigned_to) === '' ||
-            $this->date_sent_ps === null || trim($this->date_sent_ps) === '' ||
+            $this->date_sent_dps === null || trim($this->date_sent_dps) === '' ||
             $this->ps_approval === null || $this->ps_approval !== 'Approved';
     }
 
-
-    public function getFormattedDateSentDfa()
+    public function getFormattedDateAssigned()
     {
-        if ($this->date_sent_dfa) {
-            return Carbon::parse($this->date_sent_dfa)->format('F jS, Y');
+        if ($this->date_assigned) {
+            return Carbon::parse($this->date_assigned)->format('F jS, Y');
+        }
+    }
+
+
+    public function getFormattedDateSentCB()
+    {
+        if ($this->date_sent_cb) {
+            return Carbon::parse($this->date_sent_cb)->format('F jS, Y');
         }
     }
 
     public function getFormattedDateSentPs()
     {
-        if ($this->date_sent_ps) {
-            return Carbon::parse($this->date_sent_ps)->format('F jS, Y');
+        if ($this->date_sent_dps) {
+            return Carbon::parse($this->date_sent_dps)->format('F jS, Y');
         }
     }
 
@@ -319,18 +363,18 @@ class ViewRequisition extends Component
     {
 
         $this->requisition->update([
-            'requisition_status' => $this->requisition_status,
-            'sent_to_dfa' => true,
-            'date_sent_dfa' => Carbon::now(),
-            'updated_by' => Auth::user()->name,
+            'requisition_status' => 'To Be Sent to MoF',
+            'sent_to_cb' => true,
+            'date_sent_cb' => Carbon::now(),
+            'updated_by' => Auth::user()->username,
         ]);
 
         $this->requisition->cost_budgeting_requisition()->create([
             'date_received' => Carbon::now(),
         ]);
 
-        $this->setRequisitionStatus();
-        //Send email to DFA
+        //Send email to Cost & Budgeting
+        // Mail::to('jardel.regis@health.gov.tt')->send(new NotifyCostBudgeting($this->requisition));
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
     }
@@ -348,6 +392,13 @@ class ViewRequisition extends Component
     {
         if ($this->release_date) {
             return Carbon::parse($this->release_date)->format('F jS, Y');
+        }
+    }
+
+    public function getDateCompletedCB()
+    {
+        if ($this->requisition->cost_budgeting_requisition && $this->requisition->cost_budgeting_requisition->is_completed) {
+            return Carbon::parse($this->requisition->cost_budgeting_requisition->date_completed)->format('F jS, Y');
         }
     }
 
@@ -393,19 +444,54 @@ class ViewRequisition extends Component
 
     public function editProcurement2()
     {
+        if ($this->eta === '') {
+            $this->eta = null;
+        }
+
+        if ($this->date_sent_commit === '') {
+            $this->date_sent_commit = null;
+        }
+
+        if ($this->date_invoice_received === '') {
+            $this->date_invoice_received = null;
+        }
+
+        if ($this->date_sent_ap === '') {
+            $this->date_sent_ap = null;
+        }
+
+        $status = $this->requisition_status;
+
+        $this->validate([
+            'eta' => 'nullable|date|after_or_equal:today',
+            'date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->cost_budgeting_requisition->date_completed,
+            // 'date_invoice_received' => 'required|date|after_or_equal:today',
+            // 'date_sent_ap' => 'nullable|date|after_or_equal:date_sent_commit',
+        ]);
+
+        if (!$this->requisition->vote_control_requisition) {
+            if ($this->purchase_order_no && $this->eta && $this->date_sent_commit && !$this->invoice_no && !$this->date_invoice_received && !$this->date_sent_ap) {
+                $status = 'Awaiting Invoice';
+            } elseif ($this->purchase_order_no && $this->eta && $this->date_sent_commit && $this->invoice_no && $this->date_invoice_received && !$this->date_sent_ap) {
+                $status = 'To Be Sent to AP';
+            } elseif ($this->purchase_order_no && $this->eta && $this->date_sent_commit && $this->invoice_no && $this->date_invoice_received && $this->date_sent_ap && !$this->requisition->vote_control_requisition) {
+                $status = 'To Be Sent to AP';
+            }
+        }
+
 
         $this->requisition->update([
-            'requisition_status' => $this->requisition_status,
+            'requisition_status' => $status,
             'purchase_order_no' => $this->purchase_order_no,
             'eta' => $this->eta,
             'date_sent_commit' => $this->date_sent_commit,
             'invoice_no' => $this->invoice_no,
             'date_invoice_received' => $this->date_invoice_received,
             'date_sent_ap' => $this->date_sent_ap,
-            'updated_by' => Auth::user()->name,
+            'updated_by' => Auth::user()->username,
         ]);
 
-        $this->setRequisitionStatus();
+        // $this->setRequisitionStatus();
 
         $this->isEditingProcurement2 = false;
         $this->resetValidation();
@@ -416,28 +502,26 @@ class ViewRequisition extends Component
     {
 
         $this->requisition->update([
-            'requisition_status' => $this->requisition_status,
-            'updated_by' => Auth::user()->name,
+            'requisition_status' => 'Sent to Vote Control',
+            'updated_by' => Auth::user()->username,
         ]);
 
-        $this->requisition->accounts_requisition()->create([
+        $this->requisition->vote_control_requisition()->create([
             'date_received' => Carbon::now(),
         ]);
 
-        $this->setRequisitionStatus();
-
         //Send email to Accounts
+        // Mail::to('jardel.regis@health.gov.tt')->send(new NotifyVoteControl($this->requisition));
 
-        return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cheque Dispatch');
+        return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Vote Control');
     }
 
     //Accounts
 
-
     public function getFormattedDateSentChequeroom()
     {
-        if ($this->date_sent_chequeroom) {
-            return Carbon::parse($this->date_sent_chequeroom)->format('F jS, Y');
+        if ($this->date_received_from_vc) {
+            return Carbon::parse($this->date_received_from_vc)->format('F jS, Y');
         }
     }
 
@@ -450,8 +534,17 @@ class ViewRequisition extends Component
 
     public function getFormattedDateChequeForwarded()
     {
-        if ($this->date_cheque_forwarded) {
-            return Carbon::parse($this->date_cheque_forwarded)->format('F jS, Y');
+        if ($this->date_sent_chequeprocessing) {
+            return Carbon::parse($this->date_sent_chequeprocessing)->format('F jS, Y');
+        }
+    }
+
+    public function updating($name, $value)
+    {
+        if ($name == 'requesting_unit' || $name == 'upload') {
+            $this->skipRender();
+        } else {
+            $this->dispatch('preserveScroll');
         }
     }
 }

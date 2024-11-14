@@ -20,19 +20,41 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //Gives ICT access for all gates
+        //Gives Super Admins access for all gates
         Gate::before(function ($user, $ability) {
-            if ($user->department === 'ICT') {
+            if ($user->role->name === 'Super Admin') {
                 return true;
             }
         });
 
-        Gate::define('view-cost-budgeting-requisition', function ($user) {
+        Gate::define('delete-records', function ($user) {
+            return $user->role->name === 'Admin';
+        });
+
+        Gate::define('view-procurement-requisitions', function ($user) {
+            return $user->department === 'Procurement';
+        });
+
+        Gate::define('view-cost-budgeting-requisitions', function ($user) {
             return $user->department === 'Cost & Budgeting';
         });
 
-        Gate::define('view-cheque-dispatch-requisition', function ($user) {
-            return $user->department === 'Cheque Dispatch';
+        Gate::define('view-vote-control-requisitions', function ($user) {
+            return $user->department === 'Vote Control';
+        });
+
+        Gate::define('view-check-room-requisitions', function ($user) {
+            return $user->department === 'Check Room';
+        });
+
+        Gate::define('view-cheque-processing-requisitions', function ($user) {
+            return $user->department === 'Cheque Processing';
+        });
+
+        Gate::define('view-users-page', function ($user) {
+            if ($user->role->name === 'Admin') {
+                return true;
+            }
         });
     }
 }

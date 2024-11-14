@@ -2,7 +2,7 @@
 <div class="card p-7">
     <!-- Logo -->
     <div class="app-brand justify-content-center mt-5">
-      <a href="index.html" class="app-brand-link gap-3">
+      <a href="/" class="app-brand-link gap-3">
         <span class="app-brand-logo demo">
             <i class="ri-contract-fill fs-2"></i>
         <span class="app-brand-text demo text-heading fw-semibold fs-4">Procurement Requisitions System</span>
@@ -23,6 +23,9 @@
             placeholder="firstname.lastname"
             autofocus />
           <label for="email">Username</label>
+          
+          @error('username')<div class="text-danger text-center"> {{ $message }} </div>@enderror
+
         </div>
         <div class="mb-5">
           <div class="form-password-toggle">
@@ -33,14 +36,15 @@
                     wire:model="password"
                     type="password"
                     id="password"
-                    class="form-control"
+                    class="form-control @error('password')is-invalid @enderror"
                     name="password"
                     placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                     aria-describedby="password" />
                 <label for="password">Password</label>
               </div>
-              <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
+              <span wire:ignore class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
             </div>
+            @error('password')<div class="text-danger text-center"> {{ $message }} </div>@enderror
           </div>
         </div>
         

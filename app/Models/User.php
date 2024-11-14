@@ -20,11 +20,18 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
         'department',
+        'role_id'
     ];
 
     public function scopeProcurement($query)
     {
         return $query->where('department', 'Procurement');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 }

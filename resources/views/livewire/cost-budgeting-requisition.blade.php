@@ -1,109 +1,104 @@
-<div x-data="{ isEditing: $wire.entangle('isEditing')  }" x-cloak>
+<div x-data="{ isEditing: $wire.entangle('isEditing') }" x-cloak>
     <div class="card">
         <div class="card-body">
-                    
+
             <div class="d-sm-flex align-items-center justify-content-between mb-5">
-                <a href="{{route('cost_and_budgeting.index')}}" class="btn btn-primary">
+                <a href="{{ route('cost_and_budgeting.index') }}" class="btn btn-primary">
                     <i class="ri-arrow-left-circle-line me-1"></i> Back
                 </a>
                 <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
-                    <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i> {{$this->requisition->requisition_no}}</strong>
+                    <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i>
+                        {{ $this->requisition->requisition_no }}</strong>
                 </h1>
             </div>
+
+            <div class="row mt-2">
+
+                <div class="col mx-5">
+                    <label><strong>Date Received:</strong> {{ $this->getDateSentCB() }}</label>
+                </div>
+            </div>
+
             <div x-show="isEditing">
                 <form wire:submit.prevent="edit">
                     <div id="inputForm">
-                        <div class="row mt-7">
-                    
+                        <div class="row mt-8">
+
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input
-                                    autocomplete="off"
-                                    wire:model="date_sent_request_mof"
-                                    type="date"
-                                    class="form-control @error('date_sent_request_mof')is-invalid @enderror"
-                                    id="floatingInput"
-                                    {{-- placeholder="File Number" --}}
-                                    aria-describedby="floatingInputHelp" />
+                                    <input autocomplete="off" wire:model="date_sent_request_mof" type="date"
+                                        class="form-control @error('date_sent_request_mof')is-invalid @enderror"
+                                        id="floatingInput" {{-- placeholder="File Number" --}} aria-describedby="floatingInputHelp" />
                                     <label for="floatingInput">Date Request Sent to Ministry of Finance</label>
                                 </div>
-                                @error('date_sent_request_mof')<div class="text-danger"> {{ $message }} </div>@enderror
+                                @error('date_sent_request_mof')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
                             </div>
-                
+
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input
-                                    autocomplete="off"
-                                    wire:model="request_no"
-                                    type="text"
-                                    class="form-control @error('request_no')is-invalid @enderror"
-                                    id="floatingInput"
-                                    placeholder="Request Number"
-                                    aria-describedby="floatingInputHelp" />
+                                    <input autocomplete="off" wire:model="request_no" type="text"
+                                        class="form-control @error('request_no')is-invalid @enderror" id="floatingInput"
+                                        placeholder="Request Number" aria-describedby="floatingInputHelp" />
                                     <label for="floatingInput">Request Number</label>
                                 </div>
-                                @error('request_no')<div class="text-danger"> {{ $message }} </div>@enderror
+                                @error('request_no')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
                             </div>
                         </div>
-                        
-                                
+
+
                         <div class="row mt-7">
-                
+
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input
-                                    autocomplete="off"
-                                    wire:model="release_no"
-                                    type="text"
-                                    class="form-control @error('release_no')is-invalid @enderror"
-                                    id="floatingInput"
-                                    placeholder="Release Number"
-                                    aria-describedby="floatingInputHelp" />
+                                    <input autocomplete="off" wire:model="release_no" type="text"
+                                        class="form-control @error('release_no')is-invalid @enderror" id="floatingInput"
+                                        placeholder="Release Number" aria-describedby="floatingInputHelp" />
                                     <label for="floatingInput">Release Number</label>
                                 </div>
-                                @error('release_no')<div class="text-danger"> {{ $message }} </div>@enderror
+                                @error('release_no')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
                             </div>
-                    
+
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input
-                                    autocomplete="off"
-                                    wire:model="release_date"
-                                    type="date"
-                                    class="form-control @error('release_date')is-invalid @enderror"
-                                    id="floatingInput"
-                                    {{-- placeholder="File Number" --}}
-                                    aria-describedby="floatingInputHelp" />
+                                    <input autocomplete="off" wire:model="release_date" type="date"
+                                        class="form-control @error('release_date')is-invalid @enderror"
+                                        id="floatingInput" {{-- placeholder="File Number" --}} aria-describedby="floatingInputHelp" />
                                     <label for="floatingInput">Release Date</label>
                                 </div>
-                                @error('release_date')<div class="text-danger"> {{ $message }} </div>@enderror
+                                @error('release_date')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
                             </div>
-            
+
                         </div>
                         <div class="row mt-7">
-                
+
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input
-                                    autocomplete="off"
-                                    wire:model="change_of_vote_no"
-                                    type="text"
-                                    class="form-control @error('change_of_vote_no')is-invalid @enderror"
-                                    id="floatingInput"
-                                    placeholder="Change of Vote Number"
-                                    aria-describedby="floatingInputHelp" />
+                                    <input autocomplete="off" wire:model="change_of_vote_no" type="text"
+                                        class="form-control @error('change_of_vote_no')is-invalid @enderror"
+                                        id="floatingInput" placeholder="Change of Vote Number"
+                                        aria-describedby="floatingInputHelp" />
                                     <label for="floatingInput">Change of Vote Number</label>
                                 </div>
-                                @error('change_of_vote_no')<div class="text-danger"> {{ $message }} </div>@enderror
+                                @error('change_of_vote_no')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
                             </div>
-                    
+
                             <div class="col">
                             </div>
-            
+
                         </div>
-    
+
                         <div class="row">
-                            
+
                             <button class="btn btn-primary waves-effect waves-light mx-auto mt-5" style="width:100px">
                                 <span class="tf-icons ri-save-3-line me-1_5"></span>Save
                             </button>
@@ -112,60 +107,172 @@
                 </form>
             </div>
 
-            
+
             <div x-show="!isEditing">
                 <div class="row mt-8">
-                                    
+
                     <div class="col mx-5">
-                        <label><strong>Date Request Sent to Ministry of Finance: </strong>{{$this->getFormattedDateSentMOF()}}</label>
+                        <label><strong>Date Request Sent to Ministry of Finance:
+                            </strong>{{ $this->getFormattedDateSentMOF() }}</label>
                     </div>
-            
+
                     <div class="col mx-5">
-                        <label><strong>Request Number:</strong> {{$this->request_no}}</label>
+                        <label><strong>Request Number:</strong> {{ $this->request_no }}</label>
                     </div>
                 </div>
-                    
+
                 <div class="row mt-7">
-                                    
+
                     <div class="col mx-5">
-                        <label><strong>Release Number:</strong> {{$this->release_no}}</label>
+                        <label><strong>Release Number:</strong> {{ $this->release_no }}</label>
                     </div>
-            
+
                     <div class="col mx-5">
-                        <label><strong>Release Date:</strong> {{$this->getFormattedReleaseDate()}}</label>
+                        <label><strong>Release Date:</strong> {{ $this->getFormattedReleaseDate() }}</label>
                     </div>
-            
+
                 </div>
-            
+
                 <div class="row mt-7">
-                                    
+
                     <div class="col mx-5">
-                        <label><strong>Change of Vote Number:</strong> {{$this->change_of_vote_no}}</label>
+                        <label><strong>Change of Vote Number:</strong> {{ $this->change_of_vote_no }}</label>
                     </div>
-            
+
                     <div class="col mx-5">
                     </div>
-                    
+
                 </div>
-                
+
                 <div class="row text-center">
                     <div>
-                        <button type="button" @click="isEditing = true" class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                        <button type="button" @click="isEditing = true" class="btn btn-dark waves-effect waves-light"
+                            style="width: 100px">
                             <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
                         </button>
                         &nbsp;
                         @if (!$this->cb_requisition->is_completed)
-                        <button @disabled($this->isButtonDisabled) 
-                            wire:confirm="Are you sure you want to send to procurement?"
-                            wire:click="sendToProcurement"
-                            class="btn btn-success waves-effect waves-light" style="width:220px">
-                            <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Procurement
-                        </button>
-                            
+                            <button @disabled($this->isButtonDisabled)
+                                wire:confirm="Are you sure you want to send to procurement?"
+                                wire:loading.attr="disabled" wire:click="sendToProcurement"
+                                class="btn btn-success waves-effect waves-light" style="width:250px">
+                                <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Procurement
+
+                                <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
+                                    role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </button>
                         @endif
                     </div>
                 </div>
-                
+
+            </div>
+
+
+            <div class="accordion mt-8" id="accordionExample" style="margin-top: 15px">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Requisition Details
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse hide"
+                        data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+
+                            <div>
+                                <div class="row mt-8">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Requisition Number:
+                                            </strong>{{ $this->requisition_no }}</label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Requesting Unit:</strong>
+                                            {{ $this->requisition->department->name }}</label>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>File Number / Form:</strong> {{ $this->file_no }}</label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Item:</strong> {{ $this->item }}</label>
+                                    </div>
+
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Source of Funds:</strong>
+                                            {{ $this->source_of_funds }}</label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Assigned To:</strong>
+                                            {{ $this->requisition->procurement_officer->name }}</label>
+                                    </div>
+
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Assigned to Officer:</strong>
+                                            {{ $this->getFormattedDateAssigned() }}</label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date sent to DPS:</strong>
+                                            {{ $this->getFormattedDateSentPs() }}</label>
+                                    </div>
+
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>PS Approval:</strong>
+                                            @if ($this->ps_approval == 'Pending')
+                                                <span class="badge rounded-pill bg-danger fs-6">Pending</span>
+                                            @else
+                                                {{ $this->ps_approval }}
+                                            @endif
+                                        </label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Sent to Cost & Budgeting:</strong>
+                                            {{ $this->getDateSentCB() }}</label>
+                                    </div>
+
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Vendor Name:</strong> {{ $this->vendor_name }}</label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Amount:</strong> {{ $this->amount }}</label>
+                                    </div>
+
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
