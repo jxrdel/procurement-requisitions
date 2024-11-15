@@ -2,8 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Mail\NotifyChequeProcessing;
 use App\Models\CheckRoomRequisition;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
 class ViewCheckRoomRequisition extends Component
@@ -167,6 +170,12 @@ class ViewCheckRoomRequisition extends Component
         $this->requisition->cheque_processing_requisition()->create([
             'date_received' => Carbon::now(),
         ]);
+
+        //Get Cheque Processing Staff
+        $chequeProcessingStaff = User::chequeProcessing()->get();
+        foreach ($chequeProcessingStaff as $staff) {
+            Mail::to($staff->email)->send(new NotifyChequeProcessing($this->requisition));
+        }
 
         return redirect()->route('check_room.index')->with('success', 'Requisition sent to Cheque Processing successfully');
     }

@@ -558,7 +558,7 @@
                                             <button @disabled($this->isButtonProcurement2Disabled)
                                                 wire:confirm="Are you sure you want to send to vote control?"
                                                 wire:loading.attr="disabled" type="button"
-                                                wire:click="sendToAccounts"
+                                                wire:click="sendToVoteControl"
                                                 class="btn btn-success waves-effect waves-light m-auto"
                                                 style="width: 300px">
                                                 <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Vote

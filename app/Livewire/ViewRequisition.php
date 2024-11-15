@@ -388,7 +388,13 @@ class ViewRequisition extends Component
         ]);
 
         //Send email to Cost & Budgeting
-        // Mail::to('jardel.regis@health.gov.tt')->send(new NotifyCostBudgeting($this->requisition));
+
+        //Get Cost & Budgeting users
+        $users = User::costBudgeting()->get();
+
+        foreach ($users as $user) {
+            Mail::to($user->email)->send(new NotifyCostBudgeting($this->requisition));
+        }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
     }
@@ -512,7 +518,7 @@ class ViewRequisition extends Component
         $this->dispatch('show-message', message: 'Requisition edited successfully');
     }
 
-    public function sendToAccounts()
+    public function sendToVoteControl()
     {
 
         $this->requisition->update([
@@ -524,8 +530,14 @@ class ViewRequisition extends Component
             'date_received' => Carbon::now(),
         ]);
 
-        //Send email to Accounts
-        // Mail::to('jardel.regis@health.gov.tt')->send(new NotifyVoteControl($this->requisition));
+        //Send email to Vote Control
+
+        //Get Vote Control users
+        $users = User::voteControl()->get();
+
+        foreach ($users as $user) {
+            Mail::to($user->email)->send(new NotifyVoteControl($this->requisition));
+        }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Vote Control');
     }

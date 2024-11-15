@@ -27,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
+        Gate::define('change-finance-year', function ($user) {
+            return $user->role->name === 'Admin';
+        });
+
         Gate::define('delete-records', function ($user) {
             return $user->role->name === 'Admin';
         });

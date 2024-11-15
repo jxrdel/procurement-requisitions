@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Mail\CostBudgetingCompleted;
 use App\Models\CBRequisition;
 use App\Models\Requisition;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
@@ -175,7 +176,9 @@ class CostBudgetingRequisition extends Component
             'date_completed' => Carbon::now(),
         ]);
 
-        // Mail::to('jardel.regis@health.gov.tt')->send(new CostBudgetingCompleted($this->requisition));
+        //Get assigned user
+        $user = $this->requisition->procurement_officer;
+        Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->send(new CostBudgetingCompleted($this->requisition));
 
         return redirect()->route('cost_and_budgeting.index')->with('success', 'Requisition sent to procurement successfully');
     }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\CurrentFinancialYear;
 use App\Models\Department;
 use App\Models\Requisition;
 use App\Models\User;
@@ -45,7 +46,7 @@ class CreateRequisition extends Component
 
     public function mount()
     {
-        $this->requisition_no = Requisition::generateRequisitionNo();
+        $this->requisition_no = CurrentFinancialYear::generateRequisitionNo();
         $this->departments = Department::all();
         $this->staff = User::procurement()->get();
         $this->votes = Vote::all();
@@ -91,7 +92,7 @@ class CreateRequisition extends Component
 
         $newrequisition = Requisition::create([
             'requisition_status' => $this->requisition_status,
-            'requisition_no' => Requisition::generateRequisitionNo(),
+            'requisition_no' => CurrentFinancialYear::generateRequisitionNo(),
             'requesting_unit' => $this->requesting_unit,
             'file_no' => $this->file_no,
             'item' => $this->item,

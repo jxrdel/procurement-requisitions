@@ -2,9 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Mail\NotifyCheckRoom;
 use App\Mail\RequisitionCompleted;
 use App\Models\VoteControlRequisition;
 use App\Models\Requisition;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
@@ -130,24 +132,6 @@ class ViewVoteControlRequisition extends Component
         $this->vc_requisition = $this->vc_requisition->fresh();
     }
 
-    public function completeRequisition()
-    {
-        $this->vc_requisition->update([
-            'is_completed' => true,
-            'date_completed' => now(),
-        ]);
-
-        $this->requisition->update([
-            'requisition_status' => 'Completed',
-            'is_completed' => true,
-            'date_completed' => now(),
-        ]);
-
-        // Mail::to('jardel.regis@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
-
-        return redirect()->route('vote_control.index')->with('success', 'Requisition completed successfully');
-    }
-
     public function sendToCheckRoom()
     {
         $this->vc_requisition->update([
@@ -162,6 +146,12 @@ class ViewVoteControlRequisition extends Component
         $this->requisition->update([
             'requisition_status' => 'Sent to Check Room',
         ]);
+
+        //Get Emails of Check Staff
+        $checkStaff = User::checkStaff()->get();
+        foreach ($checkStaff as $staff) {
+            Mail::to($staff->email)->send(new NotifyCheckRoom($this->requisition));
+        }
 
         return redirect()->route('vote_control.index')->with('success', 'Requisition sent to Check Room successfully');
     }

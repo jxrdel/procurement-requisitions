@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CurrentFinancialYear;
 use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
@@ -277,5 +278,8 @@ class DatabaseSeeder extends Seeder
         foreach ($votes as $vote) {
             Vote::create($vote);
         }
+
+        //Set financial year
+        CurrentFinancialYear::create(['name' => '24/25']);
     }
 }
