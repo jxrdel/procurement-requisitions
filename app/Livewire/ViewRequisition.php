@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\Requisition;
 use App\Models\Status;
 use App\Models\User;
+use App\Models\Vote;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -80,6 +81,7 @@ class ViewRequisition extends Component
     public $departments;
     public $staff;
     public $logs;
+    public $votes;
 
 
     public function render()
@@ -93,9 +95,13 @@ class ViewRequisition extends Component
     {
         $this->today = Carbon::now()->format('Y-m-d');
         $this->departments = Department::all();
+        $this->votes = Vote::all();
         $this->staff = User::procurement()->get();
 
         $this->requisition = Requisition::find($id);
+        if (!$this->requisition) {
+            return abort(404);
+        }
         $this->requisition_status = $this->requisition->requisition_status;
         $this->requisition_no = $this->requisition->requisition_no;
         $this->requesting_unit = $this->requisition->requesting_unit;
@@ -147,6 +153,14 @@ class ViewRequisition extends Component
 
         if ($this->requisition->vote_control_requisition) {
             $this->active_pane = 'votecontrol';
+        }
+
+        if ($this->requisition->vote_control_requisition && $this->requisition->vote_control_requisition->is_completed) {
+            $this->active_pane = 'checkroom';
+        }
+
+        if ($this->requisition->check_room_requisition && $this->requisition->check_room_requisition->is_completed) {
+            $this->active_pane = 'chequeprocessing';
         }
     }
 
@@ -541,10 +555,17 @@ class ViewRequisition extends Component
 
     public function updating($name, $value)
     {
-        if ($name == 'requesting_unit' || $name == 'upload') {
+        if ($name == 'requesting_unit' || $name == 'upload' || $name == 'source_of_funds') {
             $this->skipRender();
         } else {
             $this->dispatch('preserveScroll');
+        }
+    }
+
+    public function getFormattedDate($date)
+    {
+        if ($date !== null) {
+            return Carbon::parse($date)->format('F jS, Y');
         }
     }
 }

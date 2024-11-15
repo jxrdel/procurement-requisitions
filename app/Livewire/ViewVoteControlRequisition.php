@@ -26,6 +26,11 @@ class ViewVoteControlRequisition extends Component
     public function mount($id)
     {
         $this->vc_requisition = VoteControlRequisition::find($id);
+
+        if (!$this->vc_requisition) {
+            return abort(404);
+        }
+
         $this->requisition = $this->vc_requisition->requisition;
 
         $this->batch_no = $this->requisition->batch_no;

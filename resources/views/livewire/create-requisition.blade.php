@@ -79,11 +79,16 @@
                 <div class="row mt-6">
 
                     <div class="col-md-6">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="source_of_funds" type="text"
-                                class="form-control @error('source_of_funds')is-invalid @enderror" id="floatingInput"
-                                placeholder="Source of Funds" aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Source of Funds</label>
+                        <div wire:ignore>
+                            <label style="width:100%" for="sofSelect">Source of Funds:</label>
+
+                            <select class="js-example-basic-single form-control" id="sofSelect" style="width: 100%">
+                                <option value="" selected>Select a Vote</option>
+                                @foreach ($votes as $vote)
+                                    <option value="{{ $vote->number }}">{{ $vote->number }}</option>
+                                @endforeach
+
+                            </select>
                         </div>
                         @error('source_of_funds')
                             <div class="text-danger"> {{ $message }} </div>
@@ -287,14 +292,18 @@
 @script
     <script>
         $(document).ready(function() {
-            // Initialize select2
-
-
             $('#unitSelect').select2();
 
             $('#unitSelect').on('change', function() {
                 var selectedValue = $(this).val(); // Get selected values as an array
                 $wire.set('requesting_unit', selectedValue); // Pass selected values to Livewire
+            });
+
+            $('#sofSelect').select2();
+
+            $('#sofSelect').on('change', function() {
+                var selectedValue = $(this).val(); // Get selected values as an array
+                $wire.set('source_of_funds', selectedValue); // Pass selected values to Livewire
             });
         });
 

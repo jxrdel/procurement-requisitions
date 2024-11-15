@@ -28,7 +28,7 @@ class NotifyCostBudgeting extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Requisition | Procurement Requisition System',
+            subject: 'Incoming Requisition | Procurement Requisition Application',
         );
     }
 

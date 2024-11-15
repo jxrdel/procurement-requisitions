@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RequisitionCompleted extends Mailable
+class NotifyChequeProcessing extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -28,7 +28,7 @@ class RequisitionCompleted extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Requisition Completed | Procurement Requisition Application',
+            subject: 'Incoming Requisition | Procurement Requisition Application',
         );
     }
 
@@ -38,10 +38,10 @@ class RequisitionCompleted extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.requisition-completed',
+            markdown: 'emails.sent-to-cheque-processing',
             with: [
                 'requisiton' => $this->requisition,
-                'url' => route('requisitions.view', $this->requisition->id),
+                'url' => route('cheque_processing.view', $this->requisition->cheque_processing_requisition->id),
             ]
         );
     }

@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Requisition;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\DataTables;
 
 class ChequeProcessingController extends Controller
 {
     public function index()
     {
+        if (Gate::denies('view-cheque-processing-requisitions')) {
+            return redirect()->route('/')->with('error', 'You do not have permission to view this page');
+        }
         return view('requisitions.cheque-processing');
     }
 

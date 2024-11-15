@@ -44,6 +44,7 @@
                 <thead>
                     <tr>
                         <th>Requisition #</th>
+                        <th>Vote Number</th>
                         <th>Requesting Unit</th>
                         <th>Assigned To</th>
                         <th style="text-align: center">Status</th>
@@ -82,6 +83,10 @@
                 "columns": [{
                         data: 'requisition_no',
                         name: 'requisition_no'
+                    },
+                    {
+                        data: 'source_of_funds',
+                        name: 'source_of_funds'
                     },
                     {
                         data: 'RequestingUnit',

@@ -141,7 +141,71 @@ class DatabaseSeeder extends Seeder
                 'username' => 'kevin.badal',
                 'department' => 'Procurement',
                 'role_id' => 3,
-            ]
+            ],
+            [
+                'name' => 'Crystal Ann Sahibram-Bickram',
+                'email' => 'crystal.bickram@health.gov.tt',
+                'username' => 'crystal.bickram',
+                'department' => 'Cost & Budgeting',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Kamanie Alexander',
+                'email' => 'kamanie.alexander@health.gov.tt',
+                'username' => 'kamanie.alexander',
+                'department' => 'Cost & Budgeting',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Salisha Shah',
+                'email' => 'salisha.shah@health.gov.tt',
+                'username' => 'salisha.shah',
+                'department' => 'Vote Control',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Candise Morris',
+                'email' => 'candise.morris@health.gov.tt',
+                'username' => 'candise.morris',
+                'department' => 'Check Staff',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Cheryl Keen',
+                'email' => 'cheryl.keen@health.gov.tt',
+                'username' => 'cheryl.keen',
+                'department' => 'Check Staff',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Vicky Kissoondath',
+                'email' => 'vicky.kissoondath@health.gov.tt',
+                'username' => 'vicky.kissoondath',
+                'department' => 'Check Staff',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'David Rooplal',
+                'email' => 'david.rooplal@health.gov.tt',
+                'username' => 'david.rooplal',
+                'department' => 'Cheque Processing',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Rohini Lodie',
+                'email' => 'rohini.lodie@health.gov.tt',
+                'username' => 'rohini.lodie',
+                'department' => 'Cheque Processing',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Adrian Rampersad',
+                'email' => 'adrian.rampersad@health.gov.tt',
+                'username' => 'adrian.rampersad',
+                'department' => 'Cheque Processing',
+                'role_id' => 3,
+            ],
+
         ];
 
         foreach ($users as $user) {

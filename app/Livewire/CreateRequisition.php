@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Department;
 use App\Models\Requisition;
 use App\Models\User;
+use App\Models\Vote;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Title;
@@ -40,12 +41,14 @@ class CreateRequisition extends Component
     public $departments;
     public $staff;
     public $logs = [];
+    public $votes;
 
     public function mount()
     {
         $this->requisition_no = Requisition::generateRequisitionNo();
         $this->departments = Department::all();
         $this->staff = User::procurement()->get();
+        $this->votes = Vote::all();
     }
 
 
@@ -192,7 +195,7 @@ class CreateRequisition extends Component
 
     public function updating($name, $value)
     {
-        if ($name == 'requesting_unit' || $name == 'uploads') {
+        if ($name == 'requesting_unit' || $name == 'uploads' || $name == 'source_of_funds') {
             $this->skipRender();
         } else {
             $this->dispatch('preserveScroll');

@@ -26,6 +26,11 @@ class ViewChequeProcessingRequisition extends Component
     public function mount($id)
     {
         $this->cp_requisition = ChequeProcessingRequisition::find($id);
+
+        if (!$this->cp_requisition) {
+            return abort(404);
+        }
+
         $this->requisition = $this->cp_requisition->requisition;
 
         $this->date_cheque_processed = $this->requisition->date_cheque_processed;
@@ -73,6 +78,22 @@ class ViewChequeProcessingRequisition extends Component
         $this->dispatch('show-message', message: 'Record edited successfully');
         $this->requisition = $this->requisition->fresh();
         $this->cp_requisition = $this->cp_requisition->fresh();
+    }
+
+    public function completeRequisition()
+    {
+        $this->cp_requisition->update([
+            'requisition_status' => 'Completed',
+            'is_completed' => true,
+            'date_completed' => Carbon::now(),
+        ]);
+
+        $this->requisition->update([
+            'is_completed' => true,
+            'date_completed' => Carbon::now(),
+        ]);
+
+        return redirect()->route('cheque_processing.index')->with('success', 'Requisition completed successfully');
     }
 
     public function getIsButtonDisabledProperty()

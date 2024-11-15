@@ -7,12 +7,16 @@ use App\Models\Requisition;
 use Carbon\Carbon;
 use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\DataTables;
 
 class CheckRoomController extends Controller
 {
     public function index()
     {
+        if (Gate::denies('view-check-room-requisitions')) {
+            return redirect()->route('/')->with('error', 'You do not have permission to view this page');
+        }
         return view('requisitions.check-room');
     }
 

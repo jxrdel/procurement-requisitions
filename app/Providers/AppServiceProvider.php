@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-check-room-requisitions', function ($user) {
-            return $user->department === 'Check Room';
+            return $user->department === 'Check Staff';
         });
 
         Gate::define('view-cheque-processing-requisitions', function ($user) {

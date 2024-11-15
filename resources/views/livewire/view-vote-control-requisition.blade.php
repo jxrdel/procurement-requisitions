@@ -87,7 +87,7 @@
                         &nbsp;
                         @if (!$this->vc_requisition->is_completed)
                             <button @disabled($this->isButtonDisabled)
-                                wire:confirm="Are you sure you want to complete the requisition?"
+                                wire:confirm="Are you sure you want to send this requisition to Check Room?"
                                 wire:loading.attr="disabled" wire:click="sendToCheckRoom"
                                 class="btn btn-success waves-effect waves-light" style="width:250px">
                                 <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Check Room

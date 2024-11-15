@@ -135,7 +135,7 @@
                                 wire:confirm="Are you sure you want to complete the requisition?"
                                 wire:loading.attr="disabled" wire:click="completeRequisition"
                                 class="btn btn-success waves-effect waves-light" style="width:270px">
-                                <span class="tf-icons ri-mail-send-line me-1_5"></span>Complete Requisition
+                                <span class="ri-checkbox-circle-line me-1_5"></span>Complete Requisition
 
                                 <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
                                     role="status">

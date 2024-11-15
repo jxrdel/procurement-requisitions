@@ -18,6 +18,9 @@
                     @if ($this->requisition->is_completed)
                         <span style="background-color: #47a102 !important;"
                             class="badge rounded-pill bg-success fs-5">Completed</span>
+                        {{-- @else
+                        <span style="background-color: #c6850c !important;"
+                            class="badge rounded-pill bg-danger fs-5">{{ $this->requisition->requisition_status }}</span> --}}
                     @endif
                 </h1>
             </div>
@@ -267,13 +270,27 @@
                                     <div class="row mt-7">
 
                                         <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
+                                            <div wire:ignore>
+                                                <label style="width:100%" for="sofSelect">Source of Funds:</label>
+
+                                                <select wire:model="source_of_funds"
+                                                    class="js-example-basic-single form-control" id="sofSelect"
+                                                    style="width: 100%">
+                                                    <option value="" selected>Select a Unit</option>
+                                                    @foreach ($votes as $vote)
+                                                        <option value="{{ $vote->number }}">{{ $vote->number }}
+                                                        </option>
+                                                    @endforeach
+
+                                                </select>
+                                            </div>
+                                            {{-- <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="source_of_funds" type="text"
                                                     class="form-control @error('source_of_funds')is-invalid @enderror"
                                                     id="floatingInput" placeholder="Source of Funds"
                                                     aria-describedby="floatingInputHelp" />
                                                 <label for="floatingInput">Source of Funds</label>
-                                            </div>
+                                            </div> --}}
                                             @error('source_of_funds')
                                                 <div class="text-danger"> {{ $message }} </div>
                                             @enderror
@@ -711,6 +728,90 @@
 
                             </div>
 
+                        </div>
+                    </div>
+
+                    <div @class([
+                        'tab-pane fade',
+                        'show active' => $this->active_pane === 'checkroom',
+                    ]) id="navs-justified-check-room" role="tabpanel">
+
+
+                        <div>
+                            <div class="row mt-8">
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Voucher Received from Vote Control:</strong>
+                                        {{ $this->getFormattedDate($this->requisition->date_received_from_vc) }}</label>
+                                </div>
+
+                                <div class="col mx-5">
+                                    <label><strong>Voucher Sent To:
+                                        </strong>{{ $this->requisition->voucher_destination }}</label>
+                                </div>
+                            </div>
+
+                            @if ($this->requisition->voucher_destination == 'Internal Audit')
+                                <div class="row mt-8">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Sent to Audit:</strong>
+                                            {{ $this->getFormattedDate($this->requisition->date_sent_audit) }}</label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Received from Audit:
+                                            </strong>{{ $this->getFormattedDate($this->requisition->date_received_from_audit) }}</label>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="row mt-8">
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Voucher Sent to Cheque Processing:</strong>
+                                        {{ $this->getFormattedDate($this->requisition->date_sent_chequeprocessing) }}</label>
+                                </div>
+
+                                <div class="col mx-5">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div @class([
+                        'tab-pane fade',
+                        'show active' => $this->active_pane === 'chequeprocessing',
+                    ]) id="navs-justified-cheque-processing" role="tabpanel">
+
+                        <div>
+                            <div class="row mt-8">
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Cheque Processed:</strong>
+                                        {{ $this->getFormattedDate($this->requisition->date_cheque_processed) }}</label>
+                                </div>
+
+                                <div class="col mx-5">
+                                    <label><strong>Cheque Number: </strong>{{ $this->requisition->cheque_no }}</label>
+                                </div>
+                            </div>
+
+                            <div class="row mt-8">
+
+                                <div class="col mx-5">
+                                    <label><strong>Cheque Date:</strong>
+                                        {{ $this->getFormattedDate($this->requisition->date_of_cheque) }}</label>
+                                </div>
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Cheque Sent to Cheque Dispatch:
+                                        </strong>{{ $this->getFormattedDate($this->requisition->date_sent_dispatch) }}</label>
+                                </div>
+                            </div>
+
+
                             @if ($this->requisition->is_completed)
                                 <div style="margin-top: 50px" class="row text-center">
 
@@ -722,20 +823,6 @@
                             @endif
 
                         </div>
-                    </div>
-
-                    <div @class([
-                        'tab-pane fade',
-                        'show active' => $this->active_pane === 'checkroom',
-                    ]) id="navs-justified-check-room" role="tabpanel">
-                        Hello
-                    </div>
-
-                    <div @class([
-                        'tab-pane fade',
-                        'show active' => $this->active_pane === 'chequeprocessing',
-                    ]) id="navs-justified-cheque-processing" role="tabpanel">
-                        Hello
                     </div>
                 </div>
             </div>
@@ -866,14 +953,20 @@
 @script
     <script>
         $(document).ready(function() {
-            // Initialize select2
-
 
             $('#unitSelect').select2();
 
             $('#unitSelect').on('change', function() {
                 var selectedValue = $(this).val(); // Get selected values as an array
                 $wire.set('requesting_unit', selectedValue); // Pass selected values to Livewire
+                $wire.set('active_pane', 'procurement1');
+            });
+
+            $('#sofSelect').select2();
+
+            $('#sofSelect').on('change', function() {
+                var selectedValue = $(this).val(); // Get selected values as an array
+                $wire.set('source_of_funds', selectedValue); // Pass selected values to Livewire
                 $wire.set('active_pane', 'procurement1');
             });
         });

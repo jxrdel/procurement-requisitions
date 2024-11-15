@@ -88,6 +88,7 @@
                                     <thead>
                                         <tr>
                                             <th>Requisition #</th>
+                                            <th>Vote Number</th>
                                             <th>Requesting Unit</th>
                                             <th>Assigned To</th>
                                             <th style="width: 20%;text-align:center">Actions</th>
@@ -117,6 +118,7 @@
                                 <thead>
                                     <tr>
                                         <th>Requisition #</th>
+                                        <th>Vote Number</th>
                                         <th>Requesting Unit</th>
                                         <th>Assigned To</th>
                                         <th style="text-align: center">Status</th>
@@ -230,6 +232,10 @@
                         name: 'requisition_no'
                     },
                     {
+                        data: 'source_of_funds',
+                        name: 'source_of_funds'
+                    },
+                    {
                         data: 'RequestingUnit',
                         name: 'departments.name'
                     },
@@ -272,6 +278,10 @@
                 "columns": [{
                         data: 'requisition_no',
                         name: 'requisition_no'
+                    },
+                    {
+                        data: 'source_of_funds',
+                        name: 'source_of_funds'
                     },
                     {
                         data: 'RequestingUnit',

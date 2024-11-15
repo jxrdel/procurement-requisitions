@@ -17,6 +17,10 @@ class Controller
             return redirect()->route('cost_and_budgeting.index');
         } elseif (Auth::user()->department === 'Vote Control') {
             return redirect()->route('vote_control.index');
+        } elseif (Auth::user()->department === 'Check Staff') {
+            return redirect()->route('check_room.index');
+        } elseif (Auth::user()->department === 'Cheque Processing') {
+            return redirect()->route('cheque_processing.index');
         }
         //Count of all requisitions
         $allRequisitionsCount = Requisition::count();
@@ -90,7 +94,7 @@ class Controller
 
     public function users()
     {
-        if (Gate::denies('view-user-page')) {
+        if (Gate::denies('view-users-page')) {
             return redirect()->route('/')->with('error', 'You are not authorized to view this page');
         }
 

@@ -27,6 +27,11 @@ class ViewCheckRoomRequisition extends Component
     public function mount($id)
     {
         $this->cr_requisition = CheckRoomRequisition::find($id);
+
+        if (!$this->cr_requisition) {
+            return abort(404);
+        }
+
         $this->requisition = $this->cr_requisition->requisition;
 
         $this->date_received_from_vc = $this->requisition->date_received_from_vc;
@@ -130,7 +135,7 @@ class ViewCheckRoomRequisition extends Component
             $status = 'Sent to Internal Audit';
         }
 
-        if ($this->date_received_from_vc && $this->voucher_destination === 'Internal Audit' && $this->date_sent_audit && $this->date_received_from_audit && !$this->date_sent_chequeprocessing) {
+        if ($this->date_received_from_vc && $this->voucher_destination === 'Internal Audit' && $this->date_sent_audit && $this->date_received_from_audit) {
             $status = 'To Be Sent to Cheque Processing';
         }
 

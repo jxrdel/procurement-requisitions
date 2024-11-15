@@ -37,6 +37,11 @@ class CostBudgetingRequisition extends Component
     public function mount($id)
     {
         $this->cb_requisition = CBRequisition::find($id);
+
+        if (!$this->cb_requisition) {
+            return abort(404);
+        }
+
         $this->requisition = Requisition::find($this->cb_requisition->requisition_id);
 
         $this->date_sent_request_mof = $this->requisition->date_sent_request_mof;
