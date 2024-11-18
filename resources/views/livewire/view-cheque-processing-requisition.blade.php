@@ -166,7 +166,7 @@
                     </button>
                 </div>
 
-                @livewire('read-only-requisition', ['id' => $this->requisition->id, 'view' => 'chequeprocessing'])
+                @livewire('read-only-requisition', ['id' => $this->requisition->id, 'view' => '5'])
             </div>
 
         </div>

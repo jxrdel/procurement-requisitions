@@ -191,7 +191,7 @@
 
             <hr>
 
-            <div class="mt-6 text-center" x-show="!showDetails">
+            <div class="mt-6 text-center" x-show="!showDetails" x-cloak>
                 <button type="button" @click="showDetails = true" class="btn btn-danger waves-effect waves-light"
                     style="width: 250px">
                     <span class="ri-add-circle-line me-1_5"></span>Show Requisition Details
@@ -207,7 +207,7 @@
                     </button>
                 </div>
 
-                @livewire('read-only-requisition', ['id' => $this->requisition->id, 'view' => 'checkroom'])
+                @livewire('read-only-requisition', ['id' => $this->requisition->id, 'view' => '4'])
             </div>
 
         </div>

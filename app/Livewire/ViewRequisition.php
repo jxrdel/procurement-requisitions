@@ -328,6 +328,8 @@ class ViewRequisition extends Component
             'created_by' => Auth::user()->username,
         ]);
 
+        $this->logdetails = null;
+
         $this->dispatch('close-log-modal');
         $this->dispatch('preserveScroll');
         $this->dispatch('show-message', message: 'Log added successfully');

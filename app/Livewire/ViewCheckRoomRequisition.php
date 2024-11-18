@@ -79,7 +79,7 @@ class ViewCheckRoomRequisition extends Component
                 'date_sent_chequeprocessing' => 'nullable|date|after_or_equal:date_received_from_audit',
             ],
             [
-                'date_received_from_vc.after_or_equal' => 'This date must be after the date the requisition was sent to Check Staff.',
+                'date_received_from_vc.after_or_equal' => 'This date must be after or equal to the date the requisition was sent to Check Staff.',
                 'date_sent_audit.after_or_equal' => 'The Date Sent to Audit must be a date after or equal to the Date Received from Vote Control.',
                 'date_received_from_audit.after_or_equal' => 'The Date Received from Audit must be a date after or equal to the Date Sent to Audit.',
                 'date_sent_chequeprocessing.after_or_equal' => 'The Date Sent to Cheque Processing must be a date after or equal to the Date Received from Audit.',

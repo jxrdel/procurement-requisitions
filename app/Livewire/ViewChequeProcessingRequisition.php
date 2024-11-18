@@ -126,7 +126,7 @@ class ViewChequeProcessingRequisition extends Component
         }
 
         if ($this->date_cheque_processed && $this->cheque_no && $this->date_of_cheque && $this->date_sent_dispatch) {
-            $status = 'To Be Completed by Cheque Dispatch';
+            $status = 'To Be Completed by Cheque Processing';
         }
 
         return $status;

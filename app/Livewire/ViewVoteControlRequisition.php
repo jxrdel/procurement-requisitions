@@ -161,7 +161,7 @@ class ViewVoteControlRequisition extends Component
         $status = 'At Vote Control';
 
         if ($this->batch_no && $this->voucher_no && !$this->vc_requisition->is_completed) {
-            $status = 'To Be Completed by Vote Control';
+            $status = 'To Be Sent to Check Room';
         }
 
         return $status;
