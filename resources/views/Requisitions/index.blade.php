@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Requisitions | Requisitions</title>
+    <title>Requisitions | PRA</title>
 @endsection
 
 @section('content')
@@ -61,12 +61,12 @@
             <table id="myTable" class="table table-hover table-bordered mt-5">
                 <thead>
                     <tr>
-                        <th>Requisition #</th>
+                        <th style="width: 12%">Requisition #</th>
                         <th>Vote Number</th>
                         <th>Requesting Unit</th>
                         <th>Assigned To</th>
                         <th style="text-align: center">Status</th>
-                        <th style="width: 20%;text-align:center">Actions</th>
+                        <th style="width: 15%;text-align:center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -88,7 +88,7 @@
             @endcan ;
         $(document).ready(function() {
             $('#myTable').DataTable({
-                "pageLength": 10,
+                "pageLength": 50,
                 order: [
                     [6, 'desc']
                 ],

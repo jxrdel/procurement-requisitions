@@ -96,7 +96,7 @@ class ViewChequeProcessingRequisition extends Component
         ]);
 
         $assigned_to = $this->requisition->procurement_officer->email;
-        Mail::to($assigned_to)->cc('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
+        Mail::to($assigned_to)->cc('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
 
         return redirect()->route('cheque_processing.index')->with('success', 'Requisition completed successfully');
     }

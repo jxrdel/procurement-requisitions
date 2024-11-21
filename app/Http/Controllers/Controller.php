@@ -48,8 +48,8 @@ class Controller
             ->map(function ($requisition) {
                 return [
                     'item_name' => $requisition->item,
-                    'officer_name' => $requisition->procurement_officer->name, // Updated to use just name
-                    'time_elapsed' => Carbon::parse($requisition->created_at)->diffForHumans(),
+                    'officer_name' => $requisition->procurement_officer->name ?? 'Not Assigned',
+                    'time_elapsed' => Carbon::parse($requisition->date_received_procurement)->diffForHumans(),
                 ];
             });
 
@@ -58,9 +58,9 @@ class Controller
             ->get();
         // Calculate total time difference in days
         $totalTimeInDays = $completedRequisitions->reduce(function ($carry, $requisition) {
-            $created_at = Carbon::parse($requisition->created_at);
+            $date_received_procurement = Carbon::parse($requisition->date_received_procurement);
             $completed_at = Carbon::parse($requisition->vote_control_requisition->date_completed);
-            $timeDifferenceInDays = $created_at->diffInDays($completed_at); // Get the difference in days
+            $timeDifferenceInDays = $date_received_procurement->diffInDays($completed_at); // Get the difference in days
             return $carry + $timeDifferenceInDays;
         }, 0);
 

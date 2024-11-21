@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Cost & Budgeting Requisitions | Requisitions</title>
+    <title>Cost & Budgeting Requisitions | PRA</title>
 @endsection
 
 @section('content')

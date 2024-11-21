@@ -175,7 +175,7 @@
                             <button @disabled($this->isButtonDisabled)
                                 wire:confirm="Are you sure you want to send to Cheque Processing?"
                                 wire:loading.attr="disabled" wire:click="sendToChequeProcessing"
-                                class="btn btn-success waves-effect waves-light" style="width:290px">
+                                class="btn btn-success waves-effect waves-light" style="width:300px">
                                 <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Cheque Processing
 
                                 <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"

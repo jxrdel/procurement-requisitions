@@ -85,7 +85,10 @@
 
                     <div class="col mx-5">
                         <label><strong>Assigned To:</strong>
-                            {{ $this->requisition->procurement_officer->name }}</label>
+                            @if ($this->requisition->procurement_officer)
+                                {{ $this->requisition->procurement_officer->name }}
+                        </label>
+                        @endif
                     </div>
 
                 </div>

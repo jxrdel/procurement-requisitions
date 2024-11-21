@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Cheque Processing Requisitions | Requisitions</title>
+    <title>Cheque Processing Requisitions | PRA</title>
 @endsection
 
 @section('content')

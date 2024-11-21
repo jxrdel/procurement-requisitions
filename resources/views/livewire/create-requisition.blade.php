@@ -96,6 +96,21 @@
                     </div>
 
                     <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="date_received_procurement" type="date"
+                                class="form-control @error('date_received_procurement')is-invalid @enderror"
+                                id="floatingInput" aria-describedby="floatingInputHelp" />
+                            <label for="floatingInput">Date Received by Procurement</label>
+                        </div>
+                        @error('date_received_procurement')
+                            <div class="text-danger"> {{ $message }} </div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mt-6">
+
+                    <div class="col">
                         <div class="form-floating form-floating-outline mb-6">
                             <select required wire:model="assigned_to"
                                 class="form-select @error('assigned_to')is-invalid @enderror"
@@ -111,9 +126,6 @@
                             @enderror
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
 
                     <div class="col">
                         <div class="form-floating form-floating-outline">
@@ -126,6 +138,9 @@
                             <div class="text-danger"> {{ $message }} </div>
                         @enderror
                     </div>
+                </div>
+
+                <div class="row">
 
                     <div class="col">
                         <div class="form-floating form-floating-outline">
@@ -138,9 +153,6 @@
                             <div class="text-danger"> {{ $message }} </div>
                         @enderror
                     </div>
-                </div>
-
-                <div class="row mt-6">
 
                     <div class="col">
                         <div class="form-floating form-floating-outline mb-6">
@@ -159,9 +171,6 @@
                         </div>
                     </div>
 
-
-                    <div class="col">
-                    </div>
                 </div>
 
                 <div class="row" x-show="ps_approval == 'Approved'" x-transition>

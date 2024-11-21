@@ -150,7 +150,7 @@ class ViewVoteControlRequisition extends Component
         //Get Emails of Check Staff
         $checkStaff = User::checkStaff()->get();
         foreach ($checkStaff as $staff) {
-            Mail::to($staff->email)->send(new NotifyCheckRoom($this->requisition));
+            Mail::to($staff->email)->queue(new NotifyCheckRoom($this->requisition));
         }
 
         return redirect()->route('vote_control.index')->with('success', 'Requisition sent to Check Room successfully');

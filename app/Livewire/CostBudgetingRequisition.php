@@ -6,6 +6,7 @@ use App\Mail\CostBudgetingCompleted;
 use App\Models\CBRequisition;
 use App\Models\Requisition;
 use App\Models\User;
+use App\Models\Vote;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
@@ -34,10 +35,12 @@ class CostBudgetingRequisition extends Component
     public $amount;
 
     public $isEditing = true;
+    public $votes;
 
     public function mount($id)
     {
         $this->cb_requisition = CBRequisition::find($id);
+        $this->votes = Vote::all();
 
         if (!$this->cb_requisition) {
             return abort(404);
@@ -178,7 +181,7 @@ class CostBudgetingRequisition extends Component
 
         //Get assigned user
         $user = $this->requisition->procurement_officer;
-        Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->send(new CostBudgetingCompleted($this->requisition));
+        Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
 
         return redirect()->route('cost_and_budgeting.index')->with('success', 'Requisition sent to procurement successfully');
     }
@@ -200,5 +203,12 @@ class CostBudgetingRequisition extends Component
         }
 
         return $status;
+    }
+
+    public function updating($name, $value)
+    {
+        if ($name === 'change_of_vote_no') {
+            $this->skipRender();
+        }
     }
 }
