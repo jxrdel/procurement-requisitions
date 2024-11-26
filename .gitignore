@@ -3,7 +3,6 @@
 /public/build
 /public/hot
 /public/storage
-/public/web.config
 /storage/*.key
 /storage/pail
 /vendor
@@ -21,3 +20,4 @@ yarn-error.log
 /.idea
 /.vscode
 /.zed
+public/web.config
