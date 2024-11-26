@@ -1,11 +1,12 @@
 @extends('layout')
 
 @section('title')
-    <title>Requisitions | Requisitions</title>
+    <title>Requisitions | PRA</title>
 @endsection
 
 @section('content')
     @livewire('delete-record-modal')
+    @livewire('change-financial-year')
     <div class="card">
         <div class="card-body">
 
@@ -13,14 +14,31 @@
                 <h1 class="h3 mb-0 text-gray-800" style="margin: auto"><strong><i class="fa-solid fa-file-import"></i> &nbsp;
                         Requisitions</strong></h1>
             </div>
-            <div class="row mb-4">
-                <!-- Centering the Create Requisition Button -->
-                <div class="col-12 text-center">
-                    <a href="{{ route('requisitions.create') }}" class="btn btn-primary waves-effect waves-light w-25">
+
+            <div class="row mb-4 align-items-center">
+                <!-- Empty Column for Spacing -->
+                <div class="col"></div>
+
+                <!-- Centered Create Requisition Button -->
+                <div class="col d-flex justify-content-center">
+                    <a href="{{ route('requisitions.create') }}" class="btn btn-primary waves-effect waves-light">
                         <span class="ri-add-circle-line me-1_5"></span>Create Requisition
                     </a>
                 </div>
+
+                <!-- Right-aligned Change Financial Year Button -->
+                <div class="col d-flex justify-content-end">
+                    @can('change-financial-year')
+                        <a href="javascript:void(0);" class="btn btn-dark waves-effect waves-light" data-bs-toggle="modal"
+                            data-bs-target="#editFYModal">
+                            Change Financial Year
+                        </a>
+                    @endcan
+                </div>
             </div>
+
+
+
 
             <div class="row mb-4">
                 <!-- Button group aligned to the right -->
@@ -43,12 +61,12 @@
             <table id="myTable" class="table table-hover table-bordered mt-5">
                 <thead>
                     <tr>
-                        <th>Requisition #</th>
+                        <th style="width: 12%">Requisition #</th>
                         <th>Vote Number</th>
                         <th>Requesting Unit</th>
                         <th>Assigned To</th>
                         <th style="text-align: center">Status</th>
-                        <th style="width: 20%;text-align:center">Actions</th>
+                        <th style="width: 15%;text-align:center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -70,9 +88,9 @@
             @endcan ;
         $(document).ready(function() {
             $('#myTable').DataTable({
-                "pageLength": 10,
+                "pageLength": 50,
                 order: [
-                    [5, 'desc']
+                    [6, 'desc']
                 ],
                 "processing": true,
                 "serverSide": true,
@@ -146,6 +164,10 @@
             $('#createContactModal').modal('hide');
         })
 
+
+        window.addEventListener('close-fy-modal', event => {
+            $('#editFYModal').modal('hide');
+        })
 
         //Delete records
         function showDelete(id) {

@@ -80,12 +80,17 @@
                         <div class="row mt-7">
 
                             <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="change_of_vote_no" type="text"
-                                        class="form-control @error('change_of_vote_no')is-invalid @enderror"
-                                        id="floatingInput" placeholder="Change of Vote Number"
-                                        aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Change of Vote Number</label>
+                                <div wire:ignore>
+                                    <label style="width:100%" for="covSelect">Change of Vote Number:</label>
+
+                                    <select class="js-example-basic-single form-control" id="covSelect"
+                                        style="width: 100%" wire:model="change_of_vote_no">
+                                        <option value="" selected>Select a Vote</option>
+                                        @foreach ($votes as $vote)
+                                            <option value="{{ $vote->number }}">{{ $vote->number }}</option>
+                                        @endforeach
+
+                                    </select>
                                 </div>
                                 @error('change_of_vote_no')
                                     <div class="text-danger"> {{ $message }} </div>
@@ -170,12 +175,12 @@
             </div>
 
 
-            <div class="accordion mt-8" id="accordionExample" style="margin-top: 15px">
+            <div wire:ignore class="accordion mt-8" id="accordionExample" style="margin-top: 15px">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            Requisition Details
+                            <strong>Requisition Details</strong>
                         </button>
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse hide"
@@ -278,3 +283,16 @@
         </div>
     </div>
 </div>
+
+@script
+    <script>
+        $(document).ready(function() {
+            $('#covSelect').select2();
+
+            $('#covSelect').on('change', function() {
+                var selectedValue = $(this).val(); // Get selected values as an array
+                $wire.set('change_of_vote_no', selectedValue); // Pass selected values to Livewire
+            });
+        });
+    </script>
+@endscript

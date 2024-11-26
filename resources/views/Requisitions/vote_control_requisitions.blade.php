@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Vote Control Requisitions | Requisitions</title>
+    <title>Vote Control Requisitions | PRA</title>
 @endsection
 
 @section('content')

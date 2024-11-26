@@ -175,7 +175,7 @@
                             <button @disabled($this->isButtonDisabled)
                                 wire:confirm="Are you sure you want to send to Cheque Processing?"
                                 wire:loading.attr="disabled" wire:click="sendToChequeProcessing"
-                                class="btn btn-success waves-effect waves-light" style="width:290px">
+                                class="btn btn-success waves-effect waves-light" style="width:300px">
                                 <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Cheque Processing
 
                                 <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
@@ -191,7 +191,7 @@
 
             <hr>
 
-            <div class="mt-6 text-center" x-show="!showDetails">
+            <div class="mt-6 text-center" x-show="!showDetails" x-cloak>
                 <button type="button" @click="showDetails = true" class="btn btn-danger waves-effect waves-light"
                     style="width: 250px">
                     <span class="ri-add-circle-line me-1_5"></span>Show Requisition Details
@@ -207,7 +207,7 @@
                     </button>
                 </div>
 
-                @livewire('read-only-requisition', ['id' => $this->requisition->id, 'view' => 'checkroom'])
+                @livewire('read-only-requisition', ['id' => $this->requisition->id, 'view' => '4'])
             </div>
 
         </div>

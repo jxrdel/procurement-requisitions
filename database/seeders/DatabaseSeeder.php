@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CurrentFinancialYear;
 use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
@@ -143,6 +144,13 @@ class DatabaseSeeder extends Seeder
                 'role_id' => 3,
             ],
             [
+                'name' => 'Derron Dickson',
+                'email' => 'derron.dickson@health.gov.tt',
+                'username' => 'derron.dickson',
+                'department' => 'Procurement',
+                'role_id' => 3,
+            ],
+            [
                 'name' => 'Crystal Ann Sahibram-Bickram',
                 'email' => 'crystal.bickram@health.gov.tt',
                 'username' => 'crystal.bickram',
@@ -171,9 +179,9 @@ class DatabaseSeeder extends Seeder
                 'role_id' => 3,
             ],
             [
-                'name' => 'Cheryl Keen',
-                'email' => 'cheryl.keen@health.gov.tt',
-                'username' => 'cheryl.keen',
+                'name' => 'Cheryl Keel',
+                'email' => 'cheryl.keel@health.gov.tt',
+                'username' => 'cheryl.keel',
                 'department' => 'Check Staff',
                 'role_id' => 3,
             ],
@@ -277,5 +285,8 @@ class DatabaseSeeder extends Seeder
         foreach ($votes as $vote) {
             Vote::create($vote);
         }
+
+        //Set financial year
+        CurrentFinancialYear::create(['name' => '24/25']);
     }
 }

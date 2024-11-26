@@ -133,7 +133,10 @@
 
                                         <div class="col mx-5">
                                             <label><strong>Assigned To:</strong>
-                                                {{ $this->requisition->procurement_officer->name }}</label>
+                                                @if ($this->requisition->procurement_officer)
+                                                    {{ $this->requisition->procurement_officer->name }}
+                                            </label>
+                                            @endif
                                         </div>
 
                                     </div>
@@ -165,10 +168,8 @@
                                         </div>
 
                                         <div class="col mx-5">
-                                            @if ($this->sent_to_cb)
-                                                <label><strong>Date Sent to Cost & Budgeting:</strong>
-                                                    {{ $this->getFormattedDateSentCB() }}</label>
-                                            @endif
+                                            <label><strong>Date Received by Procurement:</strong>
+                                                {{ $this->getFormattedDate($this->requisition->date_received_procurement) }}</label>
                                         </div>
 
                                     </div>
@@ -182,6 +183,20 @@
 
                                             <div class="col mx-5">
                                                 <label><strong>Amount:</strong> {{ $this->amount }}</label>
+                                            </div>
+
+                                        </div>
+                                    @endif
+
+                                    @if ($this->sent_to_cb)
+                                        <div class="row mt-7">
+
+                                            <div class="col mx-5">
+                                                <label><strong>Date Sent to Cost & Budgeting:</strong>
+                                                    {{ $this->getFormattedDateSentCB() }}</label>
+                                            </div>
+
+                                            <div class="col mx-5">
                                             </div>
 
                                         </div>
@@ -296,7 +311,35 @@
                                             @enderror
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="date_received_procurement"
+                                                    type="date"
+                                                    class="form-control @error('date_received_procurement')is-invalid @enderror"
+                                                    id="floatingInput" aria-describedby="floatingInputHelp" />
+                                                <label for="floatingInput">Date Received by Procurement</label>
+                                            </div>
+                                            @error('date_received_procurement')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-7">
+
+                                        <div class="col">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="date_assigned" type="date"
+                                                    class="form-control @error('date_assigned')is-invalid @enderror"
+                                                    id="floatingInput" aria-describedby="floatingInputHelp" />
+                                                <label for="floatingInput">Date Assigned</label>
+                                            </div>
+                                            @error('date_assigned')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col">
                                             <div class="form-floating form-floating-outline mb-6">
                                                 <select required wire:model="assigned_to"
                                                     class="form-select @error('assigned_to')is-invalid @enderror"
@@ -318,17 +361,6 @@
 
                                     <div class="row">
 
-                                        <div class="col">
-                                            <div class="form-floating form-floating-outline">
-                                                <input autocomplete="off" wire:model="date_assigned" type="date"
-                                                    class="form-control @error('date_assigned')is-invalid @enderror"
-                                                    id="floatingInput" aria-describedby="floatingInputHelp" />
-                                                <label for="floatingInput">Date Assigned</label>
-                                            </div>
-                                            @error('date_assigned')
-                                                <div class="text-danger"> {{ $message }} </div>
-                                            @enderror
-                                        </div>
 
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
@@ -341,9 +373,6 @@
                                                 <div class="text-danger"> {{ $message }} </div>
                                             @enderror
                                         </div>
-                                    </div>
-
-                                    <div class="row mt-7">
 
                                         <div class="col">
                                             <div class="form-floating form-floating-outline mb-6">
@@ -362,8 +391,6 @@
                                                 @enderror
                                             </div>
                                         </div>
-
-                                        <div class="col"></div>
                                     </div>
 
                                     <div class="row" x-show="ps_approval == 'Approved'" x-transition>
@@ -558,7 +585,7 @@
                                             <button @disabled($this->isButtonProcurement2Disabled)
                                                 wire:confirm="Are you sure you want to send to vote control?"
                                                 wire:loading.attr="disabled" type="button"
-                                                wire:click="sendToAccounts"
+                                                wire:click="sendToVoteControl"
                                                 class="btn btn-success waves-effect waves-light m-auto"
                                                 style="width: 300px">
                                                 <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Vote
@@ -700,32 +727,6 @@
                                 <div class="col mx-5">
                                     <label><strong>Voucher Bumber:</strong> {{ $this->voucher_no }}</label>
                                 </div>
-                            </div>
-
-                            <div class="row mt-8">
-
-                                <div class="col mx-5">
-                                    <label><strong>Date Payment Voucher sent to Cheque Room:
-                                        </strong>{{ $this->getFormattedDateSentChequeroom() }}</label>
-                                </div>
-
-                                <div class="col mx-5">
-                                    <label><strong>Date of Cheque:</strong>
-                                        {{ $this->getFormattedDateOfCheque() }}</label>
-                                </div>
-                            </div>
-
-                            <div class="row mt-7">
-
-                                <div class="col mx-5">
-                                    <label><strong>Cheque Number:</strong> {{ $this->cheque_no }}</label>
-                                </div>
-
-                                <div class="col mx-5">
-                                    <label><strong>Date Cheque Forwarded to Cheque Despatch:</strong>
-                                        {{ $this->getFormattedDateChequeForwarded() }}</label>
-                                </div>
-
                             </div>
 
                         </div>

@@ -2,8 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Mail\RequisitionCompleted;
 use App\Models\ChequeProcessingRequisition;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
 class ViewChequeProcessingRequisition extends Component
@@ -83,15 +85,18 @@ class ViewChequeProcessingRequisition extends Component
     public function completeRequisition()
     {
         $this->cp_requisition->update([
-            'requisition_status' => 'Completed',
             'is_completed' => true,
             'date_completed' => Carbon::now(),
         ]);
 
         $this->requisition->update([
+            'requisition_status' => 'Completed',
             'is_completed' => true,
             'date_completed' => Carbon::now(),
         ]);
+
+        $assigned_to = $this->requisition->procurement_officer->email;
+        Mail::to($assigned_to)->cc('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
 
         return redirect()->route('cheque_processing.index')->with('success', 'Requisition completed successfully');
     }
@@ -121,7 +126,7 @@ class ViewChequeProcessingRequisition extends Component
         }
 
         if ($this->date_cheque_processed && $this->cheque_no && $this->date_of_cheque && $this->date_sent_dispatch) {
-            $status = 'To Be Completed by Cheque Dispatch';
+            $status = 'To Be Completed by Cheque Processing';
         }
 
         return $status;

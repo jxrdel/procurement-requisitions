@@ -26,7 +26,7 @@ class ReadOnlyRequisition extends Component
     public $ps_approval_date;
     public $sent_to_cb;
     public $date_sent_cb;
-    public $active_pane = 'procurement1';
+    public $panes = 'procurement1';
     public $uploads;
     public $upload;
 
@@ -106,7 +106,7 @@ class ReadOnlyRequisition extends Component
         $this->cheque_no = $this->requisition->cheque_no;
         $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
 
-        $this->active_pane = $view;
+        $this->panes = $view;
     }
 
 

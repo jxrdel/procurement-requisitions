@@ -30,6 +30,31 @@ class User extends Authenticatable
         return $query->where('department', 'Procurement');
     }
 
+    public function scopeCostBudgeting($query)
+    {
+        return $query->where('department', 'Cost & Budgeting');
+    }
+
+    public function scopeVoteControl($query)
+    {
+        return $query->where('department', 'Vote Control');
+    }
+
+    public function scopeAdmin($query)
+    {
+        return $query->where('department', 'Admin');
+    }
+
+    public function scopeCheckStaff($query)
+    {
+        return $query->where('department', 'Check Staff');
+    }
+
+    public function scopeChequeProcessing($query)
+    {
+        return $query->where('department', 'Cheque Processing');
+    }
+
     public function role()
     {
         return $this->belongsTo(Role::class);

@@ -14,6 +14,7 @@ class Requisition extends Model
         'source_of_funds',
         'assigned_to',
         'date_assigned',
+        'date_received_procurement',
         'date_sent_dps',
         'ps_approval',
         'ps_approval_date',

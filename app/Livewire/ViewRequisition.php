@@ -38,6 +38,7 @@ class ViewRequisition extends Component
     public $source_of_funds;
     public $assigned_to;
     public $date_assigned;
+    public $date_received_procurement;
     public $date_sent_dps;
     public $ps_approval;
     public $vendor_name;
@@ -110,6 +111,7 @@ class ViewRequisition extends Component
         $this->source_of_funds = $this->requisition->source_of_funds;
         $this->assigned_to = $this->requisition->assigned_to;
         $this->date_assigned = $this->requisition->date_assigned;
+        $this->date_received_procurement = $this->requisition->date_received_procurement;
         $this->date_sent_dps = $this->requisition->date_sent_dps;
         $this->ps_approval = $this->requisition->ps_approval;
         $this->vendor_name = $this->requisition->vendor_name;
@@ -166,6 +168,19 @@ class ViewRequisition extends Component
 
     public function edit()
     {
+
+        if ($this->date_assigned === '') {
+            $this->date_assigned = null;
+        }
+
+        if ($this->date_sent_dps === '') {
+            $this->date_sent_dps = null;
+        }
+
+        if ($this->date_received_procurement === '') {
+            $this->date_received_procurement = null;
+        }
+
         if (!$this->validateForm()) {
             return;  // Stop execution if form validation fails
         }
@@ -205,17 +220,21 @@ class ViewRequisition extends Component
             'file_no' => $this->file_no,
             'item' => $this->item,
             'assigned_to' => $this->assigned_to,
+            'date_assigned' => $this->date_assigned,
             'date_sent_dps' => $this->date_sent_dps,
+            'date_sent_procurement' => $this->date_received_procurement,
             'ps_approval' => $this->ps_approval,
             // 'sent_to_cb' => $this->sent_to_cb,
             // 'date_sent_cb' => $this->date_sent_cb,
         ], [
             'requisition_no' => 'required',
             'requesting_unit' => 'required',
-            'file_no' => 'required',
+            'file_no' => 'nullable',
             'item' => 'required',
-            'assigned_to' => 'required',
+            'assigned_to' => 'nullable',
+            'date_assigned' => 'nullable|date|before_or_equal:today',
             'date_sent_dps' => 'nullable|date|before_or_equal:today',
+            'date_received_procurement' => 'nullable|date|before_or_equal:today',
             // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
         ])
             ->after(function ($validator) {
@@ -328,6 +347,8 @@ class ViewRequisition extends Component
             'created_by' => Auth::user()->username,
         ]);
 
+        $this->logdetails = null;
+
         $this->dispatch('close-log-modal');
         $this->dispatch('preserveScroll');
         $this->dispatch('show-message', message: 'Log added successfully');
@@ -344,9 +365,7 @@ class ViewRequisition extends Component
     {
         return $this->requisition_no === null || trim($this->requisition_no) === '' ||
             $this->requesting_unit === null || trim($this->requesting_unit) === '' ||
-            $this->file_no === null || trim($this->file_no) === '' ||
             $this->item === null || trim($this->item) === '' ||
-            $this->assigned_to === null || trim($this->assigned_to) === '' ||
             $this->date_sent_dps === null || trim($this->date_sent_dps) === '' ||
             $this->ps_approval === null || $this->ps_approval !== 'Approved';
     }
@@ -388,7 +407,13 @@ class ViewRequisition extends Component
         ]);
 
         //Send email to Cost & Budgeting
-        // Mail::to('jardel.regis@health.gov.tt')->send(new NotifyCostBudgeting($this->requisition));
+
+        //Get Cost & Budgeting users
+        $users = User::costBudgeting()->get();
+
+        foreach ($users as $user) {
+            Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
+        }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
     }
@@ -512,7 +537,7 @@ class ViewRequisition extends Component
         $this->dispatch('show-message', message: 'Requisition edited successfully');
     }
 
-    public function sendToAccounts()
+    public function sendToVoteControl()
     {
 
         $this->requisition->update([
@@ -524,8 +549,14 @@ class ViewRequisition extends Component
             'date_received' => Carbon::now(),
         ]);
 
-        //Send email to Accounts
-        // Mail::to('jardel.regis@health.gov.tt')->send(new NotifyVoteControl($this->requisition));
+        //Send email to Vote Control
+
+        //Get Vote Control users
+        $users = User::voteControl()->get();
+
+        foreach ($users as $user) {
+            Mail::to($user->email)->queue(new NotifyVoteControl($this->requisition));
+        }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Vote Control');
     }

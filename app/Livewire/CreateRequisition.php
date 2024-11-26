@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\CurrentFinancialYear;
 use App\Models\Department;
 use App\Models\Requisition;
 use App\Models\User;
@@ -26,6 +27,7 @@ class CreateRequisition extends Component
     public $source_of_funds;
     public $assigned_to;
     public $date_assigned;
+    public $date_received_procurement;
     public $date_sent_dps;
     public $ps_approval = 'Not Sent';
     public $ps_approval_date;
@@ -45,7 +47,7 @@ class CreateRequisition extends Component
 
     public function mount()
     {
-        $this->requisition_no = Requisition::generateRequisitionNo();
+        $this->requisition_no = CurrentFinancialYear::generateRequisitionNo();
         $this->departments = Department::all();
         $this->staff = User::procurement()->get();
         $this->votes = Vote::all();
@@ -66,6 +68,10 @@ class CreateRequisition extends Component
 
         if ($this->date_sent_dps === '') {
             $this->date_sent_dps = null;
+        }
+
+        if ($this->date_received_procurement === '') {
+            $this->date_received_procurement = null;
         }
 
         if (!$this->validateForm()) {
@@ -91,13 +97,14 @@ class CreateRequisition extends Component
 
         $newrequisition = Requisition::create([
             'requisition_status' => $this->requisition_status,
-            'requisition_no' => Requisition::generateRequisitionNo(),
+            'requisition_no' => CurrentFinancialYear::generateRequisitionNo(),
             'requesting_unit' => $this->requesting_unit,
             'file_no' => $this->file_no,
             'item' => $this->item,
             'source_of_funds' => $this->source_of_funds,
             'assigned_to' => $this->assigned_to,
             'date_assigned' => $this->date_assigned,
+            'date_received_procurement' => $this->date_received_procurement,
             'date_sent_dps' => $this->date_sent_dps,
             'ps_approval' => $this->ps_approval,
             'ps_approval_date' => $this->ps_approval_date,
@@ -139,16 +146,20 @@ class CreateRequisition extends Component
             'file_no' => $this->file_no,
             'item' => $this->item,
             'assigned_to' => $this->assigned_to,
+            'date_assigned' => $this->date_assigned,
             'date_sent_dps' => $this->date_sent_dps,
             'ps_approval' => $this->ps_approval,
+            'date_received_procurement' => $this->date_received_procurement,
             // 'sent_to_cb' => $this->sent_to_cb,
             // 'date_sent_cb' => $this->date_sent_cb,
         ], [
             'requisition_no' => 'required|unique:requisitions',
             'requesting_unit' => 'required',
-            'file_no' => 'required',
+            'file_no' => 'nullable',
             'item' => 'required',
-            'assigned_to' => 'required',
+            'assigned_to' => 'nullable',
+            'date_assigned' => 'nullable|date|before_or_equal:today',
+            'date_received_procurement' => 'required|date|before_or_equal:today',
             'date_sent_dps' => 'nullable|date|before_or_equal:today',
             // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
         ])

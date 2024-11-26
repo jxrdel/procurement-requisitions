@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Dashboard | Requisitions</title>
+    <title>Dashboard | PRA</title>
 @endsection
 
 @section('styles')

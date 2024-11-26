@@ -121,7 +121,7 @@
                     </button>
                 </div>
 
-                @livewire('read-only-requisition', ['id' => $this->requisition->id, 'view' => 'votecontrol'])
+                @livewire('read-only-requisition', ['id' => $this->requisition->id, 'view' => '3'])
             </div>
 
         </div>

@@ -15,31 +15,32 @@ class RequisitionController extends Controller
 
     public function getRequisitions()
     {
-        $requisitions = Requisition::join('users', 'requisitions.assigned_to', '=', 'users.id')
+        $requisitions = Requisition::leftJoin('users', 'requisitions.assigned_to', '=', 'users.id')
             ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
             ->select('requisitions.*', 'users.name as EmployeeName', 'departments.name as RequestingUnit');
 
         return DataTables::of($requisitions)
-            ->filterColumn('EmployeeName', function($query, $keyword) {
+            ->filterColumn('EmployeeName', function ($query, $keyword) {
                 $query->whereRaw("users.name like ?", ["%{$keyword}%"]);
             })
-            ->filterColumn('RequestingUnit', function($query, $keyword) {
+            ->filterColumn('RequestingUnit', function ($query, $keyword) {
                 $query->whereRaw("departments.name like ?", ["%{$keyword}%"]);
             })
             ->make(true);
     }
 
-    public function getCompletedRequisitions(){
-        $requisitions = Requisition::join('users', 'requisitions.assigned_to', '=', 'users.id')
+    public function getCompletedRequisitions()
+    {
+        $requisitions = Requisition::leftJoin('users', 'requisitions.assigned_to', '=', 'users.id')
             ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
             ->select('requisitions.*', 'users.name as EmployeeName', 'departments.name as RequestingUnit')
             ->where('requisitions.is_completed', true);
 
         return DataTables::of($requisitions)
-            ->filterColumn('EmployeeName', function($query, $keyword) {
+            ->filterColumn('EmployeeName', function ($query, $keyword) {
                 $query->whereRaw("users.name like ?", ["%{$keyword}%"]);
             })
-            ->filterColumn('RequestingUnit', function($query, $keyword) {
+            ->filterColumn('RequestingUnit', function ($query, $keyword) {
                 $query->whereRaw("departments.name like ?", ["%{$keyword}%"]);
             })
             ->make(true);
@@ -47,16 +48,16 @@ class RequisitionController extends Controller
 
     public function getInProgressRequisitions()
     {
-        $requisitions = Requisition::join('users', 'requisitions.assigned_to', '=', 'users.id')
+        $requisitions = Requisition::leftJoin('users', 'requisitions.assigned_to', '=', 'users.id')
             ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
             ->select('requisitions.*', 'users.name as EmployeeName', 'departments.name as RequestingUnit')
             ->where('requisitions.is_completed', '!=', true);
 
         return DataTables::of($requisitions)
-            ->filterColumn('EmployeeName', function($query, $keyword) {
+            ->filterColumn('EmployeeName', function ($query, $keyword) {
                 $query->whereRaw("users.name like ?", ["%{$keyword}%"]);
             })
-            ->filterColumn('RequestingUnit', function($query, $keyword) {
+            ->filterColumn('RequestingUnit', function ($query, $keyword) {
                 $query->whereRaw("departments.name like ?", ["%{$keyword}%"]);
             })
             ->make(true);
