@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Mail\RequisitionCompleted;
 use App\Models\ChequeProcessingRequisition;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -41,6 +42,10 @@ class ViewChequeProcessingRequisition extends Component
         $this->date_sent_dispatch = $this->requisition->date_sent_dispatch;
 
         if ($this->date_cheque_processed !== null && $this->cheque_no !== null && $this->date_of_cheque !== null && $this->date_sent_dispatch !== null) {
+            $this->isEditing = false;
+        }
+
+        if (Auth::user()->role->name === 'Viewer') {
             $this->isEditing = false;
         }
     }

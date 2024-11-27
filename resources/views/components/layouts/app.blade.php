@@ -80,26 +80,27 @@
                 <ul class="menu-inner py-1">
                     <!-- Dashboards -->
 
-                    <li class="menu-header">
-                        <span class="menu-header-text">Menu</span>
-                    </li>
+                    @can('view-procurement-requisitions')
+                        <li class="menu-header">
+                            <span class="menu-header-text">Menu</span>
+                        </li>
+                        <li @class(['menu-item', 'active' => request()->routeIs('/')])>
+                            <a href="{{ route('/') }}" class="menu-link">
+                                <i class="menu-icon tf-icons ri-home-smile-line"></i>
+                                <div data-i18n="Basic">Dashboard</div>
+                            </a>
+                        </li>
 
-                    <li @class(['menu-item', 'active' => request()->routeIs('/')])>
-                        <a href="{{ route('/') }}" class="menu-link">
-                            <i class="menu-icon tf-icons ri-home-smile-line"></i>
-                            <div data-i18n="Basic">Dashboard</div>
-                        </a>
-                    </li>
-
-                    <li @class([
-                        'menu-item',
-                        'active' => request()->routeIs('requisitions.*'),
-                    ])>
-                        <a href="{{ route('requisitions.index') }}" class="menu-link">
-                            <i class="menu-icon ri-file-edit-line"></i>
-                            <div data-i18n="Basic">Requisitions</div>
-                        </a>
-                    </li>
+                        <li @class([
+                            'menu-item',
+                            'active' => request()->routeIs('requisitions.*'),
+                        ])>
+                            <a href="{{ route('requisitions.index') }}" class="menu-link">
+                                <i class="menu-icon ri-file-edit-line"></i>
+                                <div data-i18n="Basic">Requisitions</div>
+                            </a>
+                        </li>
+                    @endcan
 
                     @can('view-users-page')
                         <li @class(['menu-item', 'active' => request()->routeIs('users')])>

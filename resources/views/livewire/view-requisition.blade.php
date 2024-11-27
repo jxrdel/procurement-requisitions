@@ -89,14 +89,16 @@
 
                         <div id="procurementView1">
                             <form wire:submit.prevent="edit">
-                                <div class="row text-center">
-                                    <div x-show="!isEditingProcurement1">
-                                        <button type="button" @click="isEditingProcurement1 = ! isEditingProcurement1"
-                                            class="btn btn-dark waves-effect waves-light" style="width: 100px">
-                                            <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
-                                        </button>
+                                @can('edit-records')
+                                    <div class="row text-center">
+                                        <div x-show="!isEditingProcurement1">
+                                            <button type="button" @click="isEditingProcurement1 = ! isEditingProcurement1"
+                                                class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                                <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                @endcan
 
                                 <div x-transition x-show="!isEditingProcurement1">
                                     <div class="row mt-8">
@@ -456,22 +458,23 @@
                                 </div>
                             </form>
 
+                            @can('edit-records')
+                                @if (!$this->sent_to_cb)
+                                    <div class="row mt-8" x-show="!isEditingProcurement1">
+                                        <button @disabled($this->isSendCBButtonDisabled)
+                                            wire:confirm="Are you sure you want to send to cost & budgeting?"
+                                            wire:loading.attr="disabled" type="button" wire:click="sendToCB"
+                                            class="btn btn-success waves-effect waves-light m-auto" style="width: 300px;">
+                                            <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Cost & Budgeting
 
-                            @if (!$this->sent_to_cb)
-                                <div class="row mt-8" x-show="!isEditingProcurement1">
-                                    <button @disabled($this->isSendCBButtonDisabled)
-                                        wire:confirm="Are you sure you want to send to cost & budgeting?"
-                                        wire:loading.attr="disabled" type="button" wire:click="sendToCB"
-                                        class="btn btn-success waves-effect waves-light m-auto" style="width: 300px;">
-                                        <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Cost & Budgeting
-
-                                        <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
-                                            role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                    </button>
-                                </div>
-                            @endif
+                                            <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
+                                                role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                @endif
+                            @endcan
                         </div>
                     </div>
                     <div wire:ignore.self @class([
@@ -530,15 +533,17 @@
 
                         <div id="procurementView2">
                             <form wire:submit.prevent="editProcurement2">
-                                <div class="row text-center">
-                                    <div x-show="!isEditingProcurement2">
-                                        <button type="button"
-                                            @click="isEditingProcurement2 = ! isEditingProcurement2"
-                                            class="btn btn-dark waves-effect waves-light" style="width: 100px">
-                                            <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
-                                        </button>
+                                @can('edit-records')
+                                    <div class="row text-center">
+                                        <div x-show="!isEditingProcurement2">
+                                            <button type="button"
+                                                @click="isEditingProcurement2 = ! isEditingProcurement2"
+                                                class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                                <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                @endcan
 
                                 <div x-transition x-show="!isEditingProcurement2">
                                     <div class="row mt-8">
@@ -580,25 +585,27 @@
 
                                     </div>
 
-                                    @if (!$this->requisition->vote_control_requisition)
-                                        <div class="row mt-8">
-                                            <button @disabled($this->isButtonProcurement2Disabled)
-                                                wire:confirm="Are you sure you want to send to vote control?"
-                                                wire:loading.attr="disabled" type="button"
-                                                wire:click="sendToVoteControl"
-                                                class="btn btn-success waves-effect waves-light m-auto"
-                                                style="width: 300px">
-                                                <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Vote
-                                                Control
+                                    @can('edit-records')
+                                        @if (!$this->requisition->vote_control_requisition)
+                                            <div class="row mt-8">
+                                                <button @disabled($this->isButtonProcurement2Disabled)
+                                                    wire:confirm="Are you sure you want to send to vote control?"
+                                                    wire:loading.attr="disabled" type="button"
+                                                    wire:click="sendToVoteControl"
+                                                    class="btn btn-success waves-effect waves-light m-auto"
+                                                    style="width: 300px">
+                                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Vote
+                                                    Control
 
-                                                <div wire:loading
-                                                    class="spinner-border spinner-border-lg text-white mx-2"
-                                                    role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    @endif
+                                                    <div wire:loading
+                                                        class="spinner-border spinner-border-lg text-white mx-2"
+                                                        role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        @endif
+                                    @endcan
 
                                 </div>
 
@@ -838,13 +845,14 @@
                 <h4 class="text-center fw-bold">Status Log</h4>
             </div>
 
-
-            <div class="row">
-                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addLogModal"
-                    class="btn btn-primary waves-effect waves-light w-25 m-auto">
-                    <span class="tf-icons ri-file-add-line me-1_5"></span>Add Log
-                </a>
-            </div>
+            @can('edit-records')
+                <div class="row">
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addLogModal"
+                        class="btn btn-primary waves-effect waves-light w-25 m-auto">
+                        <span class="tf-icons ri-file-add-line me-1_5"></span>Add Log
+                    </a>
+                </div>
+            @endcan
 
             <div class="row mt-8">
                 <table class="table table-hover table-bordered w-100">
@@ -891,21 +899,22 @@
                     <h4 class="text-center fw-bold">File Uploads</h4>
                 </div>
 
+                @can('edit-records')
+                    <div class="row">
+                        <div class="col" style="text-align: center;padding-bottom:10px">
+                            @error('upload')
+                                <div class="text-danger fw-bold"> {{ $message }} </div>
+                            @enderror
 
-                <div class="row">
-                    <div class="col" style="text-align: center;padding-bottom:10px">
-                        @error('upload')
-                            <div class="text-danger fw-bold"> {{ $message }} </div>
-                        @enderror
-
-                        <input wire:model="upload" type="file" class="form-control"
-                            style="display: inline;width: 400px;height:45px">
-                        <button wire:click.prevent="uploadFile()" class="btn btn-primary"
-                            wire:loading.attr="disabled" wire:target="upload" style="width: 8rem"><i
-                                class="fas fa-plus me-2"></i> Upload</button>
-                        <span wire:loading wire:target="upload">Uploading...</span>
+                            <input wire:model="upload" type="file" class="form-control"
+                                style="display: inline;width: 400px;height:45px">
+                            <button wire:click.prevent="uploadFile()" class="btn btn-primary"
+                                wire:loading.attr="disabled" wire:target="upload" style="width: 8rem"><i
+                                    class="fas fa-plus me-2"></i> Upload</button>
+                            <span wire:loading wire:target="upload">Uploading...</span>
+                        </div>
                     </div>
-                </div>
+                @endcan
 
                 <div class="row ">
 
@@ -923,11 +932,13 @@
                                         {{-- <button type="button" class="btn btn-danger">
                                                 <i class="ri-delete-bin-2-line me-1"></i> Delete
                                             </button> --}}
-                                        <a href="javascript:void(0)"
-                                            wire:confirm="Are you sure you want to delete this file?"
-                                            wire:click="deleteFile({{ $upload->id }})">
-                                            <i class="ri-close-large-line text-danger fw-bold"></i>
-                                        </a>
+                                        @can('edit-records')
+                                            <a href="javascript:void(0)"
+                                                wire:confirm="Are you sure you want to delete this file?"
+                                                wire:click="deleteFile({{ $upload->id }})">
+                                                <i class="ri-close-large-line text-danger fw-bold"></i>
+                                            </a>
+                                        @endcan
 
                                     </div>
                                 </div>

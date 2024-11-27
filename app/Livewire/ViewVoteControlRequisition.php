@@ -8,6 +8,7 @@ use App\Models\VoteControlRequisition;
 use App\Models\Requisition;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -43,6 +44,10 @@ class ViewVoteControlRequisition extends Component
         $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
 
         if ($this->batch_no !== null && $this->voucher_no !== null) {
+            $this->isEditing = false;
+        }
+
+        if (Auth::user()->role->name === 'Viewer') {
             $this->isEditing = false;
         }
     }

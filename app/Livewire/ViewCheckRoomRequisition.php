@@ -6,6 +6,7 @@ use App\Mail\NotifyChequeProcessing;
 use App\Models\CheckRoomRequisition;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -44,6 +45,10 @@ class ViewCheckRoomRequisition extends Component
         $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
 
         if ($this->date_received_from_vc !== null && $this->voucher_destination !== null && $this->date_sent_chequeprocessing !== null) {
+            $this->isEditing = false;
+        }
+
+        if (Auth::user()->role->name === 'Viewer') {
             $this->isEditing = false;
         }
     }

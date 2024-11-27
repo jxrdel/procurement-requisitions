@@ -58,6 +58,7 @@
                                 <option value="Vote Control">Vote Control</option>
                                 <option value="Check Staff">Check Staff</option>
                                 <option value="Cheque Processing">Cheque Processing</option>
+                                <option value="PS Office">PS Office</option>
                                 <option value="ICT">ICT</option>
                             </select>
                         </div>

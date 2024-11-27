@@ -8,6 +8,7 @@ use App\Models\Requisition;
 use App\Models\User;
 use App\Models\Vote;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -70,6 +71,10 @@ class CostBudgetingRequisition extends Component
         }
 
         if ($this->cb_requisition->is_completed) {
+            $this->isEditing = false;
+        }
+
+        if (Auth::user()->role->name === 'Viewer') {
             $this->isEditing = false;
         }
     }

@@ -125,24 +125,26 @@
 
                 <div class="row text-center mt-5">
                     <div>
-                        <button type="button" @click="isEditing = true" class="btn btn-dark waves-effect waves-light"
-                            style="width: 100px">
-                            <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
-                        </button>
-                        &nbsp;
-                        @if (!$this->cp_requisition->is_completed)
-                            <button @disabled($this->isButtonDisabled)
-                                wire:confirm="Are you sure you want to complete the requisition?"
-                                wire:loading.attr="disabled" wire:click="completeRequisition"
-                                class="btn btn-success waves-effect waves-light" style="width:270px">
-                                <span class="ri-checkbox-circle-line me-1_5"></span>Complete Requisition
-
-                                <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
-                                    role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
+                        @can('edit-records')
+                            <button type="button" @click="isEditing = true" class="btn btn-dark waves-effect waves-light"
+                                style="width: 100px">
+                                <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
                             </button>
-                        @endif
+                            &nbsp;
+                            @if (!$this->cp_requisition->is_completed)
+                                <button @disabled($this->isButtonDisabled)
+                                    wire:confirm="Are you sure you want to complete the requisition?"
+                                    wire:loading.attr="disabled" wire:click="completeRequisition"
+                                    class="btn btn-success waves-effect waves-light" style="width:270px">
+                                    <span class="ri-checkbox-circle-line me-1_5"></span>Complete Requisition
+
+                                    <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
+                                        role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </button>
+                            @endif
+                        @endcan
                     </div>
                 </div>
 

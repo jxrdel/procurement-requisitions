@@ -15,30 +15,29 @@
                         Requisitions</strong></h1>
             </div>
 
-            <div class="row mb-4 align-items-center">
-                <!-- Empty Column for Spacing -->
-                <div class="col"></div>
+            @can('create-requisitions')
+                <div class="row mb-4 align-items-center">
+                    <!-- Empty Column for Spacing -->
+                    <div class="col"></div>
 
-                <!-- Centered Create Requisition Button -->
-                <div class="col d-flex justify-content-center">
-                    <a href="{{ route('requisitions.create') }}" class="btn btn-primary waves-effect waves-light">
-                        <span class="ri-add-circle-line me-1_5"></span>Create Requisition
-                    </a>
-                </div>
-
-                <!-- Right-aligned Change Financial Year Button -->
-                <div class="col d-flex justify-content-end">
-                    @can('change-financial-year')
-                        <a href="javascript:void(0);" class="btn btn-dark waves-effect waves-light" data-bs-toggle="modal"
-                            data-bs-target="#editFYModal">
-                            Change Financial Year
+                    <!-- Centered Create Requisition Button -->
+                    <div class="col d-flex justify-content-center">
+                        <a href="{{ route('requisitions.create') }}" class="btn btn-primary waves-effect waves-light">
+                            <span class="ri-add-circle-line me-1_5"></span>Create Requisition
                         </a>
-                    @endcan
+                    </div>
+
+                    <!-- Right-aligned Change Financial Year Button -->
+                    <div class="col d-flex justify-content-end">
+                        @can('change-financial-year')
+                            <a href="javascript:void(0);" class="btn btn-dark waves-effect waves-light" data-bs-toggle="modal"
+                                data-bs-target="#editFYModal">
+                                Change Financial Year
+                            </a>
+                        @endcan
+                    </div>
                 </div>
-            </div>
-
-
-
+            @endcan
 
             <div class="row mb-4">
                 <!-- Button group aligned to the right -->

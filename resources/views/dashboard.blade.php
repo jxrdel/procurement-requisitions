@@ -250,8 +250,7 @@
                         render: function(data, type, row) {
                             return '<div style="text-align:center;"><a class="btn btn-primary" href="/requisitions/view/' +
                                 data.id +
-                                '" >View</a> <a class="btn btn-danger" href="#" onclick="showDelete(' +
-                                data.id + ')"><i class="ri-delete-bin-2-line me-1"></i></a></div>';
+                                '" >View</a></div>';
                         }
                     },
                     {
@@ -315,8 +314,7 @@
                         render: function(data, type, row) {
                             return '<div style="text-align:center;"><a class="btn btn-primary" href="/requisitions/view/' +
                                 data.id +
-                                '" >View</a> <a class="btn btn-danger" href="#" onclick="showDelete(' +
-                                data.id + ')"><i class="ri-delete-bin-2-line me-1"></i></a></div>';
+                                '" >View</a></div>';
                         }
                     },
                     {
