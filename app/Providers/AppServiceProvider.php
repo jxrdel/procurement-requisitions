@@ -44,23 +44,23 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-procurement-requisitions', function ($user) {
-            return $user->department === 'Procurement' || $user->role->name === 'Viewer';
+            return $user->department === 'Procurement' || ($user->role->name === 'Viewer');
         });
 
         Gate::define('view-cost-budgeting-requisitions', function ($user) {
-            return $user->department === 'Cost & Budgeting' || $user->role->name === 'Viewer';
+            return $user->department === 'Cost & Budgeting' || ($user->role->name === 'Viewer' && $user->department === 'PS Office');
         });
 
         Gate::define('view-vote-control-requisitions', function ($user) {
-            return $user->department === 'Vote Control' || $user->role->name === 'Viewer';
+            return $user->department === 'Vote Control' || ($user->role->name === 'Viewer' && $user->department === 'PS Office');
         });
 
         Gate::define('view-check-room-requisitions', function ($user) {
-            return $user->department === 'Check Staff' || $user->role->name === 'Viewer';
+            return $user->department === 'Check Staff' || ($user->role->name === 'Viewer' && $user->department === 'PS Office');
         });
 
         Gate::define('view-cheque-processing-requisitions', function ($user) {
-            return $user->department === 'Cheque Processing' || $user->role->name === 'Viewer';
+            return $user->department === 'Cheque Processing' || ($user->role->name === 'Viewer' && $user->department === 'PS Office');
         });
 
         Gate::define('view-users-page', function ($user) {

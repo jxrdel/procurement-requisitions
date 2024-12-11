@@ -31,6 +31,23 @@ class Controller
         //Count of requisitions in progress
         $inprogressRequisitionsCount = Requisition::where('is_completed', false)->count();
 
+        //If the user is a Viewer and not in Procurement or PS Office, only show their department's requisitions i.e. For Jesse's account
+        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department !== 'Procurement' && Auth::user()->department !== 'PS Office') {
+            $allRequisitionsCount = Requisition::join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
+                ->where('departments.name', Auth::user()->department)
+                ->count();
+
+            $completedRequisitionsCount = Requisition::where('is_completed', true)
+                ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
+                ->where('departments.name', Auth::user()->department)
+                ->count();
+
+            $inprogressRequisitionsCount = Requisition::where('is_completed', false)
+                ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
+                ->where('departments.name', Auth::user()->department)
+                ->count();
+        }
+
         $inProgressDonut = Requisition::select('requisition_status', 'requisition_no')
             ->where('is_completed', false)
             ->get()
