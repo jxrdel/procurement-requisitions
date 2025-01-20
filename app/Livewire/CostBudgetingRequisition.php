@@ -86,7 +86,7 @@ class CostBudgetingRequisition extends Component
 
     public function edit()
     {
-
+        //Set dates to null if they are empty strings. This happens when the date is deleted
         if ($this->date_sent_request_mof === '') {
             $this->date_sent_request_mof = null;
         }
@@ -97,18 +97,19 @@ class CostBudgetingRequisition extends Component
 
         $status = $this->requisition->requisition_status;
 
+        //Get requisition status
         if (!$this->requisition->vote_control_requisition && !$this->cb_requisition->is_completed) {
             $status = $this->getStatus();
         }
 
         $this->validate(
             [
-                'date_sent_request_mof' => 'nullable|date|after_or_equal:' . $this->cb_requisition->date_received,
+                'date_sent_request_mof' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
                 'release_date' => 'nullable|date|after:date_sent_request_mof',
 
             ],
             [
-                'date_sent_request_mof.after_or_equal' => 'The Date Sent to MoF must be a date after the Date Sent to Cost & Budgeting',
+                'date_sent_request_mof.after_or_equal' => 'Please check date',
                 'release_date.after' => 'The Release Date must be a date after the Date Sent to MoF',
             ]
         );
@@ -184,9 +185,13 @@ class CostBudgetingRequisition extends Component
             'date_completed' => Carbon::now(),
         ]);
 
-        //Get assigned user
+        //Send email to assigned procurement officer
         $user = $this->requisition->procurement_officer;
-        Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+        if ($user) {
+            Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+        } else {
+            Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+        }
 
         return redirect()->route('cost_and_budgeting.index')->with('success', 'Requisition sent to procurement successfully');
     }
@@ -212,6 +217,7 @@ class CostBudgetingRequisition extends Component
 
     public function updating($name, $value)
     {
+        //Skip rendering when the change_of_vote_no is being updated
         if ($name === 'change_of_vote_no') {
             $this->skipRender();
         }

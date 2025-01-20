@@ -78,13 +78,13 @@ class ViewCheckRoomRequisition extends Component
 
         $this->validate(
             [
-                'date_received_from_vc' => 'nullable|date|after_or_equal:' . $this->requisition->check_room_requisition->date_received,
+                'date_received_from_vc' => 'nullable|date|after_or_equal:' . $this->requisition->release_date,
                 'date_sent_audit' => 'nullable|date|after_or_equal:date_received_from_vc',
                 'date_received_from_audit' => 'nullable|date|after_or_equal:date_sent_audit',
                 'date_sent_chequeprocessing' => 'nullable|date|after_or_equal:date_received_from_audit',
             ],
             [
-                'date_received_from_vc.after_or_equal' => 'This date must be after or equal to the date the requisition was sent to Check Staff.',
+                'date_received_from_vc.after_or_equal' => 'Please check date.',
                 'date_sent_audit.after_or_equal' => 'The Date Sent to Audit must be a date after or equal to the Date Received from Vote Control.',
                 'date_received_from_audit.after_or_equal' => 'The Date Received from Audit must be a date after or equal to the Date Sent to Audit.',
                 'date_sent_chequeprocessing.after_or_equal' => 'The Date Sent to Cheque Processing must be a date after or equal to the Date Received from Audit.',

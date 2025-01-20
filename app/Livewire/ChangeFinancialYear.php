@@ -23,10 +23,10 @@ class ChangeFinancialYear extends Component
     {
         $this->validate(
             [
-                'financial_year' => 'required|regex:/^\d{2}\/\d{2}$/',
+                'financial_year' => 'required|regex:/^\d{2}\/\d{2}$/', // The financial year must be in the format YY/YY
             ],
             [
-                'financial_year.regex' => 'The financial year must be in the format YY/YY',
+                'financial_year.regex' => 'The financial year must be in the format YY/YY', //Validation message
             ]
         );
 

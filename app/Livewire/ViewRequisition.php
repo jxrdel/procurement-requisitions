@@ -503,7 +503,7 @@ class ViewRequisition extends Component
 
         $this->validate([
             'eta' => 'nullable|date|after_or_equal:today',
-            'date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->cost_budgeting_requisition->date_completed,
+            'date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
             // 'date_invoice_received' => 'required|date|after_or_equal:today',
             // 'date_sent_ap' => 'nullable|date|after_or_equal:date_sent_commit',
         ]);
