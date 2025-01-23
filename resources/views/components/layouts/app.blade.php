@@ -111,6 +111,22 @@
                         </li>
                     @endcan
 
+                    @can('view-accounts-payable-requisitions')
+                        <li class="menu-header mt-7">
+                            <span class="menu-header-text">Accounts Payable</span>
+                        </li>
+                        <!-- Apps -->
+                        <li @class([
+                            'menu-item',
+                            'active' => request()->routeIs('accounts_payable.*'),
+                        ])>
+                            <a href="{{ route('accounts_payable.index') }}" class="menu-link">
+                                <i class="menu-icon ri-file-edit-line"></i>
+                                <div data-i18n="Basic">Requisitions</div>
+                            </a>
+                        </li>
+                    @endcan
+
                     @can('view-cost-budgeting-requisitions')
                         <li class="menu-header mt-7">
                             <span class="menu-header-text">Cost &amp; Budgeting</span>
@@ -146,7 +162,7 @@
 
                     @can('view-check-room-requisitions')
                         <li class="menu-header mt-7">
-                            <span class="menu-header-text">Check Room</span>
+                            <span class="menu-header-text">Check Staff</span>
                         </li>
                         <!-- Apps -->
                         <li @class(['menu-item', 'active' => request()->routeIs('check_room.*')])>

@@ -18,7 +18,9 @@ class CostBudgetingRequisition extends Component
     public $requisition;
 
     public $date_sent_request_mof;
+    public $request_category;
     public $request_no;
+    public $release_type;
     public $release_no;
     public $release_date;
     public $change_of_vote_no;
@@ -34,6 +36,8 @@ class CostBudgetingRequisition extends Component
     public $ps_approval;
     public $vendor_name;
     public $amount;
+    public $logs;
+    public $logdetails;
 
     public $isEditing = true;
     public $votes;
@@ -50,7 +54,9 @@ class CostBudgetingRequisition extends Component
         $this->requisition = Requisition::find($this->cb_requisition->requisition_id);
 
         $this->date_sent_request_mof = $this->requisition->date_sent_request_mof;
+        $this->request_category = $this->requisition->request_category;
         $this->request_no = $this->requisition->request_no;
+        $this->release_type = $this->requisition->release_type;
         $this->release_no = $this->requisition->release_no;
         $this->release_date = $this->requisition->release_date;
         $this->change_of_vote_no = $this->requisition->change_of_vote_no;
@@ -81,6 +87,7 @@ class CostBudgetingRequisition extends Component
 
     public function render()
     {
+        $this->logs = $this->requisition->statuslogs;
         return view('livewire.cost-budgeting-requisition')->title($this->requisition->requisition_no . ' | View Requisition');
     }
 
@@ -117,7 +124,9 @@ class CostBudgetingRequisition extends Component
         $this->requisition->update([
             'requisition_status' => $status,
             'date_sent_request_mof' => $this->date_sent_request_mof,
+            'request_category' => $this->request_category,
             'request_no' => trim($this->request_no),
+            'release_type' => $this->release_type,
             'release_no' => trim($this->release_no),
             'release_date' => $this->release_date,
             'change_of_vote_no' => trim($this->change_of_vote_no),
@@ -198,6 +207,10 @@ class CostBudgetingRequisition extends Component
 
     public function getStatus()
     {
+        if ($this->requisition->is_completed) {
+            return 'Completed';
+        }
+
         $status = 'At Cost & Budgeting';
 
         if (!$this->date_sent_request_mof && !$this->request_no && !$this->release_no && !$this->release_date && !$this->change_of_vote_no) {
@@ -221,5 +234,19 @@ class CostBudgetingRequisition extends Component
         if ($name === 'change_of_vote_no') {
             $this->skipRender();
         }
+    }
+
+    public function addLog()
+    {
+
+        $this->requisition->statuslogs()->create([
+            'details' => $this->logdetails,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->logdetails = null;
+
+        $this->dispatch('close-log-modal');
+        $this->dispatch('show-message', message: 'Log added successfully');
     }
 }

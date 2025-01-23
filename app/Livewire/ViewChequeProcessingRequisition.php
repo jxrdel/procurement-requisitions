@@ -21,8 +21,12 @@ class ViewChequeProcessingRequisition extends Component
 
     public $isEditing = true;
 
+    public $logs;
+    public $logdetails;
+
     public function render()
     {
+        $this->logs = $this->requisition->statuslogs;
         return view('livewire.view-cheque-processing-requisition')->title($this->requisition->requisition_no . ' | View Requisition');
     }
 
@@ -124,6 +128,10 @@ class ViewChequeProcessingRequisition extends Component
 
     public function getStatus()
     {
+        if ($this->requisition->is_completed) {
+            return 'Completed';
+        }
+
         $status = 'At Cheque Processing';
 
         if ($this->date_cheque_processed && !$this->cp_requisition->is_completed) {
@@ -139,5 +147,19 @@ class ViewChequeProcessingRequisition extends Component
         }
 
         return $status;
+    }
+
+    public function addLog()
+    {
+
+        $this->requisition->statuslogs()->create([
+            'details' => $this->logdetails,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->logdetails = null;
+
+        $this->dispatch('close-log-modal');
+        $this->dispatch('show-message', message: 'Log added successfully');
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountsPayableController;
 use App\Http\Controllers\VoteControlRequisitionController;
 use App\Http\Controllers\CBRequisitionController;
 use App\Http\Controllers\CheckRoomController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\RequisitionController;
 use App\Livewire\CostBudgetingRequisition;
 use App\Livewire\CreateRequisition;
 use App\Livewire\LoginForm;
+use App\Livewire\ViewAccountsPayableRequisition;
 use App\Livewire\ViewCheckRoomRequisition;
 use App\Livewire\ViewChequeProcessingRequisition;
 use App\Livewire\ViewVoteControlRequisition;
@@ -34,6 +36,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getcostandbudgeting_requisitions', [CBRequisitionController::class, 'getCostAndBudgetingRequisitions'])->name('getcostandbudgeting_requisitions');
     Route::get('/getcompletedcostandbudgeting_requisitions', [CBRequisitionController::class, 'getCompletedCostAndBudgetingRequisitions'])->name('getcompletedcostandbudgeting_requisitions');
     Route::get('/getinprogresscostandbudgeting_requisitions', [CBRequisitionController::class, 'getInProgressCostAndBudgetingRequisitions'])->name('getinprogresscostandbudgeting_requisitions');
+
+    Route::get('/accounts_payable', [AccountsPayableController::class, 'index'])->name('accounts_payable.index');
+    Route::get('/accounts_payable/view/{id}', ViewAccountsPayableRequisition::class)->name('accounts_payable.view')->middleware('can:view-accounts-payable-requisitions');
+    Route::get('/getaccountspayable_requisitions', [AccountsPayableController::class, 'getAccountsPayableRequisitions'])->name('getaccountspayable_requisitions');
+    Route::get('/getcompletedaccountspayable_requisitions', [AccountsPayableController::class, 'getCompletedAccountsPayableRequisitions'])->name('getcompletedaccountspayable_requisitions');
+    Route::get('/getinprogressaccountspayable_requisitions', [AccountsPayableController::class, 'getInProgressAccountsPayableRequisitions'])->name('getinprogressaccountspayable_requisitions');
 
     Route::get('/vote_control', [VoteControlRequisitionController::class, 'index'])->name('vote_control.index');
     Route::get('/vote_control/view/{id}', ViewVoteControlRequisition::class)->name('vote_control.view')->middleware('can:view-vote-control-requisitions');

@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Vote Control Requisitions | PRA</title>
+    <title>Accounts Payable Requisitions | PRA</title>
 @endsection
 
 @section('content')
@@ -61,7 +61,7 @@
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "{{ route('getvotecontrol_requisitions') }}",
+                    "url": "{{ route('getaccountspayable_requisitions') }}",
                     "type": "GET"
                 },
                 "columns": [{
@@ -77,30 +77,17 @@
                         name: 'requisitions.item'
                     },
                     {
-                        data: 'date_sent_ap',
-                        name: 'date_sent_ap',
-                        render: function(data, type, row) {
-                            if (data) {
-                                var date = new Date(data);
-                                // Format the date as dd/mm/yyyy
-                                var day = ('0' + date.getDate()).slice(-
-                                    2); // Add leading 0 if necessary
-                                var month = ('0' + (date.getMonth() + 1)).slice(-
-                                    2); // Add leading 0, note months are 0-indexed
-                                var year = date.getFullYear();
-                                return day + '/' + month + '/' + year;
-                            }
-                            return ''; // Return an empty string if there's no date
-                        }
+                        data: 'ap_created_at',
+                        name: 'ap_requisitions.created_at'
                     },
                     {
-                        data: 'ar_completed',
-                        name: 'vote_control_requisitions.is_completed',
+                        data: 'ap_completed',
+                        name: 'ap_requisitions.is_completed',
                         render: function(data, type, row) {
                             var status = row.requisition_status ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
-                            if (status === 'Sent to Vote Control') {
-                                return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Vote Control</span></div>';
+                            if (status === 'Sent to Accounts Payable') {
+                                return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Procurement</span></div>';
                             } else if (data === false || data == 0) {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
                                     status + '</span></div>';
@@ -116,13 +103,13 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            return ' <div style="text-align:center"><a class="btn btn-primary" href="/vote_control/view/' +
-                                data.ar_id + '" >View</a> </div>';
+                            return ' <div style="text-align:center"><a class="btn btn-primary" href="/accounts_payable/view/' +
+                                data.ap_id + '" >View</a> </div>';
                         }
                     },
                     {
-                        data: 'ar_id',
-                        name: 'vote_control_requisitions.id',
+                        data: 'ap_id',
+                        name: 'ap_requisitions.id',
                         visible: false // Hide the column but use it for sorting
                     }
                 ]
@@ -133,15 +120,15 @@
             var selectedOption = $("input[name='btnradio']:checked").attr('id');
             switch (selectedOption) {
                 case 'btn-in-progress':
-                    $('#myTable').DataTable().ajax.url('{{ route('getinprogressvotecontrol_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getinprogressaccountspayable_requisitions') }}')
                         .load();
                     break;
                 case 'btn-completed':
-                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedvotecontrol_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedaccountspayable_requisitions') }}')
                         .load();
                     break;
                 case 'btn-all':
-                    $('#myTable').DataTable().ajax.url('{{ route('getvotecontrol_requisitions') }}').load();
+                    $('#myTable').DataTable().ajax.url('{{ route('getaccountspayable_requisitions') }}').load();
                     break;
             }
         });

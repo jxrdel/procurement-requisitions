@@ -87,7 +87,7 @@
                             var status = row.requisition_status ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
                             if (status === 'Sent to Cheque Processing') {
-                                return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Check Room</span></div>';
+                                return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Check Staff</span></div>';
                             } else if (data === false || data == 0) {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
                                     status + '</span></div>';

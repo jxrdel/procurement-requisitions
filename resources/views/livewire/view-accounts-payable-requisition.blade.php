@@ -7,7 +7,7 @@
         <div class="card-body">
 
             <div class="d-sm-flex align-items-center justify-content-between mb-5">
-                <a href="{{ route('vote_control.index') }}" class="btn btn-primary">
+                <a href="{{ route('accounts_payable.index') }}" class="btn btn-primary">
                     <i class="ri-arrow-left-circle-line me-1"></i> Back
                 </a>
                 <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
@@ -16,12 +16,6 @@
                 </h1>
             </div>
 
-            {{-- <div class="row mt-2">
-
-                <div class="col mx-5">
-                    <label><strong>Date Received:</strong> {{ $this->getDateSentVC() }}</label>
-                </div>
-            </div> --}}
             <div x-show="isEditing">
                 <form wire:submit.prevent="edit">
                     <div id="inputForm">
@@ -31,45 +25,27 @@
 
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="batch_no" type="text"
-                                        class="form-control @error('batch_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Batch Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Batch Number</label>
-                                </div>
-                                @error('batch_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="voucher_no" type="text"
-                                        class="form-control @error('voucher_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Voucher Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Voucher Number</label>
-                                </div>
-                                @error('voucher_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-7">
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_sent_checkstaff" type="date"
-                                        class="form-control @error('date_sent_checkstaff')is-invalid @enderror"
+                                    <input autocomplete="off" wire:model="date_received_ap" type="date"
+                                        class="form-control @error('date_received_ap')is-invalid @enderror"
                                         id="floatingInput" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Date Sent to Check Staff</label>
+                                    <label for="floatingInput">Date Received From Procurement</label>
                                 </div>
-                                @error('date_sent_checkstaff')
+                                @error('date_received_ap')
                                     <div class="text-danger"> {{ $message }} </div>
                                 @enderror
                             </div>
 
                             <div class="col">
+                                <div class="form-floating form-floating-outline">
+                                    <input autocomplete="off" wire:model="date_sent_vc" type="date"
+                                        class="form-control @error('date_sent_vc')is-invalid @enderror"
+                                        id="floatingInput" placeholder="Voucher Number"
+                                        aria-describedby="floatingInputHelp" />
+                                    <label for="floatingInput">Date Sent to Vote Control</label>
+                                </div>
+                                @error('date_sent_vc')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
                             </div>
 
                         </div>
@@ -90,21 +66,13 @@
                 <div class="row mt-8">
 
                     <div class="col mx-5">
-                        <label><strong>Batch Number:</strong> {{ $this->batch_no }}</label>
+                        <label><strong>Date Received From Procurement:</strong>
+                            {{ $this->getFormattedDate($this->date_received_ap) }}</label>
                     </div>
 
                     <div class="col mx-5">
-                        <label><strong>Voucher Number: </strong>{{ $this->voucher_no }}</label>
-                    </div>
-                </div>
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Date Sent to Check Staff:</strong>
-                            {{ $this->getFormattedDate($this->date_sent_checkstaff) }}</label>
-                    </div>
-
-                    <div class="col mx-5">
+                        <label><strong>Date Sent to Vote Control:</strong>
+                            {{ $this->getFormattedDate($this->date_sent_vc) }}</label>
                     </div>
                 </div>
 
@@ -116,15 +84,15 @@
                                 <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
                             </button>
                             &nbsp;
-                            @if (!$this->vc_requisition->is_completed)
+                            @if (!$this->ap_requisition->is_completed)
                                 <button @disabled($this->isButtonDisabled)
-                                    wire:confirm="Are you sure you want to send this requisition to Check Staff?"
-                                    wire:loading.attr="disabled" wire:click="sendToCheckRoom"
+                                    wire:confirm="Are you sure you want to send this requisition to Vote Control?"
+                                    wire:loading.attr="disabled" wire:click="sendToVoteControl"
                                     class="btn btn-success waves-effect waves-light" style="width:250px">
-                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Check Staff
+                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Vote Control
 
-                                    <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
-                                        role="status">
+                                    <div wire:loading wire:target="sendToVoteControl"
+                                        class="spinner-border spinner-border-lg text-white mx-2" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
                                 </button>

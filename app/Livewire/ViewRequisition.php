@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Mail\NotifyAccountsPayable;
 use App\Mail\NotifyCostBudgeting;
 use App\Mail\NotifyVoteControl;
 use App\Models\CBRequisition;
@@ -151,6 +152,10 @@ class ViewRequisition extends Component
 
         if ($this->requisition->cost_budgeting_requisition && $this->requisition->cost_budgeting_requisition->is_completed) {
             $this->active_pane = 'procurement2';
+        }
+
+        if ($this->requisition->ap_requisition && !$this->requisition->ap_requisition->is_completed) {
+            $this->active_pane = 'accounts_payable';
         }
 
         if ($this->requisition->vote_control_requisition) {
@@ -537,28 +542,28 @@ class ViewRequisition extends Component
         $this->dispatch('show-message', message: 'Requisition edited successfully');
     }
 
-    public function sendToVoteControl()
+    public function sendToAP()
     {
 
         $this->requisition->update([
-            'requisition_status' => 'Sent to Vote Control',
+            'requisition_status' => 'Sent to Accounts Payable',
             'updated_by' => Auth::user()->username,
         ]);
 
-        $this->requisition->vote_control_requisition()->create([
+        $this->requisition->ap_requisition()->create([
             'date_received' => Carbon::now(),
         ]);
 
         //Send email to Vote Control
 
         //Get Vote Control users
-        $users = User::voteControl()->get();
+        $users = User::accountsPayable()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->queue(new NotifyVoteControl($this->requisition));
+            Mail::to($user->email)->queue(new NotifyAccountsPayable($this->requisition));
         }
 
-        return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Vote Control');
+        return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Accounts Payable');
     }
 
     //Accounts

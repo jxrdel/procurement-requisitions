@@ -31,7 +31,7 @@
                     <button type="button" @class(['nav-link', 'active' => $this->panes === '5']) role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-check-room" aria-controls="navs-justified-check-room"
                         aria-selected="false">
-                        <i class="bi bi-5-circle-fill me-1_5"></i> Check Room
+                        <i class="bi bi-5-circle-fill me-1_5"></i> Check Staff
                     </button>
                 </li>
                 @if ($this->panes >= 6)
@@ -160,11 +160,21 @@
         </div>
         <div wire:ignore.self @class(['tab-pane fade', 'show active' => $this->panes === '2']) id="navs-justified-cost_budgeting" role="tabpanel">
             <div>
+
                 <div class="row mt-8">
 
                     <div class="col mx-5">
                         <label><strong>Date Request Sent to Ministry of Finance:
                             </strong>{{ $this->getFormattedDate($this->date_sent_request_mof) }}</label>
+                    </div>
+
+                    <div class="col mx-5">
+                    </div>
+                </div>
+                <div class="row mt-7">
+
+                    <div class="col mx-5">
+                        <label><strong>Request Category:</strong> {{ $this->requisition->request_category }}</label>
                     </div>
 
                     <div class="col mx-5">
@@ -175,12 +185,11 @@
                 <div class="row mt-7">
 
                     <div class="col mx-5">
-                        <label><strong>Release Number:</strong> {{ $this->release_no }}</label>
+                        <label><strong>Release Type:</strong> {{ $this->requisition->release_type }}</label>
                     </div>
 
                     <div class="col mx-5">
-                        <label><strong>Release Date:</strong>
-                            {{ $this->getFormattedDate($this->release_date) }}</label>
+                        <label><strong>Release Number:</strong> {{ $this->release_no }}</label>
                     </div>
 
                 </div>
@@ -188,13 +197,13 @@
                 <div class="row mt-7">
 
                     <div class="col mx-5">
-                        <label><strong>Change of Vote Number:</strong>
-                            {{ $this->change_of_vote_no }}</label>
+                        <label><strong>Release Date:</strong>
+                            {{ $this->getFormattedDate($this->release_date) }}</label>
                     </div>
 
                     <div class="col mx-5">
-                        <label><strong>Date Sent to Procurement:</strong>
-                            {{ $this->getFormattedDate($this->requisition->cost_budgeting_requisition->date_completed) }}</label>
+                        <label><strong>Change of Vote Number:</strong>
+                            {{ $this->requisition->change_of_vote_no }}</label>
                     </div>
 
                 </div>
@@ -258,7 +267,18 @@
                     </div>
 
                     <div class="col mx-5">
-                        <label><strong>Voucher Bumber:</strong> {{ $this->voucher_no }}</label>
+                        <label><strong>Voucher Number:</strong> {{ $this->voucher_no }}</label>
+                    </div>
+                </div>
+
+                <div class="row mt-7">
+
+                    <div class="col mx-5">
+                        <label><strong>Date Sent to Check Staff:</strong>
+                            {{ $this->getFormattedDate($this->requisition->date_sent_checkstaff) }}</label>
+                    </div>
+
+                    <div class="col mx-5">
                     </div>
                 </div>
 

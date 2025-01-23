@@ -47,6 +47,10 @@ class AppServiceProvider extends ServiceProvider
             return $user->department === 'Procurement' || ($user->role->name === 'Viewer');
         });
 
+        Gate::define('view-accounts-payable-requisitions', function ($user) {
+            return $user->department === 'Accounts Payable' || ($user->role->name === 'Viewer' && $user->department === 'PS Office');
+        });
+
         Gate::define('view-cost-budgeting-requisitions', function ($user) {
             return $user->department === 'Cost & Budgeting' || ($user->role->name === 'Viewer' && $user->department === 'PS Office');
         });

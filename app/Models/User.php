@@ -35,6 +35,11 @@ class User extends Authenticatable
         return $query->where('department', 'Cost & Budgeting');
     }
 
+    public function scopeAccountsPayable($query)
+    {
+        return $query->where('department', 'Accounts Payable');
+    }
+
     public function scopeVoteControl($query)
     {
         return $query->where('department', 'Vote Control');

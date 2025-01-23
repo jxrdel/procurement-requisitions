@@ -52,7 +52,8 @@
                             <select required wire:model="department"
                                 class="form-select @error('department')is-invalid @enderror"
                                 id="exampleFormControlSelect1" aria-label="Default select example">
-                                <option value="">Select a Department</option>\
+                                <option value="">Select a Department</option>
+                                <option value="Accounts Payable">Accounts Payable</option>
                                 <option value="Procurement">Procurement</option>
                                 <option value="Cost & Budgeting">Cost & Budgeting</option>
                                 <option value="Vote Control">Vote Control</option>

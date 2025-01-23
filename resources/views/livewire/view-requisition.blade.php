@@ -56,18 +56,28 @@
                             <i class="bi bi-3-circle-fill me-1_5"></i> Procurement
                         </button>
                     </li>
+                    <li x-on:click="$wire.active_pane = 'accounts_payable'" wire:ignore class="nav-item mb-1 mb-sm-0">
+                        <button type="button" @class([
+                            'nav-link',
+                            'active' => $this->active_pane === 'accounts_payable',
+                        ]) role="tab" data-bs-toggle="tab"
+                            data-bs-target="#navs-justified-accounts_payable"
+                            aria-controls="navs-justified-accounts_payable" aria-selected="false">
+                            <i class="bi bi-4-circle-fill me-1_5"></i> AP
+                        </button>
+                    </li>
                     <li x-on:click="$wire.active_pane = 'votecontrol'" wire:ignore class="nav-item mb-1 mb-sm-0">
                         <button type="button" @class(['nav-link', 'active' => $this->active_pane === 'votecontrol']) role="tab" data-bs-toggle="tab"
                             data-bs-target="#navs-justified-votecontrol" aria-controls="navs-justified-votecontrol"
                             aria-selected="false">
-                            <i class="bi bi-4-circle-fill me-1_5"></i> Vote Control
+                            <i class="bi bi-5-circle-fill me-1_5"></i> Vote Control
                         </button>
                     </li>
                     <li x-on:click="$wire.active_pane = 'checkroom'" wire:ignore class="nav-item mb-1 mb-sm-0">
                         <button type="button" @class(['nav-link', 'active' => $this->active_pane === 'checkroom']) role="tab" data-bs-toggle="tab"
                             data-bs-target="#navs-justified-check-room" aria-controls="navs-justified-check-room"
                             aria-selected="false">
-                            <i class="bi bi-5-circle-fill me-1_5"></i> Check Room
+                            <i class="bi bi-6-circle-fill me-1_5"></i> Check Staff
                         </button>
                     </li>
                     <li x-on:click="$wire.active_pane = 'chequeprocessing'" wire:ignore class="nav-item mb-1 mb-sm-0">
@@ -77,7 +87,7 @@
                         ]) role="tab" data-bs-toggle="tab"
                             data-bs-target="#navs-justified-cheque-processing"
                             aria-controls="navs-justified-cheque-processing" aria-selected="false">
-                            <i class="bi bi-6-circle-fill me-1_5"></i> Cheque Processing
+                            <i class="bi bi-7-circle-fill me-1_5"></i> Cheque Processing
                         </button>
                     </li>
                 </ul>
@@ -347,7 +357,7 @@
                                                     class="form-select @error('assigned_to')is-invalid @enderror"
                                                     id="exampleFormControlSelect1"
                                                     aria-label="Default select example">
-                                                    <option value="Not Sent" selected>Select Employee</option>
+                                                    <option value="" selected>Select Employee</option>
                                                     @foreach ($staff as $staff)
                                                         <option value="{{ $staff->id }}">{{ $staff->name }}
                                                         </option>
@@ -483,11 +493,22 @@
                     ]) id="navs-justified-cost_budgeting"
                         role="tabpanel">
                         <div>
+
                             <div class="row mt-8">
 
                                 <div class="col mx-5">
                                     <label><strong>Date Request Sent to Ministry of Finance:
-                                        </strong>{{ $this->getFormattedDateSentMOF() }}</label>
+                                        </strong>{{ $this->getFormattedDate($this->date_sent_request_mof) }}</label>
+                                </div>
+
+                                <div class="col mx-5">
+                                </div>
+                            </div>
+                            <div class="row mt-7">
+
+                                <div class="col mx-5">
+                                    <label><strong>Request Category:</strong>
+                                        {{ $this->requisition->request_category }}</label>
                                 </div>
 
                                 <div class="col mx-5">
@@ -498,12 +519,12 @@
                             <div class="row mt-7">
 
                                 <div class="col mx-5">
-                                    <label><strong>Release Number:</strong> {{ $this->release_no }}</label>
+                                    <label><strong>Release Type:</strong>
+                                        {{ $this->requisition->release_type }}</label>
                                 </div>
 
                                 <div class="col mx-5">
-                                    <label><strong>Release Date:</strong>
-                                        {{ $this->getFormattedReleaseDate() }}</label>
+                                    <label><strong>Release Number:</strong> {{ $this->release_no }}</label>
                                 </div>
 
                             </div>
@@ -511,13 +532,25 @@
                             <div class="row mt-7">
 
                                 <div class="col mx-5">
-                                    <label><strong>Change of Vote Number:</strong>
-                                        {{ $this->change_of_vote_no }}</label>
+                                    <label><strong>Release Date:</strong>
+                                        {{ $this->getFormattedDate($this->release_date) }}</label>
                                 </div>
+
+                                <div class="col mx-5">
+                                    <label><strong>Change of Vote Number:</strong>
+                                        {{ $this->requisition->change_of_vote_no }}</label>
+                                </div>
+
+                            </div>
+
+                            <div class="row mt-7">
 
                                 <div class="col mx-5">
                                     <label><strong>Date Sent to Procurement:</strong>
                                         {{ $this->getDateCompletedCB() }}</label>
+                                </div>
+
+                                <div class="col mx-5">
                                 </div>
 
                             </div>
@@ -586,16 +619,15 @@
                                     </div>
 
                                     @can('edit-records')
-                                        @if (!$this->requisition->vote_control_requisition)
+                                        @if (!$this->requisition->ap_requisition)
                                             <div class="row mt-8">
                                                 <button @disabled($this->isButtonProcurement2Disabled)
-                                                    wire:confirm="Are you sure you want to send to vote control?"
-                                                    wire:loading.attr="disabled" type="button"
-                                                    wire:click="sendToVoteControl"
+                                                    wire:confirm="Are you sure you want to send to accounts payable?"
+                                                    wire:loading.attr="disabled" type="button" wire:click="sendToAP"
                                                     class="btn btn-success waves-effect waves-light m-auto"
                                                     style="width: 300px">
-                                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Vote
-                                                    Control
+                                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Accounts
+                                                    Payable
 
                                                     <div wire:loading
                                                         class="spinner-border spinner-border-lg text-white mx-2"
@@ -721,6 +753,28 @@
 
                     <div @class([
                         'tab-pane fade',
+                        'show active' => $this->active_pane === 'accounts_payable',
+                    ]) id="navs-justified-accounts_payable" role="tabpanel">
+
+                        <div>
+                            <div class="row mt-8">
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Received From Procurement:
+                                        </strong>{{ $this->getFormattedDate($this->requisition->date_received_ap) }}</label>
+                                </div>
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Sent to Vote Control:</strong>
+                                        {{ $this->getFormattedDate($this->requisition->date_sent_vc) }}</label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div @class([
+                        'tab-pane fade',
                         'show active' => $this->active_pane === 'votecontrol',
                     ]) id="navs-justified-votecontrol" role="tabpanel">
 
@@ -732,7 +786,18 @@
                                 </div>
 
                                 <div class="col mx-5">
-                                    <label><strong>Voucher Bumber:</strong> {{ $this->voucher_no }}</label>
+                                    <label><strong>Voucher Number:</strong> {{ $this->voucher_no }}</label>
+                                </div>
+                            </div>
+
+                            <div class="row mt-7">
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Sent to Check Staff:</strong>
+                                        {{ $this->getFormattedDate($this->requisition->date_sent_checkstaff) }}</label>
+                                </div>
+
+                                <div class="col mx-5">
                                 </div>
                             </div>
 

@@ -19,10 +19,10 @@ class ViewVoteControlRequisition extends Component
 
     public $batch_no;
     public $voucher_no;
-    public $date_received_from_vc;
-    public $date_of_cheque;
-    public $cheque_no;
-    public $date_sent_chequeprocessing;
+    public $date_sent_checkstaff;
+
+    public $logs;
+    public $logdetails;
 
     public $isEditing = true;
 
@@ -38,10 +38,7 @@ class ViewVoteControlRequisition extends Component
 
         $this->batch_no = $this->requisition->batch_no;
         $this->voucher_no = $this->requisition->voucher_no;
-        $this->date_received_from_vc = $this->requisition->date_received_from_vc;
-        $this->date_of_cheque = $this->requisition->date_of_cheque;
-        $this->cheque_no = $this->requisition->cheque_no;
-        $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
+        $this->date_sent_checkstaff = $this->requisition->date_sent_checkstaff;
 
         if ($this->batch_no !== null && $this->voucher_no !== null) {
             $this->isEditing = false;
@@ -54,34 +51,16 @@ class ViewVoteControlRequisition extends Component
 
     public function render()
     {
+        $this->logs = $this->requisition->statuslogs;
         return view('livewire.view-vote-control-requisition')->title($this->requisition->requisition_no . ' | View Requisition');
     }
 
-    public function getFormattedDateSentChequeroom()
-    {
-        if ($this->date_received_from_vc) {
-            return Carbon::parse($this->date_received_from_vc)->format('F jS, Y');
-        }
-    }
-
-    public function getFormattedDateOfCheque()
-    {
-        if ($this->date_of_cheque) {
-            return Carbon::parse($this->date_of_cheque)->format('F jS, Y');
-        }
-    }
-
-    public function getFormattedDateChequeForwarded()
-    {
-        if ($this->date_sent_chequeprocessing) {
-            return Carbon::parse($this->date_sent_chequeprocessing)->format('F jS, Y');
-        }
-    }
     public function getIsButtonDisabledProperty()
     {
         return
             $this->voucher_no === null || trim($this->voucher_no) === '' ||
-            $this->batch_no === null || trim($this->batch_no) === '';
+            $this->batch_no === null || trim($this->batch_no) === '' ||
+            $this->date_sent_checkstaff === null || trim($this->date_sent_checkstaff) === '';
     }
 
     //Edit funciton
@@ -89,45 +68,13 @@ class ViewVoteControlRequisition extends Component
     public function edit()
     {
 
-        if ($this->date_received_from_vc === '') {
-            $this->date_received_from_vc = null;
-        }
-
-        if ($this->date_of_cheque === '') {
-            $this->date_of_cheque = null;
-        }
-
-        if ($this->cheque_no === '') {
-            $this->cheque_no = null;
-        }
-
-        if ($this->date_sent_chequeprocessing === '') {
-            $this->date_sent_chequeprocessing = null;
-        }
-
         $status = $this->getStatus();
-
-        $this->validate(
-            [
-                'date_received_from_vc' => 'nullable|date|after_or_equal:' . $this->vc_requisition->date_received,
-                'date_of_cheque' => 'nullable|date|after_or_equal:date_received_from_vc',
-                'date_sent_chequeprocessing' => 'nullable|date|after_or_equal:date_of_cheque',
-            ],
-            [
-                'date_received_from_vc.after_or_equal' => 'Date received from Vote Control must be after or equal to the date received from Vote Control',
-                'date_of_cheque.after_or_equal' => 'Date of cheque must be after or equal to the date received from Vote Control',
-                'date_sent_chequeprocessing.after_or_equal' => 'Date sent to cheque processing must be after or equal to the date of cheque',
-            ]
-        );
 
         $this->requisition->update([
             'batch_no' => $this->batch_no,
             'voucher_no' => $this->voucher_no,
+            'date_sent_checkstaff' => $this->date_sent_checkstaff,
             'requisition_status' => $status,
-            'date_received_from_vc' => $this->date_received_from_vc,
-            'date_of_cheque' => $this->date_of_cheque,
-            'cheque_no' => trim($this->cheque_no),
-            'date_sent_chequeprocessing' => $this->date_sent_chequeprocessing,
         ]);
 
         $this->isEditing = false;
@@ -149,7 +96,7 @@ class ViewVoteControlRequisition extends Component
         ]);
 
         $this->requisition->update([
-            'requisition_status' => 'Sent to Check Room',
+            'requisition_status' => 'Sent to Check Staff',
         ]);
 
         //Get Emails of Check Staff
@@ -158,15 +105,19 @@ class ViewVoteControlRequisition extends Component
             Mail::to($staff->email)->queue(new NotifyCheckRoom($this->requisition));
         }
 
-        return redirect()->route('vote_control.index')->with('success', 'Requisition sent to Check Room successfully');
+        return redirect()->route('vote_control.index')->with('success', 'Requisition sent to Check Staff successfully');
     }
 
     public function getStatus()
     {
+        if ($this->requisition->is_completed) {
+            return 'Completed';
+        }
+
         $status = 'At Vote Control';
 
         if ($this->batch_no && $this->voucher_no && !$this->vc_requisition->is_completed) {
-            $status = 'To Be Sent to Check Room';
+            $status = 'To Be Sent to Check Staff';
         }
 
         return $status;
@@ -176,6 +127,27 @@ class ViewVoteControlRequisition extends Component
     {
         if ($this->vc_requisition->date_received) {
             return Carbon::parse($this->vc_requisition->date_received)->format('F jS Y');
+        }
+    }
+
+    public function addLog()
+    {
+
+        $this->requisition->statuslogs()->create([
+            'details' => $this->logdetails,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->logdetails = null;
+
+        $this->dispatch('close-log-modal');
+        $this->dispatch('show-message', message: 'Log added successfully');
+    }
+
+    public function getFormattedDate($date)
+    {
+        if ($date !== null) {
+            return Carbon::parse($date)->format('F jS, Y');
         }
     }
 }

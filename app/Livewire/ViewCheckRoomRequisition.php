@@ -21,10 +21,14 @@ class ViewCheckRoomRequisition extends Component
     public $date_received_from_audit;
     public $date_sent_chequeprocessing;
 
+    public $logs;
+    public $logdetails;
+
     public $isEditing = true;
 
     public function render()
     {
+        $this->logs = $this->requisition->statuslogs;
         return view('livewire.view-check-room-requisition')->title($this->requisition->requisition_no . ' | View Requisition');
     }
 
@@ -129,10 +133,14 @@ class ViewCheckRoomRequisition extends Component
 
     public function getStatus()
     {
-        $status = 'At Check Room';
+        if ($this->requisition->is_completed) {
+            return 'Completed';
+        }
+
+        $status = 'At Check Staff';
 
         if ($this->date_received_from_vc && !$this->cr_requisition->is_completed) {
-            $status = 'Received by Check Room';
+            $status = 'Received by Check Staff';
         }
 
         if ($this->date_received_from_vc && $this->voucher_destination === 'Internal Audit' && !$this->date_sent_audit) {
@@ -183,5 +191,19 @@ class ViewCheckRoomRequisition extends Component
         }
 
         return redirect()->route('check_room.index')->with('success', 'Requisition sent to Cheque Processing successfully');
+    }
+
+    public function addLog()
+    {
+
+        $this->requisition->statuslogs()->create([
+            'details' => $this->logdetails,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->logdetails = null;
+
+        $this->dispatch('close-log-modal');
+        $this->dispatch('show-message', message: 'Log added successfully');
     }
 }

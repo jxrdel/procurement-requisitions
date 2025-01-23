@@ -1,4 +1,5 @@
 <div x-data="{ isEditing: $wire.entangle('isEditing') }" x-cloak>
+    @include('add-log')
     <div class="card">
         <div class="card-body">
 
@@ -12,12 +13,12 @@
                 </h1>
             </div>
 
-            <div class="row mt-2">
+            {{-- <div class="row mt-2">
 
                 <div class="col mx-5">
                     <label><strong>Date Received:</strong> {{ $this->getDateSentCB() }}</label>
                 </div>
-            </div>
+            </div> --}}
 
             <div x-show="isEditing">
                 <form wire:submit.prevent="edit">
@@ -34,6 +35,29 @@
                                 @error('date_sent_request_mof')
                                     <div class="text-danger"> {{ $message }} </div>
                                 @enderror
+                            </div>
+
+                            <div class="col">
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-7">
+
+                            <div class="col">
+                                <div class="form-floating form-floating-outline">
+                                    <select wire:model="request_category"
+                                        class="form-select @error('request_category')is-invalid @enderror"
+                                        id="exampleFormControlSelect1" aria-label="Default select example">
+                                        <option value="" selected>Select Request Category</option>
+                                        <option value="Recurrent Expenditure">Recurrent Expenditure</option>
+                                        <option value="Development Program">Development Program</option>
+                                    </select>
+                                    <label for="exampleFormControlSelect1">Request Category</label>
+                                    @error('request_category')
+                                        <div class="text-danger"> {{ $message }} </div>
+                                    @enderror
+                                </div>
                             </div>
 
                             <div class="col">
@@ -54,6 +78,22 @@
 
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
+                                    <select wire:model="release_type"
+                                        class="form-select @error('release_type')is-invalid @enderror"
+                                        id="exampleFormControlSelect1" aria-label="Default select example">
+                                        <option value="" selected>Select Release Type</option>
+                                        <option value="Release of Funds">Release of Funds</option>
+                                        <option value="Transfer of Release Funds">Transfer of Release Funds</option>
+                                    </select>
+                                    <label for="exampleFormControlSelect1">Release Type</label>
+                                    @error('release_type')
+                                        <div class="text-danger"> {{ $message }} </div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-floating form-floating-outline">
                                     <input autocomplete="off" wire:model="release_no" type="text"
                                         class="form-control @error('release_no')is-invalid @enderror" id="floatingInput"
                                         placeholder="Release Number" aria-describedby="floatingInputHelp" />
@@ -63,6 +103,10 @@
                                     <div class="text-danger"> {{ $message }} </div>
                                 @enderror
                             </div>
+
+                        </div>
+                        <div class="row mt-7">
+
 
                             <div class="col">
                                 <div class="form-floating form-floating-outline">
@@ -75,10 +119,6 @@
                                     <div class="text-danger"> {{ $message }} </div>
                                 @enderror
                             </div>
-
-                        </div>
-                        <div class="row mt-7">
-
                             <div class="col">
                                 <div wire:ignore>
                                     <label style="width:100%" for="covSelect">Change of Vote Number:</label>
@@ -95,9 +135,6 @@
                                 @error('change_of_vote_no')
                                     <div class="text-danger"> {{ $message }} </div>
                                 @enderror
-                            </div>
-
-                            <div class="col">
                             </div>
 
                         </div>
@@ -122,6 +159,15 @@
                     </div>
 
                     <div class="col mx-5">
+                    </div>
+                </div>
+                <div class="row mt-7">
+
+                    <div class="col mx-5">
+                        <label><strong>Request Category:</strong> {{ $this->request_category }}</label>
+                    </div>
+
+                    <div class="col mx-5">
                         <label><strong>Request Number:</strong> {{ $this->request_no }}</label>
                     </div>
                 </div>
@@ -129,11 +175,11 @@
                 <div class="row mt-7">
 
                     <div class="col mx-5">
-                        <label><strong>Release Number:</strong> {{ $this->release_no }}</label>
+                        <label><strong>Release Type:</strong> {{ $this->release_type }}</label>
                     </div>
 
                     <div class="col mx-5">
-                        <label><strong>Release Date:</strong> {{ $this->getFormattedReleaseDate() }}</label>
+                        <label><strong>Release Number:</strong> {{ $this->release_no }}</label>
                     </div>
 
                 </div>
@@ -141,19 +187,20 @@
                 <div class="row mt-7">
 
                     <div class="col mx-5">
-                        <label><strong>Change of Vote Number:</strong> {{ $this->change_of_vote_no }}</label>
+                        <label><strong>Release Date:</strong> {{ $this->getFormattedReleaseDate() }}</label>
                     </div>
 
                     <div class="col mx-5">
+                        <label><strong>Change of Vote Number:</strong> {{ $this->change_of_vote_no }}</label>
                     </div>
 
                 </div>
 
-                <div class="row text-center">
+                <div class="row text-center mt-4">
                     <div>
                         @can('edit-records')
-                            <button type="button" @click="isEditing = true" class="btn btn-dark waves-effect waves-light"
-                                style="width: 100px">
+                            <button type="button" @click="isEditing = true"
+                                class="btn btn-dark waves-effect waves-light" style="width: 100px">
                                 <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
                             </button>
                             &nbsp;
@@ -176,6 +223,52 @@
 
             </div>
 
+            <div>
+                <hr>
+
+                @can('edit-records')
+                    <div class="row mt-5">
+                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addLogModal"
+                            class="btn btn-dark waves-effect waves-light w-25 m-auto">
+                            <span class="tf-icons ri-file-add-line me-1_5"></span>Add Log
+                        </a>
+                    </div>
+                @endcan
+
+                <div class="row mt-8">
+                    <table class="table table-hover table-bordered w-100">
+                        <thead>
+                            <tr>
+                                <th>Details</th>
+                                <th class="text-center" style="width: 20%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            @forelse ($logs as $index => $log)
+                                <tr>
+                                    <td>{{ $log->details }}</td>
+                                    <td class="text-center">
+
+                                        <button @cannot('delete-records') disabled @endcannot
+                                            wire:confirm="Are you sure you want to delete this log?"
+                                            wire:click="deleteLog({{ $log->id }})" type="button"
+                                            class="btn btn-danger">
+                                            <i class="ri-delete-bin-2-line me-1"></i> Delete
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">No logs added</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr>
 
             <div wire:ignore class="accordion mt-8" id="accordionExample" style="margin-top: 15px">
                 <div class="accordion-item">
@@ -295,6 +388,10 @@
                 var selectedValue = $(this).val(); // Get selected values as an array
                 $wire.set('change_of_vote_no', selectedValue); // Pass selected values to Livewire
             });
+
+            window.addEventListener('close-log-modal', event => {
+                $('#addLogModal').modal('hide');
+            })
         });
     </script>
 @endscript

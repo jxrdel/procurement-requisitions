@@ -30,6 +30,8 @@ return new class extends Migration
             $table->boolean('sent_to_cb')->default(false);
 
             //Cost & Budgeting
+            $table->string('release_type')->nullable();
+            $table->string('request_category')->nullable();
             $table->dateTime('date_sent_cb')->nullable();
             $table->date('date_sent_request_mof')->nullable();
             $table->string('request_no')->nullable();
@@ -47,12 +49,17 @@ return new class extends Migration
             $table->date('date_invoice_received')->nullable();
             $table->dateTime('date_sent_ap')->nullable();
 
+            //AP
+            $table->date('date_received_ap')->nullable();
+            $table->date('date_sent_vc')->nullable();
+
             //Vote Control
             $table->string('batch_no')->nullable();
             $table->string('voucher_no')->nullable();
             $table->date('vc_commitment_date')->nullable();
+            $table->date('date_sent_checkstaff')->nullable();
 
-            //Check Room
+            //Check Staff
             $table->date('date_received_from_vc')->nullable();
             $table->string('voucher_destination')->nullable();
             $table->date('date_sent_audit')->nullable();

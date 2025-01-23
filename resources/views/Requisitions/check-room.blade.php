@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Check Room Requisitions | PRA</title>
+    <title>Check Staff Requisitions | PRA</title>
 @endsection
 
 @section('content')
@@ -99,7 +99,7 @@
                         render: function(data, type, row) {
                             var status = row.requisition_status ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
-                            if (status === 'Sent to Check Room') {
+                            if (status === 'Sent to Check Staff') {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Vote Control</span></div>';
                             } else if (data === false || data == 0) {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' +

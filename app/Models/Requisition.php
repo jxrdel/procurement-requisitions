@@ -23,6 +23,8 @@ class Requisition extends Model
         'denied_note',
         'sent_to_cb',
         'date_sent_cb',
+        'release_type',
+        'request_category',
         'date_sent_request_mof',
         'request_no',
         'release_no',
@@ -36,9 +38,12 @@ class Requisition extends Model
         'invoice_no',
         'date_invoice_received',
         'date_sent_ap',
+        'date_received_ap',
+        'date_sent_vc',
         'batch_no',
         'voucher_no',
         'vc_commitment_date',
+        'date_sent_checkstaff',
         'date_received_from_vc',
         'voucher_destination',
         'date_sent_audit',
@@ -74,6 +79,11 @@ class Requisition extends Model
     public function cost_budgeting_requisition()
     {
         return $this->hasOne(CBRequisition::class);
+    }
+
+    public function ap_requisition()
+    {
+        return $this->hasOne(APRequisition::class);
     }
 
     public function vote_control_requisition()
