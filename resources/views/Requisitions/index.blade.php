@@ -63,7 +63,7 @@
                         <th style="width: 12%">Requisition #</th>
                         <th>Vote Number</th>
                         <th>Requesting Unit</th>
-                        <th>Assigned To</th>
+                        <th>Item</th>
                         <th style="text-align: center">Status</th>
                         <th style="width: 15%;text-align:center">Actions</th>
                     </tr>
@@ -110,8 +110,8 @@
                         name: 'departments.name'
                     },
                     {
-                        data: 'EmployeeName',
-                        name: 'users.name'
+                        data: 'item',
+                        name: 'item'
                     },
                     {
                         data: 'requisition_status',
