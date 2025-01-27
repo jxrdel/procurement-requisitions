@@ -111,22 +111,6 @@
                         </li>
                     @endcan
 
-                    @can('view-accounts-payable-requisitions')
-                        <li class="menu-header mt-7">
-                            <span class="menu-header-text">Accounts Payable</span>
-                        </li>
-                        <!-- Apps -->
-                        <li @class([
-                            'menu-item',
-                            'active' => request()->routeIs('accounts_payable.*'),
-                        ])>
-                            <a href="{{ route('accounts_payable.index') }}" class="menu-link">
-                                <i class="menu-icon ri-file-edit-line"></i>
-                                <div data-i18n="Basic">Requisitions</div>
-                            </a>
-                        </li>
-                    @endcan
-
                     @can('view-cost-budgeting-requisitions')
                         <li class="menu-header mt-7">
                             <span class="menu-header-text">Cost &amp; Budgeting</span>
@@ -137,6 +121,22 @@
                             'active' => request()->routeIs('cost_and_budgeting.*'),
                         ])>
                             <a href="{{ route('cost_and_budgeting.index') }}" class="menu-link">
+                                <i class="menu-icon ri-file-edit-line"></i>
+                                <div data-i18n="Basic">Requisitions</div>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('view-accounts-payable-requisitions')
+                        <li class="menu-header mt-7">
+                            <span class="menu-header-text">Accounts Payable</span>
+                        </li>
+                        <!-- Apps -->
+                        <li @class([
+                            'menu-item',
+                            'active' => request()->routeIs('accounts_payable.*'),
+                        ])>
+                            <a href="{{ route('accounts_payable.index') }}" class="menu-link">
                                 <i class="menu-icon ri-file-edit-line"></i>
                                 <div data-i18n="Basic">Requisitions</div>
                             </a>
@@ -189,6 +189,16 @@
                             </a>
                         </li>
                     @endcan
+
+                    <li class="menu-header mt-7">
+                        <span class="menu-header-text">Help</span>
+                    </li>
+                    <li @class(['menu-item mb-3', 'active' => request()->routeIs('help')])>
+                        <a href="{{ route('help') }}" class="menu-link">
+                            <i class="menu-icon fa-solid fa-circle-question"></i>
+                            <div data-i18n="Basic">User Manual</div>
+                        </a>
+                    </li>
 
                 </ul>
             </aside>
@@ -332,6 +342,18 @@
                 timeOut: 3000
             });
         })
+
+        window.addEventListener('show-error', event => {
+
+            toastr.options = {
+                "progressBar": true,
+                "closeButton": true,
+            }
+            toastr.error(event.detail.message, '', {
+                timeOut: 3000
+            });
+        })
+
         window.addEventListener('scroll-to-top', event => {
             window.scrollTo({
                 top: 0,

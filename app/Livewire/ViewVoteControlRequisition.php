@@ -21,9 +21,6 @@ class ViewVoteControlRequisition extends Component
     public $voucher_no;
     public $date_sent_checkstaff;
 
-    public $logs;
-    public $logdetails;
-
     public $isEditing = true;
 
     public function mount($id)
@@ -51,7 +48,6 @@ class ViewVoteControlRequisition extends Component
 
     public function render()
     {
-        $this->logs = $this->requisition->statuslogs;
         return view('livewire.view-vote-control-requisition')->title($this->requisition->requisition_no . ' | View Requisition');
     }
 
@@ -128,20 +124,6 @@ class ViewVoteControlRequisition extends Component
         if ($this->vc_requisition->date_received) {
             return Carbon::parse($this->vc_requisition->date_received)->format('F jS Y');
         }
-    }
-
-    public function addLog()
-    {
-
-        $this->requisition->statuslogs()->create([
-            'details' => $this->logdetails,
-            'created_by' => Auth::user()->username,
-        ]);
-
-        $this->logdetails = null;
-
-        $this->dispatch('close-log-modal');
-        $this->dispatch('show-message', message: 'Log added successfully');
     }
 
     public function getFormattedDate($date)

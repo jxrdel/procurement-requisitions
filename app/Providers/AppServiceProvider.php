@@ -70,5 +70,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('view-users-page', function ($user) {
             return $user->role->name === 'Admin';
         });
+
+        Gate::define('view-log', function ($user, $log) {
+            return $user->department === $log->user->department;
+        });
     }
 }

@@ -94,6 +94,10 @@ class CreateRequisition extends Component
             $this->requisition_status = 'Approved by PS';
         }
 
+        if ($this->assigned_to === '') {
+            $this->assigned_to = null;
+        }
+
 
         $newrequisition = Requisition::create([
             'requisition_status' => $this->requisition_status,

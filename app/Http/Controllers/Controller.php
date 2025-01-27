@@ -21,6 +21,8 @@ class Controller
             return redirect()->route('check_room.index');
         } elseif (Auth::user()->department === 'Cheque Processing') {
             return redirect()->route('cheque_processing.index');
+        } elseif (Auth::user()->department === 'Accounts Payable') {
+            return redirect()->route('accounts_payable.index');
         }
         //Count of all requisitions
         $allRequisitionsCount = Requisition::count();
@@ -123,5 +125,10 @@ class Controller
         $users = User::all();
 
         return DataTables::of($users)->make(true);
+    }
+
+    public function help()
+    {
+        return view('help');
     }
 }

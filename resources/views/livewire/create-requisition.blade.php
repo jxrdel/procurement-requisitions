@@ -112,10 +112,10 @@
 
                     <div class="col">
                         <div class="form-floating form-floating-outline mb-6">
-                            <select required wire:model="assigned_to"
+                            <select wire:model="assigned_to"
                                 class="form-select @error('assigned_to')is-invalid @enderror"
                                 id="exampleFormControlSelect1" aria-label="Default select example">
-                                <option value="Not Sent" selected>Select Employee</option>
+                                <option value="" selected>Select Employee</option>
                                 @foreach ($staff as $staff)
                                     <option value="{{ $staff->id }}">{{ $staff->name }}</option>
                                 @endforeach

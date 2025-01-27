@@ -100,7 +100,7 @@
                             var status = row.requisition_status ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
                             if (status === 'Sent to Vote Control') {
-                                return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Vote Control</span></div>';
+                                return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Accounts Payable</span></div>';
                             } else if (data === false || data == 0) {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
                                     status + '</span></div>';

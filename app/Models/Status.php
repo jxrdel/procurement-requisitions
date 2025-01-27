@@ -15,4 +15,14 @@ class Status extends Model
         'updated_by',
         'requisition_id',
     ];
+
+    public function requisition()
+    {
+        return $this->belongsTo(Requisition::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'username');
+    }
 }

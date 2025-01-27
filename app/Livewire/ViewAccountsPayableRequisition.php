@@ -19,9 +19,6 @@ class ViewAccountsPayableRequisition extends Component
     public $date_received_ap;
     public $date_sent_vc;
 
-    public $logs;
-    public $logdetails;
-
     public $isEditing = true;
 
     public function mount($id)
@@ -48,7 +45,6 @@ class ViewAccountsPayableRequisition extends Component
 
     public function render()
     {
-        $this->logs = $this->requisition->statuslogs;
         return view('livewire.view-accounts-payable-requisition')->title($this->requisition->requisition_no . ' | View Requisition');
     }
 
@@ -141,19 +137,5 @@ class ViewAccountsPayableRequisition extends Component
         }
 
         return $status;
-    }
-
-    public function addLog()
-    {
-
-        $this->requisition->statuslogs()->create([
-            'details' => $this->logdetails,
-            'created_by' => Auth::user()->username,
-        ]);
-
-        $this->logdetails = null;
-
-        $this->dispatch('close-log-modal');
-        $this->dispatch('show-message', message: 'Log added successfully');
     }
 }

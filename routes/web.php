@@ -63,4 +63,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/users', [Controller::class, 'users'])->name('users');
     Route::get('/getusers', [Controller::class, 'getUsers'])->name('getusers');
+
+    Route::get('/help', [Controller::class, 'help'])->name('help');
 });

@@ -61,7 +61,7 @@
                 <thead>
                     <tr>
                         <th style="width: 12%">Requisition #</th>
-                        <th>Vote Number</th>
+                        {{-- <th>Vote Number</th> --}}
                         <th>Requesting Unit</th>
                         <th>Item</th>
                         <th style="text-align: center">Status</th>
@@ -89,7 +89,7 @@
             $('#myTable').DataTable({
                 "pageLength": 50,
                 order: [
-                    [6, 'desc']
+                    [5, 'desc']
                 ],
                 "processing": true,
                 "serverSide": true,
@@ -101,10 +101,10 @@
                         data: 'requisition_no',
                         name: 'requisition_no'
                     },
-                    {
-                        data: 'source_of_funds',
-                        name: 'source_of_funds'
-                    },
+                    // {
+                    //     data: 'source_of_funds',
+                    //     name: 'source_of_funds'
+                    // },
                     {
                         data: 'RequestingUnit',
                         name: 'departments.name'

@@ -2,7 +2,8 @@
     <ul wire:ignore class="nav nav-tabs mb-4 nav-fill" role="tablist">
         <li x-on:click="$wire.panes = '1'" wire:ignore class="nav-item mb-1 mb-sm-0">
             <button type="button" @class(['nav-link', 'active' => $this->panes === '1']) role="tab" data-bs-toggle="tab"
-                data-bs-target="#navs-justified-1" aria-controls="navs-justified-1" aria-selected="true">
+                data-bs-target="#navs-justified-procurement-1" aria-controls="navs-justified-procurement-1"
+                aria-selected="true">
                 <i class="bi bi-1-circle-fill me-1_5"></i> Procurement
             </button>
         </li>
@@ -15,40 +16,52 @@
         </li>
         <li x-on:click="$wire.panes = '3'" wire:ignore class="nav-item mb-1 mb-sm-0">
             <button type="button" @class(['nav-link', 'active' => $this->panes === '3']) role="tab" data-bs-toggle="tab"
-                data-bs-target="#navs-justified-3" aria-controls="navs-justified-3" aria-selected="false">
+                data-bs-target="#navs-justified-procurement-2" aria-controls="navs-justified-procurement-2"
+                aria-selected="false">
                 <i class="bi bi-3-circle-fill me-1_5"></i> Procurement
             </button>
         </li>
         @if ($this->panes >= 4)
             <li x-on:click="$wire.panes = '4'" wire:ignore class="nav-item mb-1 mb-sm-0">
                 <button type="button" @class(['nav-link', 'active' => $this->panes === '4']) role="tab" data-bs-toggle="tab"
-                    data-bs-target="#navs-justified-4" aria-controls="navs-justified-4" aria-selected="false">
-                    <i class="bi bi-4-circle-fill me-1_5"></i> Vote Control
+                    data-bs-target="#navs-justified-accounts-payable" aria-controls="navs-justified-accounts-payable"
+                    aria-selected="false">
+                    <i class="bi bi-4-circle-fill me-1_5"></i> Accounts Payable
                 </button>
             </li>
             @if ($this->panes >= 5)
                 <li x-on:click="$wire.panes = '5'" wire:ignore class="nav-item mb-1 mb-sm-0">
                     <button type="button" @class(['nav-link', 'active' => $this->panes === '5']) role="tab" data-bs-toggle="tab"
-                        data-bs-target="#navs-justified-check-room" aria-controls="navs-justified-check-room"
+                        data-bs-target="#navs-justified-vote-control" aria-controls="navs-justified-vote-control"
                         aria-selected="false">
-                        <i class="bi bi-5-circle-fill me-1_5"></i> Check Staff
+                        <i class="bi bi-5-circle-fill me-1_5"></i> Vote Control
                     </button>
                 </li>
                 @if ($this->panes >= 6)
                     <li x-on:click="$wire.panes = '6'" wire:ignore class="nav-item mb-1 mb-sm-0">
                         <button type="button" @class(['nav-link', 'active' => $this->panes === '6']) role="tab" data-bs-toggle="tab"
-                            data-bs-target="#navs-justified-cheque-processing"
-                            aria-controls="navs-justified-cheque-processing" aria-selected="false">
-                            <i class="bi bi-6-circle-fill me-1_5"></i> Cheque Processing
+                            data-bs-target="#navs-justified-check-room" aria-controls="navs-justified-check-room"
+                            aria-selected="false">
+                            <i class="bi bi-6-circle-fill me-1_5"></i> Check Staff
                         </button>
                     </li>
+
+                    @if ($this->panes >= 7)
+                        <li x-on:click="$wire.panes = '7'" wire:ignore class="nav-item mb-1 mb-sm-0">
+                            <button type="button" @class(['nav-link', 'active' => $this->panes === '7']) role="tab" data-bs-toggle="tab"
+                                data-bs-target="#navs-justified-cheque-processing"
+                                aria-controls="navs-justified-cheque-processing" aria-selected="false">
+                                <i class="bi bi-7-circle-fill me-1_5"></i> Cheque Processing
+                            </button>
+                        </li>
+                    @endif
                 @endif
 
             @endif
         @endif
     </ul>
     <div wire:ignore.self class="tab-content">
-        <div @class(['tab-pane fade', 'show active' => $this->panes === '1']) id="navs-justified-1" role="tabpanel">
+        <div @class(['tab-pane fade', 'show active' => $this->panes === '1']) id="navs-justified-procurement-1" role="tabpanel">
 
             <div>
                 <div class="row mt-8">
@@ -158,6 +171,7 @@
             </div>
 
         </div>
+
         <div wire:ignore.self @class(['tab-pane fade', 'show active' => $this->panes === '2']) id="navs-justified-cost_budgeting" role="tabpanel">
             <div>
 
@@ -210,7 +224,8 @@
 
             </div>
         </div>
-        <div wire:ignore.self @class(['tab-pane fade', 'show active' => $this->panes === '3']) id="navs-justified-3" role="tabpanel">
+
+        <div wire:ignore.self @class(['tab-pane fade', 'show active' => $this->panes === '3']) id="navs-justified-procurement-2" role="tabpanel">
 
 
             <div>
@@ -257,7 +272,26 @@
 
         </div>
 
-        <div @class(['tab-pane fade', 'show active' => $this->panes === '4']) id="navs-justified-4" role="tabpanel">
+        <div @class(['tab-pane fade', 'show active' => $this->panes === '4']) id="navs-justified-accounts-payable" role="tabpanel">
+
+            <div>
+                <div class="row mt-8">
+
+                    <div class="col mx-5">
+                        <label><strong>Date Received From Procurement:
+                            </strong>{{ $this->getFormattedDate($this->requisition->date_received_ap) }}</label>
+                    </div>
+
+                    <div class="col mx-5">
+                        <label><strong>Date Sent to Vote Control:</strong>
+                            {{ $this->getFormattedDate($this->requisition->date_sent_vc) }}</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div @class(['tab-pane fade', 'show active' => $this->panes === '5']) id="navs-justified-vote-control" role="tabpanel">
 
             <div>
                 <div class="row mt-8">
@@ -282,46 +316,10 @@
                     </div>
                 </div>
 
-                {{-- <div class="row mt-8">
-
-                    <div class="col mx-5">
-                        <label><strong>Date Payment Voucher sent to Cheque Room:
-                            </strong>{{ $this->getFormattedDateSentChequeroom() }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Date of Cheque:</strong>
-                            {{ $this->getFormattedDateOfCheque() }}</label>
-                    </div>
-                </div>
-
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Cheque Number:</strong> {{ $this->cheque_no }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Date Cheque Forwarded to Cheque Despatch:</strong>
-                            {{ $this->getFormattedDateChequeForwarded() }}</label>
-                    </div>
-
-                </div>
-
-                @if ($this->requisition->is_completed)
-                    <div style="margin-top: 50px" class="row text-center">
-
-                        <h3><strong>Requisition Completed on
-                                {{ \Carbon\Carbon::parse($this->date_completed)->format('F jS, Y') }}</strong>
-                        </h3>
-
-                    </div>
-                @endif --}}
-
             </div>
         </div>
 
-        <div @class(['tab-pane fade', 'show active' => $this->panes === '5']) id="navs-justified-check-room" role="tabpanel">
+        <div @class(['tab-pane fade', 'show active' => $this->panes === '6']) id="navs-justified-check-room" role="tabpanel">
 
 
             <div>
@@ -366,7 +364,7 @@
             </div>
         </div>
 
-        <div @class(['tab-pane fade', 'show active' => $this->panes === '6']) id="navs-justified-cheque-processing" role="tabpanel">
+        <div @class(['tab-pane fade', 'show active' => $this->panes === '7']) id="navs-justified-cheque-processing" role="tabpanel">
 
             <div>
                 <div class="row mt-8">

@@ -36,8 +36,6 @@ class CostBudgetingRequisition extends Component
     public $ps_approval;
     public $vendor_name;
     public $amount;
-    public $logs;
-    public $logdetails;
 
     public $isEditing = true;
     public $votes;
@@ -87,7 +85,6 @@ class CostBudgetingRequisition extends Component
 
     public function render()
     {
-        $this->logs = $this->requisition->statuslogs;
         return view('livewire.cost-budgeting-requisition')->title($this->requisition->requisition_no . ' | View Requisition');
     }
 
@@ -234,19 +231,5 @@ class CostBudgetingRequisition extends Component
         if ($name === 'change_of_vote_no') {
             $this->skipRender();
         }
-    }
-
-    public function addLog()
-    {
-
-        $this->requisition->statuslogs()->create([
-            'details' => $this->logdetails,
-            'created_by' => Auth::user()->username,
-        ]);
-
-        $this->logdetails = null;
-
-        $this->dispatch('close-log-modal');
-        $this->dispatch('show-message', message: 'Log added successfully');
     }
 }
