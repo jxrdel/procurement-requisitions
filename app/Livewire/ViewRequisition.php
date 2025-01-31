@@ -554,13 +554,13 @@ class ViewRequisition extends Component
             'date_received' => Carbon::now(),
         ]);
 
-        //Send email to Vote Control
+        //Send email to Accounts Payable
 
-        //Get Vote Control users
+        //Get Accounts Payable users
         $users = User::accountsPayable()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->queue(new NotifyAccountsPayable($this->requisition));
+            Mail::to($user->email)->send(new NotifyAccountsPayable($this->requisition));
         }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Accounts Payable');

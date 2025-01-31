@@ -100,9 +100,9 @@ class ViewChequeProcessingRequisition extends Component
             'date_completed' => Carbon::now(),
         ]);
 
-        $assigned_to = $this->requisition->procurement_officer->email;
+        $assigned_to = $this->requisition->procurement_officer;
         if ($assigned_to) {
-            Mail::to($assigned_to)->cc('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
+            Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
         } else {
             Mail::to('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
         }

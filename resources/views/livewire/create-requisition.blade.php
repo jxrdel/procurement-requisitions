@@ -189,7 +189,7 @@
 
                     <div class="col">
                         <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="amount" type="number"
+                            <input autocomplete="off" wire:model="amount" type="number" step="0.01"
                                 class="form-control @error('amount')is-invalid @enderror" id="floatingInput"
                                 placeholder="0.00" aria-describedby="floatingInputHelp" />
                             <label for="floatingInput">Amount</label>

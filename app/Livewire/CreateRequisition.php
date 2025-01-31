@@ -101,7 +101,7 @@ class CreateRequisition extends Component
 
         $newrequisition = Requisition::create([
             'requisition_status' => $this->requisition_status,
-            'requisition_no' => CurrentFinancialYear::generateRequisitionNo(),
+            'requisition_no' => $this->requisition_no,
             'requesting_unit' => $this->requesting_unit,
             'file_no' => $this->file_no,
             'item' => $this->item,

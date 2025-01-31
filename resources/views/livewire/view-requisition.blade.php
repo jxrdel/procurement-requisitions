@@ -146,7 +146,7 @@
                                         <div class="col mx-5">
                                             <label><strong>Assigned To:</strong>
                                                 @if ($this->requisition->procurement_officer)
-                                                    {{ $this->requisition->procurement_officer->name }}
+                                                    {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}
                                             </label>
                                             @endif
                                         </div>
@@ -353,7 +353,7 @@
 
                                         <div class="col">
                                             <div class="form-floating form-floating-outline mb-6">
-                                                <select required wire:model="assigned_to"
+                                                <select wire:model="assigned_to"
                                                     class="form-select @error('assigned_to')is-invalid @enderror"
                                                     id="exampleFormControlSelect1"
                                                     aria-label="Default select example">
@@ -422,7 +422,7 @@
 
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
-                                                <input autocomplete="off" wire:model="amount" type="number"
+                                                <input autocomplete="off" wire:model="amount" type="number" step="0.01"
                                                     class="form-control @error('amount')is-invalid @enderror"
                                                     id="floatingInput" placeholder="0.00"
                                                     aria-describedby="floatingInputHelp" />

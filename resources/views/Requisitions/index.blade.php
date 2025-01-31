@@ -88,9 +88,9 @@
         $(document).ready(function() {
             $('#myTable').DataTable({
                 "pageLength": 50,
-                order: [
-                    [5, 'desc']
-                ],
+                // order: [
+                //     [0, 'asc']
+                // ],
                 "processing": true,
                 "serverSide": true,
                 "ajax": {

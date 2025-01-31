@@ -275,7 +275,7 @@
 
                                     <div class="col mx-5">
                                         <label><strong>Assigned To:</strong>
-                                            {{ $this->requisition->procurement_officer->name }}</label>
+                                            {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}</label>
                                     </div>
 
                                 </div>
