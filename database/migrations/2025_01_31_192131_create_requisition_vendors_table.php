@@ -16,6 +16,14 @@ return new class extends Migration
             $table->string('vendor_name');
             $table->decimal('amount', 15, 2);
 
+            //Procurement
+            $table->string('purchase_order_no')->nullable();
+            $table->date('eta')->nullable();
+            $table->date('date_sent_commit')->nullable();
+            $table->string('invoice_no')->nullable();
+            $table->date('date_invoice_received')->nullable();
+            $table->date('date_sent_ap')->nullable();
+
             //Cost & Budgeting
             $table->date('date_sent_request_mof')->nullable();
             $table->string('release_type')->nullable();
@@ -46,6 +54,8 @@ return new class extends Migration
             $table->string('cheque_no')->nullable();
             $table->date('date_cheque_processed')->nullable();
             $table->date('date_sent_dispatch')->nullable();
+
+            $table->unsignedBigInteger('requisition_id');
 
 
             $table->foreign('requisition_id')->references('id')->on('requisitions')->onDelete('cascade');

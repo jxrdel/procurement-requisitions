@@ -21,6 +21,7 @@ class ViewCheckRoomRequisition extends Component
     public $date_received_from_audit;
     public $date_sent_chequeprocessing;
 
+    public $vendors = [];
     public $isEditing = true;
 
     public function render()
@@ -37,6 +38,24 @@ class ViewCheckRoomRequisition extends Component
         }
 
         $this->requisition = $this->cr_requisition->requisition;
+        $this->vendors = $this->requisition->vendors()
+            ->select(
+                'id',
+                'vendor_name',
+                'amount',
+                'date_received_from_vc',
+                'voucher_destination',
+                'date_sent_audit',
+                'date_received_from_audit',
+                'date_sent_chequeprocessing'
+            )
+            ->get()
+            ->toArray();
+
+        //Add accordion view to each vendor
+        foreach ($this->vendors as $key => $vendor) {
+            $this->vendors[$key]['accordionView'] = 'hide';
+        }
 
         $this->date_received_from_vc = $this->requisition->date_received_from_vc;
         $this->voucher_destination = $this->requisition->voucher_destination;
@@ -44,9 +63,13 @@ class ViewCheckRoomRequisition extends Component
         $this->date_received_from_audit = $this->requisition->date_received_from_audit;
         $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
 
-        if ($this->date_received_from_vc !== null && $this->voucher_destination !== null && $this->date_sent_chequeprocessing !== null) {
-            $this->isEditing = false;
+        foreach ($this->vendors as $vendor) {
+            if ($vendor['date_received_from_vc'] !== null && $vendor['voucher_destination'] !== null && $vendor['date_sent_chequeprocessing'] !== null) {
+                $this->isEditing = false;
+                break;
+            }
         }
+
 
         if (Auth::user()->role->name === 'Viewer') {
             $this->isEditing = false;
@@ -55,51 +78,60 @@ class ViewCheckRoomRequisition extends Component
 
     public function edit()
     {
-        if ($this->date_received_from_vc === '') {
-            $this->date_received_from_vc = null;
+        foreach ($this->vendors as &$vendor) {
+            if ($vendor['date_received_from_vc'] === "") {
+                $vendor['date_received_from_vc'] = null;
+            }
+
+            if ($vendor['date_sent_audit'] === "") {
+                $vendor['date_sent_audit'] = null;
+            }
+
+            if ($vendor['date_received_from_audit'] === "") {
+                $vendor['date_received_from_audit'] = null;
+            }
+
+            if ($vendor['date_sent_chequeprocessing'] === "") {
+                $vendor['date_sent_chequeprocessing'] = null;
+            }
+
+            if ($vendor['voucher_destination'] === 'Cheque Processing') {
+                $vendor['date_sent_audit'] = null;
+                $vendor['date_received_from_audit'] = null;
+            }
         }
 
-        if ($this->date_sent_audit === '') {
-            $this->date_sent_audit = null;
-        }
-
-        if ($this->date_received_from_audit === '') {
-            $this->date_received_from_audit = null;
-        }
-
-        if ($this->date_sent_chequeprocessing === '') {
-            $this->date_sent_chequeprocessing = null;
-        }
-
-        if ($this->voucher_destination === 'Cheque Processing') {
-            $this->date_sent_audit = null;
-            $this->date_received_from_audit = null;
-        }
+        unset($vendor);
 
         $this->validate(
             [
-                'date_received_from_vc' => 'nullable|date|after_or_equal:' . $this->requisition->release_date,
-                'date_sent_audit' => 'nullable|date|after_or_equal:date_received_from_vc',
-                'date_received_from_audit' => 'nullable|date|after_or_equal:date_sent_audit',
-                'date_sent_chequeprocessing' => 'nullable|date|after_or_equal:date_received_from_audit',
+                'vendors.*.date_received_from_vc' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+                'vendors.*.date_sent_audit' => 'nullable|date|after_or_equal:vendors.*.date_received_from_vc',
+                'vendors.*.date_received_from_audit' => 'nullable|date|after_or_equal:vendors.*.date_sent_audit',
+                'vendors.*.date_sent_chequeprocessing' => 'nullable|date|after_or_equal:vendors.*.date_received_from_audit',
             ],
             [
-                'date_received_from_vc.after_or_equal' => 'Please check date.',
-                'date_sent_audit.after_or_equal' => 'The Date Sent to Audit must be a date after or equal to the Date Received from Vote Control.',
-                'date_received_from_audit.after_or_equal' => 'The Date Received from Audit must be a date after or equal to the Date Sent to Audit.',
-                'date_sent_chequeprocessing.after_or_equal' => 'The Date Sent to Cheque Processing must be a date after or equal to the Date Received from Audit.',
+                'vendors.*.date_received_from_vc.after_or_equal' => 'Please check date.',
+                'vendors.*.date_sent_audit.after_or_equal' => 'The Date Sent to Audit must be a date after or equal to the Date Received from Vote Control.',
+                'vendors.*.date_received_from_audit.after_or_equal' => 'The Date Received from Audit must be a date after or equal to the Date Sent to Audit.',
+                'vendors.*.date_sent_chequeprocessing.after_or_equal' => 'The Date Sent to Cheque Processing must be a date after or equal to the Date Received from Audit.',
             ]
         );
 
         $status = $this->getStatus();
 
+        foreach ($this->vendors as $vendor) {
+            $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                'date_received_from_vc' => $vendor['date_received_from_vc'],
+                'voucher_destination' => $vendor['voucher_destination'],
+                'date_sent_audit' => $vendor['date_sent_audit'],
+                'date_received_from_audit' => $vendor['date_received_from_audit'],
+                'date_sent_chequeprocessing' => $vendor['date_sent_chequeprocessing'],
+            ]);
+        }
+
         $this->requisition->update([
             'requisition_status' => $status,
-            'date_received_from_vc' => $this->date_received_from_vc,
-            'voucher_destination' => $this->voucher_destination,
-            'date_sent_audit' => $this->date_sent_audit,
-            'date_received_from_audit' => $this->date_received_from_audit,
-            'date_sent_chequeprocessing' => $this->date_sent_chequeprocessing,
         ]);
 
         $this->isEditing = false;
@@ -111,20 +143,29 @@ class ViewCheckRoomRequisition extends Component
 
     public function getIsButtonDisabledProperty()
     {
-        $isDisabled = true;
-
-        if ($this->voucher_destination === 'Internal Audit') {
-            $isDisabled = $this->date_received_from_vc === null || trim($this->date_received_from_vc) === '' ||
-                $this->voucher_destination === null || trim($this->voucher_destination) === '' ||
-                $this->date_sent_audit === null || trim($this->date_sent_audit) === '' ||
-                $this->date_received_from_audit === null || trim($this->date_received_from_audit) === '' ||
-                $this->date_sent_chequeprocessing === null || trim($this->date_sent_chequeprocessing) === '';
-        } else {
-            $isDisabled = $this->date_received_from_vc === null || trim($this->date_received_from_vc) === '' ||
-                $this->voucher_destination === null || trim($this->voucher_destination) === '' ||
-                $this->date_sent_chequeprocessing === null || trim($this->date_sent_chequeprocessing) === '';
+        foreach ($this->vendors as $vendor) {
+            if ($vendor['voucher_destination'] === 'Internal Audit') {
+                if (
+                    empty($vendor['date_received_from_vc']) ||
+                    empty($vendor['voucher_destination']) ||
+                    empty($vendor['date_sent_audit']) ||
+                    empty($vendor['date_received_from_audit']) ||
+                    empty($vendor['date_sent_chequeprocessing'])
+                ) {
+                    return true; // Disable the button if any required field is missing
+                }
+            } else {
+                if (
+                    empty($vendor['date_received_from_vc']) ||
+                    empty($vendor['voucher_destination']) ||
+                    empty($vendor['date_sent_chequeprocessing'])
+                ) {
+                    return true; // Disable the button if any required field is missing
+                }
+            }
         }
-        return $isDisabled;
+
+        return false; // Enable the button only if all vendors have the required fields
     }
 
     public function getStatus()
@@ -133,30 +174,37 @@ class ViewCheckRoomRequisition extends Component
             return 'Completed';
         }
 
-        $status = 'At Check Staff';
+        // Define priority levels for sorting (lower value = earlier stage)
+        $priority = [
+            'At Check Staff' => 1,
+            'Received by Check Staff' => 2,
+            'To be Sent to Internal Audit' => 3,
+            'Sent to Internal Audit' => 4,
+            'To Be Sent to Cheque Processing' => 5,
+        ];
 
-        if ($this->date_received_from_vc && !$this->cr_requisition->is_completed) {
-            $status = 'Received by Check Staff';
-        }
+        $statuses = collect($this->vendors)->map(function ($vendor) {
+            if ($vendor['date_received_from_vc'] && $vendor['voucher_destination'] === 'Internal Audit') {
+                if (!$vendor['date_sent_audit']) {
+                    return 'To be Sent to Internal Audit';
+                }
+                if ($vendor['date_sent_audit'] && !$vendor['date_received_from_audit']) {
+                    return 'Sent to Internal Audit';
+                }
+                if ($vendor['date_sent_audit'] && $vendor['date_received_from_audit']) {
+                    return 'To Be Sent to Cheque Processing';
+                }
+            }
+            if ($vendor['date_received_from_vc'] && $vendor['voucher_destination'] === 'Cheque Processing' && $vendor['date_sent_chequeprocessing']) {
+                return 'To Be Sent to Cheque Processing';
+            }
 
-        if ($this->date_received_from_vc && $this->voucher_destination === 'Internal Audit' && !$this->date_sent_audit) {
-            $status = 'To be Sent to Internal Audit';
-        }
+            return 'At Check Staff';
+        });
 
-        if ($this->date_received_from_vc && $this->voucher_destination === 'Internal Audit' && $this->date_sent_audit && !$this->date_received_from_audit) {
-            $status = 'Sent to Internal Audit';
-        }
-
-        if ($this->date_received_from_vc && $this->voucher_destination === 'Internal Audit' && $this->date_sent_audit && $this->date_received_from_audit) {
-            $status = 'To Be Sent to Cheque Processing';
-        }
-
-        if ($this->date_received_from_vc && $this->voucher_destination === 'Cheque Processing' && $this->date_sent_chequeprocessing) {
-            $status = 'To Be Sent to Cheque Processing';
-        }
-
-        return $status;
+        return $statuses->sortBy(fn($status) => $priority[$status])->first() ?? 'At Check Staff';
     }
+
 
     public function getFormattedDate($date)
     {
@@ -183,9 +231,16 @@ class ViewCheckRoomRequisition extends Component
         //Get Cheque Processing Staff
         $chequeProcessingStaff = User::chequeProcessing()->get();
         foreach ($chequeProcessingStaff as $staff) {
-            Mail::to($staff->email)->queue(new NotifyChequeProcessing($this->requisition));
+            // Mail::to($staff->email)->queue(new NotifyChequeProcessing($this->requisition));
         }
 
         return redirect()->route('check_room.index')->with('success', 'Requisition sent to Cheque Processing successfully');
+    }
+
+    public function toggleAccordionView($index)
+    {
+        $this->vendors[$index]['accordionView'] = $this->vendors[$index]['accordionView'] === 'show' ? 'hide' : 'show';
+
+        $this->skipRender();
     }
 }

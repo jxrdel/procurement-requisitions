@@ -142,17 +142,30 @@
                 </div>
 
                 @if ($this->ps_approval == 'Approved')
-                    <div class="row mt-7">
 
-                        <div class="col mx-5">
-                            <label><strong>Vendor Name:</strong> {{ $this->vendor_name }}</label>
+                    @foreach ($this->requisition->vendors as $index => $vendor)
+                        <div class="row mt-7">
+
+                            <div class="col mx-5">
+                                <label><strong>Vendor #{{ $index + 1 }}:</strong>
+                                    {{ $vendor->vendor_name }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Amount:</strong> {{ $vendor->amount }}</label>
+                            </div>
+
                         </div>
+                    @endforeach
 
-                        <div class="col mx-5">
-                            <label><strong>Amount:</strong> {{ $this->amount }}</label>
+                    @if (count($this->requisition->vendors) > 0)
+                        <div class="row mt-7">
+
+                            <div class="col mx-5">
+                                <label><strong>Total:</strong> ${{ $this->total }}</label>
+                            </div>
                         </div>
-
-                    </div>
+                    @endif
                 @endif
 
                 @if ($this->ps_approval == 'Approval Denied')

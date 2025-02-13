@@ -29,6 +29,7 @@ class ReadOnlyRequisition extends Component
     public $panes = 'procurement1';
     public $uploads;
     public $upload;
+    public $vendors;
 
     //Cost & Budgeting
 
@@ -55,6 +56,7 @@ class ReadOnlyRequisition extends Component
     public $date_sent_chequeprocessing;
 
     public $date_completed;
+    public $total;
 
     public function render()
     {
@@ -83,6 +85,22 @@ class ReadOnlyRequisition extends Component
         $this->date_sent_cb = $this->requisition->date_sent_cb;
         $this->date_completed = $this->requisition->date_completed;
 
+        $this->vendors = $this->requisition->vendors()
+            ->select(
+                'id',
+                'vendor_name',
+                'amount',
+                'date_sent_request_mof',
+                'request_category',
+                'request_no',
+                'release_type',
+                'release_no',
+                'release_date',
+                'change_of_vote_no'
+            )
+            ->get()->toArray();
+
+        $this->total = $this->requisition->vendors()->sum('amount');
         //Cost & Budgeting
         $this->date_sent_request_mof = $this->requisition->date_sent_request_mof;
         $this->request_no = $this->requisition->request_no;

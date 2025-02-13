@@ -20,6 +20,7 @@ class ViewChequeProcessingRequisition extends Component
     public $date_sent_dispatch;
 
     public $isEditing = true;
+    public $vendors = [];
 
     public function render()
     {
@@ -35,49 +36,84 @@ class ViewChequeProcessingRequisition extends Component
         }
 
         $this->requisition = $this->cp_requisition->requisition;
+        $this->vendors = $this->requisition->vendors()
+            ->select(
+                'id',
+                'vendor_name',
+                'amount',
+                'date_cheque_processed',
+                'cheque_no',
+                'date_of_cheque',
+                'date_sent_dispatch'
+            )->get()->toArray();
+
+        //Add accordion view to each vendor
+        foreach ($this->vendors as $key => $vendor) {
+            $this->vendors[$key]['accordionView'] = 'hide';
+        }
 
         $this->date_cheque_processed = $this->requisition->date_cheque_processed;
         $this->cheque_no = $this->requisition->cheque_no;
         $this->date_of_cheque = $this->requisition->date_of_cheque;
         $this->date_sent_dispatch = $this->requisition->date_sent_dispatch;
 
-        if ($this->date_cheque_processed !== null && $this->cheque_no !== null && $this->date_of_cheque !== null && $this->date_sent_dispatch !== null) {
+        foreach ($this->vendors as $vendor) {
+            if (
+                $vendor['date_cheque_processed'] === null ||
+                $vendor['cheque_no'] === null ||
+                $vendor['date_of_cheque'] === null ||
+                $vendor['date_sent_dispatch'] === null
+            ) {
+                return; // Exit early if any field is null, keeping isEditing true
+            }
+
             $this->isEditing = false;
         }
 
         if (Auth::user()->role->name === 'Viewer') {
             $this->isEditing = false;
+            return;
         }
     }
 
     public function edit()
     {
         $this->validate([
-            'date_cheque_processed' => 'nullable|date',
-            'date_of_cheque' => 'nullable|date',
-            'date_sent_dispatch' => 'nullable|date',
+            'vendors.*.date_cheque_processed' => 'nullable|date',
+            'vendors.*.cheque_no' => 'nullable',
+            'vendors.*.date_of_cheque' => 'nullable|date',
+            'vendors.*.date_sent_dispatch' => 'nullable|date',
         ]);
 
-        if ($this->date_cheque_processed === '') {
-            $this->date_cheque_processed = null;
+        foreach ($this->vendors as &$vendor) {
+            if ($vendor['date_cheque_processed'] === "") {
+                $vendor['date_cheque_processed'] = null;
+            }
+
+            if ($vendor['date_of_cheque'] === "") {
+                $vendor['date_of_cheque'] = null;
+            }
+
+            if ($vendor['date_sent_dispatch'] === "") {
+                $vendor['date_sent_dispatch'] = null;
+            }
         }
 
-        if ($this->date_of_cheque === '') {
-            $this->date_of_cheque = null;
-        }
-
-        if ($this->date_sent_dispatch === '') {
-            $this->date_sent_dispatch = null;
-        }
+        unset($vendor);
 
         $status = $this->getStatus();
 
+        foreach ($this->vendors as $vendor) {
+            $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                'date_cheque_processed' => $vendor['date_cheque_processed'],
+                'cheque_no' => $vendor['cheque_no'],
+                'date_of_cheque' => $vendor['date_of_cheque'],
+                'date_sent_dispatch' => $vendor['date_sent_dispatch'],
+            ]);
+        }
+
         $this->requisition->update([
             'requisition_status' => $status,
-            'date_cheque_processed' => $this->date_cheque_processed,
-            'cheque_no' => $this->cheque_no,
-            'date_of_cheque' => $this->date_of_cheque,
-            'date_sent_dispatch' => $this->date_sent_dispatch,
         ]);
 
         $this->isEditing = false;
@@ -100,20 +136,32 @@ class ViewChequeProcessingRequisition extends Component
             'date_completed' => Carbon::now(),
         ]);
 
-        $assigned_to = $this->requisition->procurement_officer;
-        if ($assigned_to) {
-            Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
-        } else {
-            Mail::to('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
-        }
+        // $assigned_to = $this->requisition->procurement_officer;
+        // if ($assigned_to) {
+        //     Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
+        // } else {
+        //     Mail::to('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
+        // }
 
         return redirect()->route('cheque_processing.index')->with('success', 'Requisition completed successfully');
     }
 
     public function getIsButtonDisabledProperty()
     {
-        return $this->date_cheque_processed === null || $this->cheque_no === null || $this->date_of_cheque === null || $this->date_sent_dispatch === null;
+        foreach ($this->vendors as $vendor) {
+            if (
+                empty($vendor['date_cheque_processed']) ||
+                empty($vendor['cheque_no']) ||
+                empty($vendor['date_of_cheque']) ||
+                empty($vendor['date_sent_dispatch'])
+            ) {
+                return true; // Disable the button if any vendor has missing data
+            }
+        }
+
+        return false; // Enable the button only if all vendors have the required fields
     }
+
 
     public function getFormattedDate($date)
     {
@@ -128,20 +176,33 @@ class ViewChequeProcessingRequisition extends Component
             return 'Completed';
         }
 
-        $status = 'At Cheque Processing';
+        // Define priority levels for sorting (lower value = earlier stage)
+        $priority = [
+            'At Cheque Processing' => 1,
+            'Cheque Details to be Entered' => 2,
+            'To be Sent to Cheque Dispatch' => 3,
+            'To Be Completed by Cheque Processing' => 4,
+        ];
 
-        if ($this->date_cheque_processed && !$this->cp_requisition->is_completed) {
-            $status = 'Cheque Details to be Entered';
-        }
+        $statuses = collect($this->vendors)->map(function ($vendor) {
+            if ($vendor['date_cheque_processed'] && $vendor['cheque_no'] && $vendor['date_of_cheque'] && !$vendor['date_sent_dispatch']) {
+                return 'To be Sent to Cheque Dispatch';
+            }
+            if ($vendor['date_cheque_processed'] && $vendor['cheque_no'] && $vendor['date_of_cheque'] && $vendor['date_sent_dispatch']) {
+                return 'To Be Completed by Cheque Processing';
+            }
 
-        if ($this->date_cheque_processed && $this->cheque_no && $this->date_of_cheque && !$this->date_sent_dispatch) {
-            $status = 'To be Sent to Cheque Dispatch';
-        }
+            return 'At Cheque Processing';
+        });
 
-        if ($this->date_cheque_processed && $this->cheque_no && $this->date_of_cheque && $this->date_sent_dispatch) {
-            $status = 'To Be Completed by Cheque Processing';
-        }
+        return $statuses->sortBy(fn($status) => $priority[$status])->first() ?? 'At Cheque Processing';
+    }
 
-        return $status;
+
+    public function toggleAccordionView($index)
+    {
+        $this->vendors[$index]['accordionView'] = $this->vendors[$index]['accordionView'] === 'show' ? 'hide' : 'show';
+
+        $this->skipRender();
     }
 }

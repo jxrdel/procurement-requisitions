@@ -44,13 +44,15 @@ class CreateRequisition extends Component
     public $staff;
     public $logs = [];
     public $votes;
+    public $vendors = [];
 
     public function mount()
     {
         $this->requisition_no = CurrentFinancialYear::generateRequisitionNo();
         $this->departments = Department::all();
         $this->staff = User::procurement()->get();
-        $this->votes = Vote::all();
+        $this->votes = Vote::active()->get();
+        // $this->vendors[] = ['name' => '', 'amount' => ''];
     }
 
 
@@ -98,7 +100,6 @@ class CreateRequisition extends Component
             $this->assigned_to = null;
         }
 
-
         $newrequisition = Requisition::create([
             'requisition_status' => $this->requisition_status,
             'requisition_no' => $this->requisition_no,
@@ -117,6 +118,15 @@ class CreateRequisition extends Component
             'denied_note' => $this->denied_note,
             'created_by' => Auth::user()->username,
         ]);
+
+        if (count($this->vendors) > 0) {
+            foreach ($this->vendors as $vendor) {
+                $newrequisition->vendors()->create([
+                    'vendor_name' => $vendor['vendor_name'],
+                    'amount' => $vendor['amount'],
+                ]);
+            }
+        }
 
         foreach ($this->logs as $log) {
             $newrequisition->statuslogs()->create([
@@ -144,29 +154,40 @@ class CreateRequisition extends Component
     public function validateForm()
     {
 
-        $reqvalidator = Validator::make([
-            'requisition_no' => $this->requisition_no,
-            'requesting_unit' => $this->requesting_unit,
-            'file_no' => $this->file_no,
-            'item' => $this->item,
-            'assigned_to' => $this->assigned_to,
-            'date_assigned' => $this->date_assigned,
-            'date_sent_dps' => $this->date_sent_dps,
-            'ps_approval' => $this->ps_approval,
-            'date_received_procurement' => $this->date_received_procurement,
-            // 'sent_to_cb' => $this->sent_to_cb,
-            // 'date_sent_cb' => $this->date_sent_cb,
-        ], [
-            'requisition_no' => 'required|unique:requisitions',
-            'requesting_unit' => 'required',
-            'file_no' => 'nullable',
-            'item' => 'required',
-            'assigned_to' => 'nullable',
-            'date_assigned' => 'nullable|date|before_or_equal:today',
-            'date_received_procurement' => 'required|date|before_or_equal:today',
-            'date_sent_dps' => 'nullable|date|before_or_equal:today',
-            // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
-        ])
+        $reqvalidator = Validator::make(
+            [
+                'requisition_no' => $this->requisition_no,
+                'requesting_unit' => $this->requesting_unit,
+                'file_no' => $this->file_no,
+                'item' => $this->item,
+                'assigned_to' => $this->assigned_to,
+                'date_assigned' => $this->date_assigned,
+                'date_sent_dps' => $this->date_sent_dps,
+                'ps_approval' => $this->ps_approval,
+                'date_received_procurement' => $this->date_received_procurement,
+                // 'sent_to_cb' => $this->sent_to_cb,
+                // 'date_sent_cb' => $this->date_sent_cb,
+                'vendors' => $this->vendors,
+            ],
+            [
+                'requisition_no' => 'required|unique:requisitions',
+                'requesting_unit' => 'required',
+                'file_no' => 'nullable',
+                'item' => 'required',
+                'assigned_to' => 'nullable',
+                'date_assigned' => 'nullable|date|before_or_equal:today',
+                'date_received_procurement' => 'required|date|before_or_equal:today',
+                'date_sent_dps' => 'nullable|date|before_or_equal:today',
+                'vendors.*.vendor_name' => 'required',
+                'vendors.*.amount' => 'required|numeric',
+                // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
+            ],
+            [
+                'vendors.*.vendor_name.required' => 'Vendor name is required',
+                'vendors.*.amount.required' => 'Amount is required',
+                'vendors.*.amount.numeric' => 'Amount must be a number',
+            ],
+        )
             ->after(function ($validator) {
                 // Ensure 'ps_approval' is not 'Not Sent' if 'date_sent_dps' is populated
                 if ($this->date_sent_dps !== null && $this->ps_approval === 'Not Sent') {
@@ -215,5 +236,15 @@ class CreateRequisition extends Component
         } else {
             $this->dispatch('preserveScroll');
         }
+    }
+
+    public function addVendor()
+    {
+        $this->vendors[] = ['name' => '', 'amount' => ''];
+    }
+
+    public function removeVendor($index)
+    {
+        unset($this->vendors[$index]);
     }
 }

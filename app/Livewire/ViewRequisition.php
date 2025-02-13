@@ -51,6 +51,8 @@ class ViewRequisition extends Component
     public $active_pane = 'procurement1';
     public $uploads;
     public $upload;
+    public $vendors = [];
+    public $deleted_vendors = [];
 
     //Cost & Budgeting
 
@@ -97,7 +99,7 @@ class ViewRequisition extends Component
     {
         $this->today = Carbon::now()->format('Y-m-d');
         $this->departments = Department::all();
-        $this->votes = Vote::all();
+        $this->votes = Vote::active()->get();
         $this->staff = User::procurement()->get();
 
         $this->requisition = Requisition::find($id);
@@ -122,6 +124,55 @@ class ViewRequisition extends Component
         $this->sent_to_cb = $this->requisition->sent_to_cb;
         $this->date_sent_cb = $this->requisition->date_sent_cb;
         $this->date_completed = $this->requisition->date_completed;
+        $this->vendors = $this->requisition->vendors()->select(
+            'id',
+            'vendor_name',
+            'amount',
+
+            //Procurement
+            'purchase_order_no',
+            'eta',
+            'date_sent_commit',
+            'invoice_no',
+            'date_invoice_received',
+            'date_sent_ap',
+
+            // Cost & Budgeting
+            'date_sent_request_mof',
+            'release_type',
+            'request_category',
+            'request_no',
+            'release_no',
+            'release_date',
+            'change_of_vote_no',
+
+            // AP
+            'date_received_ap',
+            'date_sent_vc',
+
+            // Vote Control
+            'batch_no',
+            'voucher_no',
+            'date_sent_checkstaff',
+
+            // Check Staff
+            'date_received_from_vc',
+            'voucher_destination',
+            'date_sent_audit',
+            'date_received_from_audit',
+            'date_sent_chequeprocessing',
+
+            // Cheque Processing
+            'date_of_cheque',
+            'cheque_no',
+            'date_cheque_processed',
+            'date_sent_dispatch',
+        )->get()
+            ->toArray();
+
+        foreach ($this->vendors as $key => $vendor) {
+            $this->vendors[$key]['accordionView'] = 'hide';
+        }
 
         //Cost & Budgeting
         $this->date_sent_request_mof = $this->requisition->date_sent_request_mof;
@@ -210,6 +261,25 @@ class ViewRequisition extends Component
             $this->setRequisitionStatus();
         }
 
+        foreach ($this->deleted_vendors as $id) {
+            $this->requisition->vendors()->where('id', $id)->delete();
+        }
+
+        foreach ($this->vendors as $index => $vendor) {
+            if (isset($vendor['id'])) {
+                $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                    'vendor_name' => $vendor['vendor_name'],
+                    'amount' => $vendor['amount'],
+                ]);
+            } else {
+                $newvendor = $this->requisition->vendors()->create([
+                    'vendor_name' => $vendor['vendor_name'],
+                    'amount' => $vendor['amount'],
+                ]);
+                $this->vendors[$index]['id'] = $newvendor->id;
+            }
+        }
+
         $this->isEditingProcurement1 = false;
         $this->resetValidation();
         $this->dispatch('show-message', message: 'Requisition edited successfully');
@@ -219,29 +289,40 @@ class ViewRequisition extends Component
     public function validateForm()
     {
 
-        $reqvalidator = Validator::make([
-            'requisition_no' => $this->requisition_no,
-            'requesting_unit' => $this->requesting_unit,
-            'file_no' => $this->file_no,
-            'item' => $this->item,
-            'assigned_to' => $this->assigned_to,
-            'date_assigned' => $this->date_assigned,
-            'date_sent_dps' => $this->date_sent_dps,
-            'date_sent_procurement' => $this->date_received_procurement,
-            'ps_approval' => $this->ps_approval,
-            // 'sent_to_cb' => $this->sent_to_cb,
-            // 'date_sent_cb' => $this->date_sent_cb,
-        ], [
-            'requisition_no' => 'required',
-            'requesting_unit' => 'required',
-            'file_no' => 'nullable',
-            'item' => 'required',
-            'assigned_to' => 'nullable',
-            'date_assigned' => 'nullable|date|before_or_equal:today',
-            'date_sent_dps' => 'nullable|date|before_or_equal:today',
-            'date_received_procurement' => 'nullable|date|before_or_equal:today',
-            // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
-        ])
+        $reqvalidator = Validator::make(
+            [
+                'requisition_no' => $this->requisition_no,
+                'requesting_unit' => $this->requesting_unit,
+                'file_no' => $this->file_no,
+                'item' => $this->item,
+                'assigned_to' => $this->assigned_to,
+                'date_assigned' => $this->date_assigned,
+                'date_sent_dps' => $this->date_sent_dps,
+                'date_sent_procurement' => $this->date_received_procurement,
+                'ps_approval' => $this->ps_approval,
+                // 'sent_to_cb' => $this->sent_to_cb,
+                // 'date_sent_cb' => $this->date_sent_cb,
+                'vendors' => $this->vendors,
+            ],
+            [
+                'requisition_no' => 'required',
+                'requesting_unit' => 'required',
+                'file_no' => 'nullable',
+                'item' => 'required',
+                'assigned_to' => 'nullable',
+                'date_assigned' => 'nullable|date|before_or_equal:today',
+                'date_sent_dps' => 'nullable|date|before_or_equal:today',
+                'date_received_procurement' => 'nullable|date|before_or_equal:today',
+                // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
+                'vendors.*.vendor_name' => 'required',
+                'vendors.*.amount' => 'required|numeric',
+            ],
+            [
+                'vendors.*.vendor_name.required' => 'Vendor name is required',
+                'vendors.*.amount.required' => 'Amount is required',
+                'vendors.*.amount.numeric' => 'Amount must be a number',
+            ],
+        )
             ->after(function ($validator) {
                 // Ensure 'ps_approval' is not 'Not Sent' if 'date_sent_dps' is populated
                 if ($this->date_sent_dps !== null && $this->ps_approval === 'Not Sent') {
@@ -372,7 +453,7 @@ class ViewRequisition extends Component
             $this->requesting_unit === null || trim($this->requesting_unit) === '' ||
             $this->item === null || trim($this->item) === '' ||
             $this->date_sent_dps === null || trim($this->date_sent_dps) === '' ||
-            $this->ps_approval === null || $this->ps_approval !== 'Approved';
+            $this->ps_approval === null || $this->ps_approval !== 'Approved' || count($this->requisition->vendors) === 0;
     }
 
     public function getFormattedDateAssigned()
@@ -417,7 +498,7 @@ class ViewRequisition extends Component
         $users = User::costBudgeting()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
+            // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
         }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
@@ -450,12 +531,21 @@ class ViewRequisition extends Component
 
     public function getIsButtonProcurement2DisabledProperty()
     {
-        return $this->purchase_order_no === null || trim($this->purchase_order_no) === '' ||
-            $this->eta === null || $this->eta === '' ||
-            $this->date_sent_commit === null || $this->date_sent_commit === '' ||
-            $this->invoice_no === null || trim($this->invoice_no) === '' ||
-            $this->date_invoice_received === null || $this->date_invoice_received === '' ||
-            $this->date_sent_ap === null || $this->date_sent_ap === '';
+
+        foreach ($this->vendors as $vendor) {
+            if (
+                $vendor['purchase_order_no'] === null || trim($vendor['purchase_order_no']) === '' ||
+                $vendor['eta'] === null || $vendor['eta'] === '' ||
+                $vendor['date_sent_commit'] === null || $vendor['date_sent_commit'] === '' ||
+                $vendor['invoice_no'] === null || trim($vendor['invoice_no']) === '' ||
+                $vendor['date_invoice_received'] === null || $vendor['date_invoice_received'] === '' ||
+                $vendor['date_sent_ap'] === null || $vendor['date_sent_ap'] === ''
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getFormattedEta()
@@ -504,36 +594,60 @@ class ViewRequisition extends Component
             $this->date_sent_ap = null;
         }
 
-        $status = $this->requisition_status;
+        foreach ($this->vendors as &$vendor) {
+            if ($vendor['eta'] === '') {
+                $vendor['eta'] = null;
+            }
 
-        $this->validate([
-            'eta' => 'nullable|date|after_or_equal:today',
-            'date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-            // 'date_invoice_received' => 'required|date|after_or_equal:today',
-            // 'date_sent_ap' => 'nullable|date|after_or_equal:date_sent_commit',
-        ]);
+            if ($vendor['date_sent_commit'] === '') {
+                $vendor['date_sent_commit'] = null;
+            }
 
-        if (!$this->requisition->vote_control_requisition) {
-            if ($this->purchase_order_no && $this->eta && $this->date_sent_commit && !$this->invoice_no && !$this->date_invoice_received && !$this->date_sent_ap) {
-                $status = 'Awaiting Invoice';
-            } elseif ($this->purchase_order_no && $this->eta && $this->date_sent_commit && $this->invoice_no && $this->date_invoice_received && !$this->date_sent_ap) {
-                $status = 'To Be Sent to AP';
-            } elseif ($this->purchase_order_no && $this->eta && $this->date_sent_commit && $this->invoice_no && $this->date_invoice_received && $this->date_sent_ap && !$this->requisition->vote_control_requisition) {
-                $status = 'To Be Sent to AP';
+            if ($vendor['date_invoice_received'] === '') {
+                $vendor['date_invoice_received'] = null;
+            }
+
+            if ($vendor['date_sent_ap'] === '') {
+                $vendor['date_sent_ap'] = null;
             }
         }
 
+        unset($vendor);
 
-        $this->requisition->update([
-            'requisition_status' => $status,
-            'purchase_order_no' => $this->purchase_order_no,
-            'eta' => $this->eta,
-            'date_sent_commit' => $this->date_sent_commit,
-            'invoice_no' => $this->invoice_no,
-            'date_invoice_received' => $this->date_invoice_received,
-            'date_sent_ap' => $this->date_sent_ap,
-            'updated_by' => Auth::user()->username,
-        ]);
+        $status = $this->requisition_status;
+
+        $this->validate(
+            [
+                'vendors.*.eta' => 'nullable|date|after_or_equal:today',
+                'vendors.*.date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+            ],
+            [
+                'vendors.*.eta.after_or_equal' => 'ETA must be a date after or equal to today',
+                'vendors.*.date_sent_commit.after_or_equal' => 'Date sent to Commitment must be a date after or equal to the date sent to DPS',
+            ]
+        );
+
+        if (!$this->requisition->vote_control_requisition) {
+            $status = $this->getProcurement2Status();
+        }
+
+        foreach ($this->vendors as $vendor) {
+            $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                'purchase_order_no' => $vendor['purchase_order_no'],
+                'eta' => $vendor['eta'],
+                'date_sent_commit' => $vendor['date_sent_commit'],
+                'invoice_no' => $vendor['invoice_no'],
+                'date_invoice_received' => $vendor['date_invoice_received'],
+                'date_sent_ap' => $vendor['date_sent_ap'],
+            ]);
+        }
+
+        if (!$this->requisition->is_completed) {
+            $this->requisition->update([
+                'requisition_status' => $status,
+                'updated_by' => Auth::user()->username,
+            ]);
+        }
 
         // $this->setRequisitionStatus();
 
@@ -560,7 +674,7 @@ class ViewRequisition extends Component
         $users = User::accountsPayable()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->send(new NotifyAccountsPayable($this->requisition));
+            // Mail::to($user->email)->send(new NotifyAccountsPayable($this->requisition));
         }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Accounts Payable');
@@ -603,5 +717,109 @@ class ViewRequisition extends Component
         if ($date !== null) {
             return Carbon::parse($date)->format('F jS, Y');
         }
+    }
+
+    public function addVendor()
+    {
+        $this->vendors[] = [
+            'vendor_name' => '',
+            'amount' => '0.00',
+
+            // Procurement
+            'purchase_order_no' => '',
+            'eta' => '',
+            'date_sent_commit' => '',
+            'invoice_no' => '',
+            'date_invoice_received' => '',
+            'date_sent_ap' => '',
+
+            // Cost & Budgeting
+            'date_sent_request_mof' => '',
+            'release_type' => '',
+            'request_category' => '',
+            'request_no' => '',
+            'release_no' => '',
+            'release_date' => '',
+            'change_of_vote_no' => '',
+
+            // AP
+            'date_received_ap' => '',
+            'date_sent_vc' => '',
+
+            // Vote Control
+            'batch_no' => '',
+            'voucher_no' => '',
+            'date_sent_checkstaff' => '',
+
+            // Check Staff
+            'date_received_from_vc' => '',
+            'voucher_destination' => '',
+            'date_sent_audit' => '',
+            'date_received_from_audit' => '',
+            'date_sent_chequeprocessing' => '',
+
+            // Cheque Processing
+            'date_of_cheque' => '',
+            'cheque_no' => '',
+            'date_cheque_processed' => '',
+            'date_sent_dispatch' => '',
+
+            'accordionView' => 'hide',
+        ];
+    }
+
+    public function removeVendor($index)
+    {
+        // dd($this->vendors[$index]);
+        if (isset($this->vendors[$index]['id'])) {
+            $this->deleted_vendors[] = $this->vendors[$index]['id'];
+        }
+        unset($this->vendors[$index]);
+    }
+
+    public function toggleAccordionView($index)
+    {
+        $this->vendors[$index]['accordionView'] = $this->vendors[$index]['accordionView'] === 'show' ? 'hide' : 'show';
+
+        $this->skipRender();
+    }
+    public function getTotalAmountProperty()
+    {
+        return collect($this->vendors)->sum('amount');
+    }
+    public function getProcurement2Status()
+    {
+        $priority = [
+            'Awaiting Invoice' => 1,
+            'To Be Sent to AP' => 2,
+        ];
+
+        $statuses = collect($this->vendors)->map(function ($vendor) {
+            if (
+                $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
+                !$vendor['invoice_no'] && !$vendor['date_invoice_received'] && !$vendor['date_sent_ap']
+            ) {
+                return 'Awaiting Invoice';
+            }
+
+            if (
+                $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
+                $vendor['invoice_no'] && $vendor['date_invoice_received'] && !$vendor['date_sent_ap']
+            ) {
+                return 'To Be Sent to AP';
+            }
+
+            if (
+                $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
+                $vendor['invoice_no'] && $vendor['date_invoice_received'] &&
+                $vendor['date_sent_ap'] && !$this->requisition->vote_control_requisition
+            ) {
+                return 'To Be Sent to AP';
+            }
+
+            return 'At Procurement'; // Default case if none of the conditions match
+        });
+
+        return $statuses->sortBy(fn($status) => $priority[$status] ?? PHP_INT_MAX)->first();
     }
 }

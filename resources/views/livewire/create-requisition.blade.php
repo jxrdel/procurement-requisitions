@@ -173,31 +173,53 @@
 
                 </div>
 
-                <div class="row" x-show="ps_approval == 'Approved'" x-transition>
+                <div class="row mt-2" x-show="ps_approval == 'Approved'" x-transition>
 
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="vendor_name" type="text"
-                                class="form-control @error('vendor_name')is-invalid @enderror" id="floatingInput"
-                                placeholder="ex. Fujitsu" aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Vendor Name</label>
-                        </div>
-                        @error('vendor_name')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
-                    </div>
+                    <h4 class="text-center fw-bold">Vendors</h4>
 
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="amount" type="number" step="0.01"
-                                class="form-control @error('amount')is-invalid @enderror" id="floatingInput"
-                                placeholder="0.00" aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Amount</label>
+                    @forelse ($vendors as $index => $vendor)
+                        <div class="row mx-auto mt-2">
+                            <div class="col">
+                                <div class="form-floating form-floating-outline">
+                                    <input autocomplete="off" wire:model="vendors.{{ $index }}.vendor_name"
+                                        type="text"
+                                        class="form-control @error('vendors.' . $index . '.vendor_name')is-invalid @enderror"
+                                        id="floatingInput" placeholder="ex. Fujitsu"
+                                        aria-describedby="floatingInputHelp" />
+                                    <label for="floatingInput">Vendor Name</label>
+                                </div>
+                                @error('vendors.' . $index . '.vendor_name')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+
+                            <div class="col">
+                                <div class="form-floating form-floating-outline">
+                                    <input autocomplete="off" wire:model="vendors.{{ $index }}.amount"
+                                        type="number" step="0.01"
+                                        class="form-control @error('vendors.' . $index . '.amount')is-invalid @enderror"
+                                        id="floatingInput" placeholder="0.00" aria-describedby="floatingInputHelp" />
+                                    <label for="floatingInput">Amount</label>
+                                </div>
+                                @error('vendors.' . $index . '.amount')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                            <div class="col-1">
+                                <button type="button" wire:click="removeVendor({{ $index }})"
+                                    class="btn rounded-pill btn-icon btn-danger mx-auto mt-2">
+                                    <span class="tf-icons ri-delete-bin-2-line"></span>
+                                </button>
+                            </div>
                         </div>
-                        @error('amount')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
-                    </div>
+                    @empty
+                        <p class="text-center">Click the button below to add a vendor</p>
+                    @endforelse
+
+                    <button type="button" x-on:click="$wire.addVendor"
+                        class="btn rounded-pill btn-icon btn-primary mx-auto mt-2">
+                        <span class="tf-icons ri-add-line ri-22px"></span>
+                    </button>
                 </div>
 
                 <div class="row" x-show="ps_approval == 'Approval Denied'" x-transition>

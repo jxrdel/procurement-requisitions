@@ -64,5 +64,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users', [Controller::class, 'users'])->name('users');
     Route::get('/getusers', [Controller::class, 'getUsers'])->name('getusers');
 
+    Route::get('/votes', [Controller::class, 'votes'])->name('votes');
+    Route::get('/getvotes', [Controller::class, 'getVotes'])->name('getvotes');
+
     Route::get('/help', [Controller::class, 'help'])->name('help');
 });

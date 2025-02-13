@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Requisition;
 use App\Models\User;
+use App\Models\Vote;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -130,5 +131,17 @@ class Controller
     public function help()
     {
         return view('help');
+    }
+
+    public function votes()
+    {
+        return view('votes');
+    }
+
+    public function getVotes()
+    {
+        $votes = Vote::all();
+
+        return DataTables::of($votes)->make(true);
     }
 }

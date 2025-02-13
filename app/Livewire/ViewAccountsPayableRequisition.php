@@ -19,6 +19,7 @@ class ViewAccountsPayableRequisition extends Component
     public $date_received_ap;
     public $date_sent_vc;
 
+    public $vendors = [];
     public $isEditing = true;
 
     public function mount($id)
@@ -30,12 +31,22 @@ class ViewAccountsPayableRequisition extends Component
         }
 
         $this->requisition = $this->ap_requisition->requisition;
+        $this->vendors = $this->requisition->vendors()->select('id', 'vendor_name', 'amount', 'date_received_ap', 'date_sent_vc')->get()->toArray();
+
+        //Add accordion view to each vendor
+        foreach ($this->vendors as $key => $vendor) {
+            $this->vendors[$key]['accordionView'] = 'hide';
+        }
+
 
         $this->date_received_ap = $this->requisition->date_received_ap;
         $this->date_sent_vc = $this->requisition->date_sent_vc;
 
-        if ($this->date_received_ap !== null && $this->date_sent_vc !== null) {
-            $this->isEditing = false;
+        foreach ($this->vendors as $vendor) {
+            if ($vendor['date_received_ap'] !== null && $vendor['date_sent_vc'] !== null) {
+                $this->isEditing = false;
+                break;
+            }
         }
 
         if (Auth::user()->role->name === 'Viewer') {
@@ -50,22 +61,26 @@ class ViewAccountsPayableRequisition extends Component
 
     public function edit()
     {
-        if ($this->date_received_ap == '') {
-            $this->date_received_ap = null;
+        foreach ($this->vendors as &$vendor) {
+            if ($vendor['date_received_ap'] == '') {
+                $vendor['date_received_ap'] = null;
+            }
+
+            if ($vendor['date_sent_vc'] == '') {
+                $vendor['date_sent_vc'] = null;
+            }
         }
 
-        if ($this->date_sent_vc == '') {
-            $this->date_sent_vc = null;
-        }
+        unset($vendor);
 
         $this->validate(
             [
-                'date_received_ap' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                'date_sent_vc' => 'nullable|date|after_or_equal:' . $this->date_received_ap,
+                'vendors.*.date_received_ap' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+                'vendors.*.date_sent_vc' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
             ],
             [
-                'date_received_ap.after_or_equal' => 'Please check date',
-                'date_sent_vc.after_or_equal' => 'Please check date',
+                'vendors.*.date_received_ap.after_or_equal' => 'Please check date',
+                'vendors.*.date_sent_vc.after_or_equal' => 'Please check date',
             ]
         );
 
@@ -73,9 +88,14 @@ class ViewAccountsPayableRequisition extends Component
 
         $this->requisition->update([
             'requisition_status' => $status,
-            'date_received_ap' => $this->date_received_ap,
-            'date_sent_vc' => $this->date_sent_vc,
         ]);
+
+        foreach ($this->vendors as $vendor) {
+            $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                'date_received_ap' => $vendor['date_received_ap'],
+                'date_sent_vc' => $vendor['date_sent_vc'],
+            ]);
+        }
 
         $this->isEditing = false;
         $this->dispatch('show-message', message: 'Record edited successfully');
@@ -85,7 +105,14 @@ class ViewAccountsPayableRequisition extends Component
 
     public function getIsButtonDisabledProperty()
     {
-        return $this->date_received_ap === null || $this->date_sent_vc === null;
+        foreach ($this->vendors as $vendor) {
+            if ($vendor['date_received_ap'] === null || $vendor['date_sent_vc'] === null) {
+                return true;
+            }
+        }
+
+        return false;
+        // return $this->date_received_ap === null || $this->date_sent_vc === null;
     }
 
     public function getFormattedDate($date)
@@ -118,7 +145,7 @@ class ViewAccountsPayableRequisition extends Component
         $users = User::voteControl()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->queue(new NotifyVoteControl($this->requisition));
+            // Mail::to($user->email)->queue(new NotifyVoteControl($this->requisition));
         }
 
         return redirect()->route('accounts_payable.index')->with('success', 'Requisition sent to Vote Control successfully');
@@ -130,12 +157,27 @@ class ViewAccountsPayableRequisition extends Component
             return 'Completed';
         }
 
-        $status = 'At Accounts Payable';
+        // Define priority levels for sorting (lower value = earlier stage)
+        $priority = [
+            'At Accounts Payable' => 1,
+            'To Be Sent to Vote Control' => 2,
+        ];
 
-        if ($this->date_received_ap && $this->date_sent_vc && !$this->ap_requisition->is_completed) {
-            $status = 'To Be Sent to Vote Control';
-        }
+        $statuses = collect($this->vendors)->map(function ($vendor) {
+            if ($vendor['date_received_ap'] && $vendor['date_sent_vc'] && !$this->ap_requisition->is_completed) {
+                return 'To Be Sent to Vote Control';
+            }
+            return 'At Accounts Payable';
+        });
 
-        return $status;
+        return $statuses->sortBy(fn($status) => $priority[$status])->first() ?? 'At Accounts Payable';
+    }
+
+
+    public function toggleAccordionView($index)
+    {
+        $this->vendors[$index]['accordionView'] = $this->vendors[$index]['accordionView'] === 'show' ? 'hide' : 'show';
+
+        $this->skipRender();
     }
 }

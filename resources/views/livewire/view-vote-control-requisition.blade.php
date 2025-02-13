@@ -26,58 +26,87 @@
                     <div id="inputForm">
 
 
-                        <div class="row mt-7">
+                        @foreach ($this->vendors as $index => $vendor)
+                            <div class="accordion mt-8" id="accordion{{ $index }}" style="margin-top: 15px">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button x-on:click="$wire.toggleAccordionView({{ $index }})"
+                                            class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse{{ $index }}" aria-expanded="true"
+                                            aria-controls="collapse{{ $index }}">
+                                            <strong>Vendor: {{ $vendor['vendor_name'] }} | Amount:
+                                                ${{ number_format($vendor['amount'], 2) }}</strong>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ $index }}"
+                                        class="accordion-collapse collapse {{ $vendor['accordionView'] }}"
+                                        data-bs-parent="#accordion{{ $index }}">
+                                        <div class="accordion-body">
+                                            <div class="row mt-7">
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.batch_no"
+                                                            type="text" placeholder="Batch Number"
+                                                            class="form-control @error('vendors.' . $index . '.batch_no')is-invalid @enderror"
+                                                            id="floatingInput" aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Batch Number</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.batch_no')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
 
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="batch_no" type="text"
-                                        class="form-control @error('batch_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Batch Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Batch Number</label>
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.voucher_no"
+                                                            type="text"
+                                                            class="form-control @error('vendors.' . $index . '.voucher_no')is-invalid @enderror"
+                                                            id="floatingInput" placeholder="Voucher Number"
+                                                            aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Voucher Number</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.voucher_no')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-7">
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.date_sent_checkstaff"
+                                                            type="date"
+                                                            class="form-control @error('vendors.' . $index . '.date_sent_checkstaff')is-invalid @enderror"
+                                                            id="floatingInput" aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Date Sent to Check Staff</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.date_sent_checkstaff')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
+
+                                                <div class="col">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                @error('batch_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
                             </div>
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="voucher_no" type="text"
-                                        class="form-control @error('voucher_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Voucher Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Voucher Number</label>
-                                </div>
-                                @error('voucher_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-7">
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_sent_checkstaff" type="date"
-                                        class="form-control @error('date_sent_checkstaff')is-invalid @enderror"
-                                        id="floatingInput" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Date Sent to Check Staff</label>
-                                </div>
-                                @error('date_sent_checkstaff')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                            <div class="col">
-                            </div>
-
-                        </div>
+                        @endforeach
 
 
-                        <div class="row">
+                        <div class="row d-flex justify-content-center text-center mt-6">
 
-                            <button class="btn btn-primary waves-effect waves-light mx-auto mt-5" style="width:100px">
+                            <button class="btn btn-primary waves-effect waves-light mt-5" style="width:100px">
                                 <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                            </button>
+                            &nbsp;
+                            <button type="button" @click="isEditing = ! isEditing"
+                                class="btn btn-dark waves-effect waves-light mt-5" style="width: 100px">
+                                <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
                             </button>
                         </div>
                     </div>
@@ -86,26 +115,37 @@
 
 
             <div x-show="!isEditing">
-                <div class="row mt-8">
 
-                    <div class="col mx-5">
-                        <label><strong>Batch Number:</strong> {{ $this->batch_no }}</label>
-                    </div>
+                @foreach ($vendors as $vendor)
+                    <div class="row mt-5">
+                        <div class="divider">
+                            <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }} -
+                                ${{ number_format($vendor['amount'], 2) }}</div>
+                        </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Voucher Number: </strong>{{ $this->voucher_no }}</label>
-                    </div>
-                </div>
-                <div class="row mt-7">
+                        <div class="row mt-2">
 
-                    <div class="col mx-5">
-                        <label><strong>Date Sent to Check Staff:</strong>
-                            {{ $this->getFormattedDate($this->date_sent_checkstaff) }}</label>
-                    </div>
+                            <div class="col mx-5">
+                                <label><strong>Batch Number:</strong> {{ $vendor['batch_no'] }}</label>
+                            </div>
 
-                    <div class="col mx-5">
+                            <div class="col mx-5">
+                                <label><strong>Voucher Number: </strong>{{ $vendor['voucher_no'] }}</label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-7">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Sent to Check Staff:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_sent_checkstaff']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                            </div>
+                        </div>
                     </div>
-                </div>
+                @endforeach
 
                 <div class="row text-center mt-5">
                     <div>

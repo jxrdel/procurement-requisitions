@@ -19,41 +19,70 @@
                 <form wire:submit.prevent="edit">
                     <div id="inputForm">
 
+                        @foreach ($this->vendors as $index => $vendor)
+                            <div class="accordion mt-8" id="accordion{{ $index }}" style="margin-top: 15px">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button x-on:click="$wire.toggleAccordionView({{ $index }})"
+                                            class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse{{ $index }}" aria-expanded="true"
+                                            aria-controls="collapse{{ $index }}">
+                                            <strong>Vendor: {{ $vendor['vendor_name'] }} | Amount:
+                                                ${{ number_format($vendor['amount'], 2) }}</strong>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ $index }}"
+                                        class="accordion-collapse collapse {{ $vendor['accordionView'] }}"
+                                        data-bs-parent="#accordion{{ $index }}">
+                                        <div class="accordion-body">
+                                            <div class="row mt-7">
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.date_received_ap"
+                                                            type="date"
+                                                            class="form-control @error('vendors.' . $index . '.date_received_ap')is-invalid @enderror"
+                                                            id="floatingInput" aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Date Received From
+                                                            Procurement</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.date_received_ap')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
 
-                        <div class="row mt-7">
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.date_sent_vc"
+                                                            type="date"
+                                                            class="form-control @error('vendors.' . $index . '.date_sent_vc')is-invalid @enderror"
+                                                            id="floatingInput" placeholder="Voucher Number"
+                                                            aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Date Sent to Vote
+                                                            Control</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.date_sent_vc')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
 
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_received_ap" type="date"
-                                        class="form-control @error('date_received_ap')is-invalid @enderror"
-                                        id="floatingInput" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Date Received From Procurement</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                @error('date_received_ap')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
                             </div>
+                        @endforeach
 
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_sent_vc" type="date"
-                                        class="form-control @error('date_sent_vc')is-invalid @enderror"
-                                        id="floatingInput" placeholder="Voucher Number"
-                                        aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Date Sent to Vote Control</label>
-                                </div>
-                                @error('date_sent_vc')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
+                        <div class="row d-flex justify-content-center text-center mt-6">
 
-                        </div>
-
-
-                        <div class="row">
-
-                            <button class="btn btn-primary waves-effect waves-light mx-auto mt-5" style="width:100px">
+                            <button class="btn btn-primary waves-effect waves-light mt-5" style="width:100px">
                                 <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                            </button>
+                            &nbsp;
+                            <button type="button" @click="isEditing = ! isEditing"
+                                class="btn btn-dark waves-effect waves-light mt-5" style="width: 100px">
+                                <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
                             </button>
                         </div>
                     </div>
@@ -62,18 +91,29 @@
 
 
             <div x-show="!isEditing">
-                <div class="row mt-8">
 
-                    <div class="col mx-5">
-                        <label><strong>Date Received From Procurement:</strong>
-                            {{ $this->getFormattedDate($this->date_received_ap) }}</label>
-                    </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Date Sent to Vote Control:</strong>
-                            {{ $this->getFormattedDate($this->date_sent_vc) }}</label>
+                @foreach ($vendors as $vendor)
+                    <div class="row mt-5">
+                        <div class="divider">
+                            <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }} -
+                                ${{ number_format($vendor['amount'], 2) }}</div>
+                        </div>
+
+                        <div class="row mt-8">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Received From Procurement :</strong>
+                                    {{ $this->getFormattedDate($vendor['date_received_ap']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Date Sent to Vote Control:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_sent_vc']) }}</label>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                @endforeach
 
                 <div class="row text-center mt-5">
                     <div>

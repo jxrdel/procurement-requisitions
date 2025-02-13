@@ -21,6 +21,7 @@ class ViewVoteControlRequisition extends Component
     public $voucher_no;
     public $date_sent_checkstaff;
 
+    public $vendors = [];
     public $isEditing = true;
 
     public function mount($id)
@@ -36,9 +37,18 @@ class ViewVoteControlRequisition extends Component
         $this->batch_no = $this->requisition->batch_no;
         $this->voucher_no = $this->requisition->voucher_no;
         $this->date_sent_checkstaff = $this->requisition->date_sent_checkstaff;
+        $this->vendors = $this->requisition->vendors()->select('id', 'vendor_name', 'amount', 'batch_no', 'voucher_no', 'date_sent_checkstaff')->get()->toArray();
 
-        if ($this->batch_no !== null && $this->voucher_no !== null) {
-            $this->isEditing = false;
+        //Add accordion view to each vendor
+        foreach ($this->vendors as $key => $vendor) {
+            $this->vendors[$key]['accordionView'] = 'hide';
+        }
+
+        foreach ($this->vendors as $vendor) {
+            if ($vendor['batch_no'] !== null && $vendor['voucher_no'] !== null && $vendor['date_sent_checkstaff'] !== null) {
+                $this->isEditing = false;
+                break;
+            }
         }
 
         if (Auth::user()->role->name === 'Viewer') {
@@ -53,10 +63,13 @@ class ViewVoteControlRequisition extends Component
 
     public function getIsButtonDisabledProperty()
     {
-        return
-            $this->voucher_no === null || trim($this->voucher_no) === '' ||
-            $this->batch_no === null || trim($this->batch_no) === '' ||
-            $this->date_sent_checkstaff === null || trim($this->date_sent_checkstaff) === '';
+        foreach ($this->vendors as $vendor) {
+            if ($vendor['voucher_no'] === null || trim($vendor['voucher_no']) === '' || $vendor['batch_no'] === null || trim($vendor['batch_no']) === '' || $vendor['date_sent_checkstaff'] === null || trim($vendor['date_sent_checkstaff']) === '') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     //Edit funciton
@@ -64,12 +77,25 @@ class ViewVoteControlRequisition extends Component
     public function edit()
     {
 
+        foreach ($this->vendors as &$vendor) {
+            if ($vendor['date_sent_checkstaff'] == '') {
+                $vendor['date_sent_checkstaff'] = null;
+            }
+        }
+
+        unset($vendor);
+
         $status = $this->getStatus();
 
+        foreach ($this->vendors as $vendor) {
+            $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                'batch_no' => $vendor['batch_no'],
+                'voucher_no' => $vendor['voucher_no'],
+                'date_sent_checkstaff' => $vendor['date_sent_checkstaff'],
+            ]);
+        }
+
         $this->requisition->update([
-            'batch_no' => $this->batch_no,
-            'voucher_no' => $this->voucher_no,
-            'date_sent_checkstaff' => $this->date_sent_checkstaff,
             'requisition_status' => $status,
         ]);
 
@@ -98,7 +124,7 @@ class ViewVoteControlRequisition extends Component
         //Get Emails of Check Staff
         $checkStaff = User::checkStaff()->get();
         foreach ($checkStaff as $staff) {
-            Mail::to($staff->email)->queue(new NotifyCheckRoom($this->requisition));
+            // Mail::to($staff->email)->queue(new NotifyCheckRoom($this->requisition));
         }
 
         return redirect()->route('vote_control.index')->with('success', 'Requisition sent to Check Staff successfully');
@@ -110,14 +136,23 @@ class ViewVoteControlRequisition extends Component
             return 'Completed';
         }
 
-        $status = 'At Vote Control';
+        // Define priority levels for sorting (lower value = earlier stage)
+        $priority = [
+            'At Vote Control' => 1,
+            'To Be Sent to Check Staff' => 2,
+        ];
 
-        if ($this->batch_no && $this->voucher_no && !$this->vc_requisition->is_completed) {
-            $status = 'To Be Sent to Check Staff';
-        }
+        $statuses = collect($this->vendors)->map(function ($vendor) {
+            if ($vendor['batch_no'] && $vendor['voucher_no'] && !$this->vc_requisition->is_completed) {
+                return 'To Be Sent to Check Staff';
+            }
+            return 'At Vote Control';
+        });
 
-        return $status;
+        return $statuses->sortBy(fn($status) => $priority[$status])->first() ?? 'At Vote Control';
     }
+
+
 
     public function getDateSentVC()
     {
@@ -131,5 +166,12 @@ class ViewVoteControlRequisition extends Component
         if ($date !== null) {
             return Carbon::parse($date)->format('F jS, Y');
         }
+    }
+
+    public function toggleAccordionView($index)
+    {
+        $this->vendors[$index]['accordionView'] = $this->vendors[$index]['accordionView'] === 'show' ? 'hide' : 'show';
+
+        $this->skipRender();
     }
 }

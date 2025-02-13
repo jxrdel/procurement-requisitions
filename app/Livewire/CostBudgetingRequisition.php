@@ -36,14 +36,16 @@ class CostBudgetingRequisition extends Component
     public $ps_approval;
     public $vendor_name;
     public $amount;
+    public $total;
 
     public $isEditing = true;
     public $votes;
+    public $vendors = [];
 
     public function mount($id)
     {
         $this->cb_requisition = CBRequisition::find($id);
-        $this->votes = Vote::all();
+        $this->votes = Vote::active()->get();
 
         if (!$this->cb_requisition) {
             return abort(404);
@@ -58,6 +60,25 @@ class CostBudgetingRequisition extends Component
         $this->release_no = $this->requisition->release_no;
         $this->release_date = $this->requisition->release_date;
         $this->change_of_vote_no = $this->requisition->change_of_vote_no;
+        $this->vendors = $this->requisition->vendors()
+            ->select(
+                'id',
+                'vendor_name',
+                'amount',
+                'date_sent_request_mof',
+                'request_category',
+                'request_no',
+                'release_type',
+                'release_no',
+                'release_date',
+                'change_of_vote_no'
+            )
+            ->get()->toArray();
+        //Add accordion view to each vendor
+        foreach ($this->vendors as $key => $vendor) {
+            $this->vendors[$key]['accordionView'] = 'hide';
+        }
+        $this->total = $this->requisition->vendors()->sum('amount');
 
         //Requisition Details
         $this->requisition_no = $this->requisition->requisition_no;
@@ -69,9 +90,13 @@ class CostBudgetingRequisition extends Component
         $this->ps_approval = $this->requisition->ps_approval;
         $this->vendor_name = $this->requisition->vendor_name;
         $this->amount = $this->requisition->amount;
+        $this->isEditing = false;
 
-        if ($this->date_sent_request_mof !== null && $this->request_no !== null && $this->release_no !== null && $this->release_date !== null) {
-            $this->isEditing = false;
+        foreach ($this->vendors as $vendor) {
+            if ($vendor['date_sent_request_mof'] === null || $vendor['request_no'] === null || $vendor['release_no'] === null || $vendor['release_date'] === null) {
+                $this->isEditing = true;
+                break;
+            }
         }
 
         if ($this->cb_requisition->is_completed) {
@@ -91,13 +116,30 @@ class CostBudgetingRequisition extends Component
     public function edit()
     {
         //Set dates to null if they are empty strings. This happens when the date is deleted
-        if ($this->date_sent_request_mof === '') {
-            $this->date_sent_request_mof = null;
+        foreach ($this->vendors as &$vendor) { //Use reference to update the original array
+            if ($vendor['date_sent_request_mof'] === '') {
+                $vendor['date_sent_request_mof'] = null;
+            }
+
+            if ($vendor['release_date'] === '') {
+                $vendor['release_date'] = null;
+            }
         }
 
-        if ($this->release_date === '') {
-            $this->release_date = null;
-        }
+        // Unset reference to avoid unintended behavior
+        unset($vendor);
+
+        $this->validate(
+            [
+                'vendors.*.date_sent_request_mof' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+                'vendors.*.release_date' => 'nullable|date|after:vendors.*.date_sent_request_mof',
+
+            ],
+            [
+                'vendors.*.date_sent_request_mof.after_or_equal' => 'Please check date',
+                'vendors.*.release_date.after' => 'The Release Date must be a date after the Date Sent to MoF',
+            ]
+        );
 
         $status = $this->requisition->requisition_status;
 
@@ -106,28 +148,21 @@ class CostBudgetingRequisition extends Component
             $status = $this->getStatus();
         }
 
-        $this->validate(
-            [
-                'date_sent_request_mof' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                'release_date' => 'nullable|date|after:date_sent_request_mof',
-
-            ],
-            [
-                'date_sent_request_mof.after_or_equal' => 'Please check date',
-                'release_date.after' => 'The Release Date must be a date after the Date Sent to MoF',
-            ]
-        );
-
         $this->requisition->update([
             'requisition_status' => $status,
-            'date_sent_request_mof' => $this->date_sent_request_mof,
-            'request_category' => $this->request_category,
-            'request_no' => trim($this->request_no),
-            'release_type' => $this->release_type,
-            'release_no' => trim($this->release_no),
-            'release_date' => $this->release_date,
-            'change_of_vote_no' => trim($this->change_of_vote_no),
         ]);
+
+        foreach ($this->vendors as $vendor) {
+            $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                'date_sent_request_mof' => $vendor['date_sent_request_mof'],
+                'request_category' => $vendor['request_category'],
+                'request_no' => $vendor['request_no'],
+                'release_type' => $vendor['release_type'],
+                'release_no' => $vendor['release_no'],
+                'release_date' => $vendor['release_date'],
+                'change_of_vote_no' => $vendor['change_of_vote_no'],
+            ]);
+        }
 
         $this->isEditing = false;
         $this->resetValidation();
@@ -172,10 +207,13 @@ class CostBudgetingRequisition extends Component
 
     public function getIsButtonDisabledProperty()
     {
-        return $this->request_no === null || trim($this->request_no) === '' ||
-            $this->release_no === null || trim($this->release_no) === '' ||
-            $this->date_sent_request_mof === null || $this->date_sent_request_mof === '' ||
-            $this->release_date === null || $this->release_date === '';
+        foreach ($this->vendors as $vendor) {
+            if ($vendor['date_sent_request_mof'] === null || $vendor['request_no'] === null || $vendor['release_no'] === null || $vendor['release_date'] === null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function sendToProcurement()
@@ -194,9 +232,9 @@ class CostBudgetingRequisition extends Component
         //Send email to assigned procurement officer
         $user = $this->requisition->procurement_officer;
         if ($user) {
-            Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+            // Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
         } else {
-            Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+            // Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
         }
 
         return redirect()->route('cost_and_budgeting.index')->with('success', 'Requisition sent to procurement successfully');
@@ -208,28 +246,56 @@ class CostBudgetingRequisition extends Component
             return 'Completed';
         }
 
-        $status = 'At Cost & Budgeting';
+        $statuses = [];
 
-        if (!$this->date_sent_request_mof && !$this->request_no && !$this->release_no && !$this->release_date && !$this->change_of_vote_no) {
-            $status = 'To be sent to MoF';
+        foreach ($this->vendors as $vendor) {
+            if (!$vendor['date_sent_request_mof'] && !$vendor['request_no'] && !$vendor['release_no'] && !$vendor['release_date'] && !$vendor['change_of_vote_no']) {
+                $statuses[] = 'To be sent to MoF';
+            } elseif ($vendor['date_sent_request_mof'] && !$vendor['release_no'] && !$vendor['release_date']) {
+                $statuses[] = 'Awaiting Release';
+            } elseif ($vendor['date_sent_request_mof'] && $vendor['release_no'] && $vendor['release_date']) {
+                $statuses[] = 'To be sent to Procurement';
+            } else {
+                $statuses[] = 'At Cost & Budgeting';
+            }
         }
 
-        if ($this->date_sent_request_mof && !$this->release_no && !$this->release_date) {
-            $status = 'Awaiting Release';
+        if (empty($statuses)) {
+            return 'At Cost & Budgeting'; // Default status if no vendors exist
         }
 
-        if ($this->date_sent_request_mof && $this->release_no && $this->release_date) {
-            $status = 'To be sent to Procurement';
-        }
+        // Define priority order
+        $priority = [
+            'To be sent to MoF' => 1,
+            'Awaiting Release' => 2,
+            'To be sent to Procurement' => 3,
+            'At Cost & Budgeting' => 4,
+        ];
 
-        return $status;
+        // Get the lowest priority status
+        return collect($statuses)->sortBy(fn($status) => $priority[$status])->first();
     }
+
 
     public function updating($name, $value)
     {
         //Skip rendering when the change_of_vote_no is being updated
-        if ($name === 'change_of_vote_no') {
+        if ($name === 'change_of_vote_no' || $name === 'vendors') {
             $this->skipRender();
+        }
+    }
+
+    public function toggleAccordionView($index)
+    {
+        $this->vendors[$index]['accordionView'] = $this->vendors[$index]['accordionView'] === 'show' ? 'hide' : 'show';
+
+        $this->skipRender();
+    }
+
+    public function getFormattedDate($date)
+    {
+        if ($date !== null) {
+            return Carbon::parse($date)->format('F jS, Y');
         }
     }
 }

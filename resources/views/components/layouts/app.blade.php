@@ -111,6 +111,15 @@
                         </li>
                     @endcan
 
+                    @can('view-votes-page')
+                        <li @class(['menu-item', 'active' => request()->routeIs('votes')])>
+                            <a href="{{ route('votes') }}" class="menu-link">
+                                <i style="margin-left: 2px" class="menu-icon fa-solid fa-check-to-slot fs-5"></i>
+                                <div data-i18n="Basic">Votes</div>
+                            </a>
+                        </li>
+                    @endcan
+
                     @can('view-cost-budgeting-requisitions')
                         <li class="menu-header mt-7">
                             <span class="menu-header-text">Cost &amp; Budgeting</span>

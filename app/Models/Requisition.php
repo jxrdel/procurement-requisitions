@@ -106,6 +106,11 @@ class Requisition extends Model
         return $this->hasMany(FileUpload::class);
     }
 
+    public function vendors()
+    {
+        return $this->hasMany(RequisitionVendor::class);
+    }
+
     //Get unique requisition number
     public static function generateRequisitionNo()
     {

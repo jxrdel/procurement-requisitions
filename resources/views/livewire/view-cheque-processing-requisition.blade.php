@@ -15,80 +15,104 @@
                 </h1>
             </div>
 
-            <div class="row mt-2">
-
-                <div class="col mx-5">
-                    <label><strong>Date Received:</strong>
-                        {{ $this->requisition->cheque_processing_requisition->created_at->format('F jS, Y') }}</label>
-                </div>
-            </div>
             <div x-show="isEditing">
                 <form wire:submit.prevent="edit">
                     <div id="inputForm">
 
-                        <div class="row mt-7">
+                        @foreach ($this->vendors as $index => $vendor)
+                            <div class="accordion mt-8" id="accordion{{ $index }}" style="margin-top: 15px">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button x-on:click="$wire.toggleAccordionView({{ $index }})"
+                                            class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse{{ $index }}" aria-expanded="true"
+                                            aria-controls="collapse{{ $index }}">
+                                            <strong>Vendor: {{ $vendor['vendor_name'] }} | Amount:
+                                                ${{ number_format($vendor['amount'], 2) }}</strong>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ $index }}"
+                                        class="accordion-collapse collapse {{ $vendor['accordionView'] }}"
+                                        data-bs-parent="#accordion{{ $index }}">
+                                        <div class="accordion-body">
+                                            <div class="row mt-5">
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.date_cheque_processed"
+                                                            type="date"
+                                                            class="form-control @error('vendors.' . $index . '.date_cheque_processed')is-invalid @enderror"
+                                                            id="floatingInput" placeholder="Cheque Number"
+                                                            aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Date Cheque Processed</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.date_cheque_processed')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
 
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_cheque_processed" type="date"
-                                        class="form-control @error('date_cheque_processed')is-invalid @enderror"
-                                        id="floatingInput" placeholder="Cheque Number"
-                                        aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Date Cheque Processed</label>
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.cheque_no"
+                                                            type="text"
+                                                            class="form-control @error('vendors.' . $index . '.cheque_no')is-invalid @enderror"
+                                                            id="floatingInput" placeholder="Cheque Number"
+                                                            aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Cheque Number</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.cheque_no')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-6 mb-6">
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.date_of_cheque"
+                                                            type="date"
+                                                            class="form-control @error('vendors.' . $index . '.date_of_cheque')is-invalid @enderror"
+                                                            id="floatingInput" aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Cheque Date</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.date_of_cheque')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
+
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off"
+                                                            wire:model="vendors.{{ $index }}.date_sent_dispatch"
+                                                            type="date"
+                                                            class="form-control @error('vendors.' . $index . '.date_sent_dispatch')is-invalid @enderror"
+                                                            id="floatingInput" placeholder="Cheque Number"
+                                                            aria-describedby="floatingInputHelp" />
+                                                        <label for="floatingInput">Date Cheque Sent to Cheque
+                                                            Dispatch</label>
+                                                    </div>
+                                                    @error('vendors.' . $index . '.date_sent_dispatch')
+                                                        <div class="text-danger"> {{ $message }} </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                @error('date_cheque_processed')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
                             </div>
+                        @endforeach
 
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="cheque_no" type="text"
-                                        class="form-control @error('cheque_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Cheque Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Cheque Number</label>
-                                </div>
-                                @error('cheque_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
+                        <div class="row d-flex justify-content-center text-center mt-6">
 
-                        </div>
-
-                        <div class="row mt-6 mb-6">
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_of_cheque" type="date"
-                                        class="form-control @error('date_of_cheque')is-invalid @enderror"
-                                        id="floatingInput" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Cheque Date</label>
-                                </div>
-                                @error('date_of_cheque')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_sent_dispatch" type="date"
-                                        class="form-control @error('date_sent_dispatch')is-invalid @enderror"
-                                        id="floatingInput" placeholder="Cheque Number"
-                                        aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Date Cheque Sent to Cheque Dispatch</label>
-                                </div>
-                                @error('date_sent_dispatch')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                        </div>
-
-
-                        <div class="row">
-
-                            <button class="btn btn-primary waves-effect waves-light mx-auto mt-5" style="width:100px">
+                            <button class="btn btn-primary waves-effect waves-light mt-5" style="width:100px">
                                 <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                            </button>
+                            &nbsp;
+                            <button type="button" @click="isEditing = ! isEditing"
+                                class="btn btn-dark waves-effect waves-light mt-5" style="width: 100px">
+                                <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
                             </button>
                         </div>
                     </div>
@@ -97,31 +121,41 @@
 
 
             <div x-show="!isEditing">
-                <div class="row mt-8">
 
-                    <div class="col mx-5">
-                        <label><strong>Date Cheque Processed:</strong>
-                            {{ $this->getFormattedDate($this->date_cheque_processed) }}</label>
+
+                @foreach ($vendors as $vendor)
+                    <div class="row mt-5">
+                        <div class="divider">
+                            <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }} -
+                                ${{ number_format($vendor['amount'], 2) }}</div>
+                        </div>
+
+                        <div class="row mt-2">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Cheque Processed:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_cheque_processed']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Cheque Number: </strong>{{ $vendor['cheque_no'] }}</label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+
+                            <div class="col mx-5">
+                                <label><strong>Cheque Date:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_of_cheque']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Date Cheque Sent to Cheque Dispatch:
+                                    </strong>{{ $this->getFormattedDate($vendor['date_sent_dispatch']) }}</label>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Cheque Number: </strong>{{ $this->cheque_no }}</label>
-                    </div>
-                </div>
-
-                <div class="row mt-8">
-
-                    <div class="col mx-5">
-                        <label><strong>Cheque Date:</strong>
-                            {{ $this->getFormattedDate($this->date_of_cheque) }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Date Cheque Sent to Cheque Dispatch:
-                            </strong>{{ $this->getFormattedDate($this->date_sent_dispatch) }}</label>
-                    </div>
-                </div>
-
+                @endforeach
 
                 <div class="row text-center mt-5">
                     <div>
