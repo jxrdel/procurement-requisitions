@@ -43,6 +43,7 @@ class ViewCheckRoomRequisition extends Component
                 'id',
                 'vendor_name',
                 'amount',
+                'change_of_vote_no',
                 'date_received_from_vc',
                 'voucher_destination',
                 'date_sent_audit',

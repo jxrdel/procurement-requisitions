@@ -72,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-votes-page', function ($user) {
-            return $user->role->name === 'Admin';
+            return $user->role->name === 'Admin' || $user->department === 'Cost & Budgeting';
         });
 
         Gate::define('view-log', function ($user, $log) {

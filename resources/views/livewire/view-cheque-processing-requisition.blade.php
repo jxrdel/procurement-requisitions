@@ -98,6 +98,12 @@
                                                     @enderror
                                                 </div>
                                             </div>
+
+                                            <div class="row mt-6 mb-6">
+                                                <label><strong>Vote Number:</strong>
+                                                    {{ $vendor['change_of_vote_no'] ?? $this->requisition->source_of_funds }}
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -152,6 +158,13 @@
                             <div class="col mx-5">
                                 <label><strong>Date Cheque Sent to Cheque Dispatch:
                                     </strong>{{ $this->getFormattedDate($vendor['date_sent_dispatch']) }}</label>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col mx-5">
+                                <label><strong>Vote Number:</strong>
+                                    {{ $vendor['change_of_vote_no'] ?? $this->requisition->source_of_funds }}
+                                </label>
                             </div>
                         </div>
                     </div>

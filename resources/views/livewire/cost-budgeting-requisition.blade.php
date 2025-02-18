@@ -70,6 +70,7 @@
                                                         id="exampleFormControlSelect1"
                                                         aria-label="Default select example">
                                                         <option value="" selected>Select Request Category</option>
+                                                        <option value="ADHOC">ADHOC</option>
                                                         <option value="Recurrent Expenditure">Recurrent Expenditure
                                                         </option>
                                                         <option value="Development Program">Development Program</option>

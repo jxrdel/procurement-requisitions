@@ -11,10 +11,13 @@ use App\Livewire\CostBudgetingRequisition;
 use App\Livewire\CreateRequisition;
 use App\Livewire\LoginForm;
 use App\Livewire\ViewAccountsPayableRequisition;
+use App\Livewire\ViewAccountsPayableVendor;
 use App\Livewire\ViewCheckRoomRequisition;
+use App\Livewire\ViewCheckStaffVendor;
 use App\Livewire\ViewChequeProcessingRequisition;
 use App\Livewire\ViewVoteControlRequisition;
 use App\Livewire\ViewRequisition;
+use App\Livewire\ViewVoteControlVendor;
 use App\Models\VoteControlRequisition;
 use Illuminate\Support\Facades\Route;
 
@@ -38,20 +41,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getinprogresscostandbudgeting_requisitions', [CBRequisitionController::class, 'getInProgressCostAndBudgetingRequisitions'])->name('getinprogresscostandbudgeting_requisitions');
 
     Route::get('/accounts_payable', [AccountsPayableController::class, 'index'])->name('accounts_payable.index');
-    Route::get('/accounts_payable/view/{id}', ViewAccountsPayableRequisition::class)->name('accounts_payable.view')->middleware('can:view-accounts-payable-requisitions');
-    Route::get('/getaccountspayable_requisitions', [AccountsPayableController::class, 'getAccountsPayableRequisitions'])->name('getaccountspayable_requisitions');
-    Route::get('/getcompletedaccountspayable_requisitions', [AccountsPayableController::class, 'getCompletedAccountsPayableRequisitions'])->name('getcompletedaccountspayable_requisitions');
-    Route::get('/getinprogressaccountspayable_requisitions', [AccountsPayableController::class, 'getInProgressAccountsPayableRequisitions'])->name('getinprogressaccountspayable_requisitions');
+    Route::get('/accounts_payable/view/{id}', ViewAccountsPayableVendor::class)->name('accounts_payable.view')->middleware('can:view-accounts-payable-requisitions');
+    Route::get('/getaccountspayable_vendors', [AccountsPayableController::class, 'getAccountsPayableVendors'])->name('getaccountspayable_vendors');
+    Route::get('/getcompletedaccountspayable_vendors', [AccountsPayableController::class, 'getCompletedAccountsPayableVendors'])->name('getcompletedaccountspayable_vendors');
+    Route::get('/getinprogressaccountspayable_vendors', [AccountsPayableController::class, 'getInProgressAccountsPayableVendors'])->name('getinprogressaccountspayable_vendors');
 
     Route::get('/vote_control', [VoteControlRequisitionController::class, 'index'])->name('vote_control.index');
-    Route::get('/vote_control/view/{id}', ViewVoteControlRequisition::class)->name('vote_control.view')->middleware('can:view-vote-control-requisitions');
-    Route::get('/getvotecontrol_requisitions', [VoteControlRequisitionController::class, 'getVoteControlRequisitions'])->name('getvotecontrol_requisitions');
-    Route::get('/getcompletedvotecontrol_requisitions', [VoteControlRequisitionController::class, 'getCompletedVoteControlRequisitions'])->name('getcompletedvotecontrol_requisitions');
-    Route::get('/getinprogressvotecontrol_requisitions', [VoteControlRequisitionController::class, 'getInProgressVoteControlRequisitions'])->name('getinprogressvotecontrol_requisitions');
+    Route::get('/vote_control/view/{id}', ViewVoteControlVendor::class)->name('vote_control.view')->middleware('can:view-vote-control-requisitions');
+    Route::get('/getvotecontrol_vendors', [VoteControlRequisitionController::class, 'getVoteControlVendors'])->name('getvotecontrol_vendors');
+    Route::get('/getcompletedvotecontrol_vendors', [VoteControlRequisitionController::class, 'getCompletedVoteControlVendors'])->name('getcompletedvotecontrol_vendors');
+    Route::get('/getinprogressvotecontrol_requisitions', [VoteControlRequisitionController::class, 'getInProgressVoteControlVendors'])->name('getinprogressvotecontrol_requisitions');
 
     Route::get('/check_room', [CheckRoomController::class, 'index'])->name('check_room.index');
-    Route::get('/check_room/view/{id}', ViewCheckRoomRequisition::class)->name('check_room.view')->middleware('can:view-check-room-requisitions');
-    Route::get('/getcheckroom_requisitions', [CheckRoomController::class, 'getCheckRoomRequisitions'])->name('getcheckroom_requisitions');
+    Route::get('/check_room/view/{id}', ViewCheckStaffVendor::class)->name('check_room.view')->middleware('can:view-check-room-requisitions');
+    Route::get('/getcheckroom_requisitions', [CheckRoomController::class, 'getCheckStaffVendors'])->name('getcheckroom_requisitions');
     Route::get('/getcompletedcheckroom_requisitions', [CheckRoomController::class, 'getCompletedCheckRoomRequisitions'])->name('getcompletedcheckroom_requisitions');
     Route::get('/getinprogresscheckroom_requisitions', [CheckRoomController::class, 'getInProgressCheckRoomRequisitions'])->name('getinprogresscheckroom_requisitions');
 

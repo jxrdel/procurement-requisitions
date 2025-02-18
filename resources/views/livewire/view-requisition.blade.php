@@ -1,5 +1,6 @@
 <div>
     @include('add-log')
+    @include('livewire.vendor-invoices-modal')
     <div class="card" x-data="{
         sent_to_cb: $wire.entangle('sent_to_cb'),
         ps_approval: $wire.entangle('ps_approval'),
@@ -658,29 +659,35 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="row mt-5">
+
+                                            @can('edit-records')
+                                                @if (!$vendor['sent_to_ap'])
+                                                    <div class="row mt-8">
+                                                        <button @disabled($this->isProcurement2ButtonDisabled($vendor))
+                                                            wire:confirm="Are you sure you want to send to accounts payable?"
+                                                            wire:target="sendToAP({{ $vendor['id'] }})"
+                                                            wire:loading.attr="disabled" type="button"
+                                                            wire:click="sendToAP({{ $vendor['id'] }})"
+                                                            class="btn btn-success waves-effect waves-light m-auto"
+                                                            style="width: 300px">
+                                                            <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to
+                                                            Accounts
+                                                            Payable
+
+                                                            <div wire:loading wire:target="sendToAP({{ $vendor['id'] }})"
+                                                                class="spinner-border spinner-border-lg text-white mx-2"
+                                                                role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                            </div>
+                                                        </button>
+                                                    </div>
+                                                @endif
+                                            @endcan
+                                        </div>
                                     @endforeach
 
-
-                                    @can('edit-records')
-                                        @if (!$this->requisition->ap_requisition)
-                                            <div class="row mt-8">
-                                                <button @disabled($this->isButtonProcurement2Disabled)
-                                                    wire:confirm="Are you sure you want to send to accounts payable?"
-                                                    wire:loading.attr="disabled" type="button" wire:click="sendToAP"
-                                                    class="btn btn-success waves-effect waves-light m-auto"
-                                                    style="width: 300px">
-                                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Accounts
-                                                    Payable
-
-                                                    <div wire:loading
-                                                        class="spinner-border spinner-border-lg text-white mx-2"
-                                                        role="status">
-                                                        <span class="visually-hidden">Loading...</span>
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        @endif
-                                    @endcan
 
                                 </div>
 
@@ -808,6 +815,16 @@
                                                                     <div class="text-danger"> {{ $message }} </div>
                                                                 @enderror
                                                             </div>
+                                                        </div>
+
+
+                                                        <div class="d-flex justify-content-center mt-8">
+                                                            <button type="button"
+                                                                wire:click="displayInvoicesModal({{ $vendor['id'] }})"
+                                                                class="btn btn-success waves-effect waves-light">
+                                                                Invoices
+                                                                ({{ $invoice_count_buttons[$vendor['id']] ?? 0 }})
+                                                            </button>
                                                         </div>
 
                                                     </div>
@@ -1175,6 +1192,9 @@
             $('#addLogModal').modal('hide');
         })
 
+        window.addEventListener('display-invoices-modal', event => {
+            $('#invoiceModal').modal('show');
+        })
 
         $wire.on('scrollToError', () => {
             // Wait for Livewire to finish rendering the error fields
@@ -1202,6 +1222,10 @@
 
         $('#addLogModal').on('shown.bs.modal', function() {
             $('#detailsInput').focus()
+        })
+
+        $('#invoiceModal').on('hidden.bs.modal', function() {
+            // $wire.refreshVendors();
         })
     </script>
 @endscript

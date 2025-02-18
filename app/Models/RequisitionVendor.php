@@ -13,12 +13,14 @@ class RequisitionVendor extends Model
         'amount',
 
         //Procurement
+        'vendor_status',
         'purchase_order_no',
         'eta',
         'date_sent_commit',
         'invoice_no',
         'date_invoice_received',
         'date_sent_ap',
+        'sent_to_ap',
 
         // Cost & Budgeting
         'date_sent_request_mof',
@@ -58,5 +60,30 @@ class RequisitionVendor extends Model
     public function requisition()
     {
         return $this->belongsTo(Requisition::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(VendorInvoice::class, 'vendor_id');
+    }
+
+    public function ap()
+    {
+        return $this->hasOne(APVendor::class, 'vendor_id');
+    }
+
+    public function voteControl()
+    {
+        return $this->hasOne(VoteControlVendor::class, 'vendor_id');
+    }
+
+    public function checkStaff()
+    {
+        return $this->hasOne(CheckStaffVendor::class, 'vendor_id');
+    }
+
+    public function chequeProcessing()
+    {
+        return $this->hasOne(ChequeProcessingVendor::class, 'vendor_id');
     }
 }

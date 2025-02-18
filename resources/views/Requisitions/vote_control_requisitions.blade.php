@@ -61,12 +61,12 @@
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "{{ route('getvotecontrol_requisitions') }}",
+                    "url": "{{ route('getvotecontrol_vendors') }}",
                     "type": "GET"
                 },
                 "columns": [{
-                        data: 'requisition_no',
-                        name: 'requisition_no'
+                        data: 'RequisitionNo',
+                        name: 'requisitions.requisition_no'
                     },
                     {
                         data: 'RequestingUnit',
@@ -77,27 +77,14 @@
                         name: 'requisitions.item'
                     },
                     {
-                        data: 'date_sent_ap',
-                        name: 'date_sent_ap',
-                        render: function(data, type, row) {
-                            if (data) {
-                                var date = new Date(data);
-                                // Format the date as dd/mm/yyyy
-                                var day = ('0' + date.getDate()).slice(-
-                                    2); // Add leading 0 if necessary
-                                var month = ('0' + (date.getMonth() + 1)).slice(-
-                                    2); // Add leading 0, note months are 0-indexed
-                                var year = date.getFullYear();
-                                return day + '/' + month + '/' + year;
-                            }
-                            return ''; // Return an empty string if there's no date
-                        }
+                        data: 'vc_created_at',
+                        name: 'vote_control_vendors.created_at'
                     },
                     {
-                        data: 'ar_completed',
-                        name: 'vote_control_requisitions.is_completed',
+                        data: 'vc_completed',
+                        name: 'vote_control_vendors.is_completed',
                         render: function(data, type, row) {
-                            var status = row.requisition_status ||
+                            var status = row.VendorStatus ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
                             if (status === 'Sent to Vote Control') {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Accounts Payable</span></div>';
@@ -117,12 +104,12 @@
                         searchable: false,
                         render: function(data, type, row) {
                             return ' <div style="text-align:center"><a class="btn btn-primary" href="/vote_control/view/' +
-                                data.ar_id + '" >View</a> </div>';
+                                data.vc_id + '" >View</a> </div>';
                         }
                     },
                     {
-                        data: 'ar_id',
-                        name: 'vote_control_requisitions.id',
+                        data: 'vc_id',
+                        name: 'vote_control_vendors.id',
                         visible: false // Hide the column but use it for sorting
                     }
                 ]
@@ -137,11 +124,11 @@
                         .load();
                     break;
                 case 'btn-completed':
-                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedvotecontrol_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedvotecontrol_vendors') }}')
                         .load();
                     break;
                 case 'btn-all':
-                    $('#myTable').DataTable().ajax.url('{{ route('getvotecontrol_requisitions') }}').load();
+                    $('#myTable').DataTable().ajax.url('{{ route('getvotecontrol_vendors') }}').load();
                     break;
             }
         });

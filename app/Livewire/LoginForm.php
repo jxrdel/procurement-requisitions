@@ -23,40 +23,40 @@ class LoginForm extends Component
 
     public function login()
     {
-        // $user = User::find(1);
+        $user = User::find(1);
 
-        // Auth::login($user);
-        // return redirect()->intended('/'); // Fallback to dashboard if no intended page
+        Auth::login($user);
+        return redirect()->intended('/'); // Fallback to dashboard if no intended page
 
-        try {
+        // try {
 
-            $connection = Container::getConnection('default');
-            $user = User::where('username', $this->username)->first(); //Gets user
+        //     $connection = Container::getConnection('default');
+        //     $user = User::where('username', $this->username)->first(); //Gets user
 
-            if ($user) { //If user is found..
-                $ADuser = $connection->query()->where('samaccountname', '=', $this->username)->first(); //Gets user from AD
-                // dd($ADuser);
-                if ($ADuser) {
-                    if ($connection->auth()->attempt($ADuser['distinguishedname'][0], $this->password)) { //Authenticate User
-                        // dd('Success');
-                        Auth::login($user);
-                        redirect()->intended('/');
-                    } else {
-                        // dd('Error');
-                        $this->resetValidation();
-                        $this->addError('password', 'Incorrect password');
-                        $this->password = null;
-                    }
-                } else {
-                    $this->resetValidation();
-                    $this->addError('username', 'User does not have a Windows Login. Please contact Administrator');
-                }
-            } else { //Display error if no user is found
-                $this->resetValidation();
-                $this->addError('username', 'User not found');
-            }
-        } catch (Exception $e) {
-            dd('Error: Please contact IT at ext 11124', $e->getMessage());
-        }
+        //     if ($user) { //If user is found..
+        //         $ADuser = $connection->query()->where('samaccountname', '=', $this->username)->first(); //Gets user from AD
+        //         // dd($ADuser);
+        //         if ($ADuser) {
+        //             if ($connection->auth()->attempt($ADuser['distinguishedname'][0], $this->password)) { //Authenticate User
+        //                 // dd('Success');
+        //                 Auth::login($user);
+        //                 redirect()->intended('/');
+        //             } else {
+        //                 // dd('Error');
+        //                 $this->resetValidation();
+        //                 $this->addError('password', 'Incorrect password');
+        //                 $this->password = null;
+        //             }
+        //         } else {
+        //             $this->resetValidation();
+        //             $this->addError('username', 'User does not have a Windows Login. Please contact Administrator');
+        //         }
+        //     } else { //Display error if no user is found
+        //         $this->resetValidation();
+        //         $this->addError('username', 'User not found');
+        //     }
+        // } catch (Exception $e) {
+        //     dd('Error: Please contact IT at ext 11124', $e->getMessage());
+        // }
     }
 }

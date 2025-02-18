@@ -42,6 +42,7 @@ class ViewChequeProcessingRequisition extends Component
                 'vendor_name',
                 'amount',
                 'date_cheque_processed',
+                'change_of_vote_no',
                 'cheque_no',
                 'date_of_cheque',
                 'date_sent_dispatch'

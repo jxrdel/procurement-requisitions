@@ -37,7 +37,7 @@ class ViewVoteControlRequisition extends Component
         $this->batch_no = $this->requisition->batch_no;
         $this->voucher_no = $this->requisition->voucher_no;
         $this->date_sent_checkstaff = $this->requisition->date_sent_checkstaff;
-        $this->vendors = $this->requisition->vendors()->select('id', 'vendor_name', 'amount', 'batch_no', 'voucher_no', 'date_sent_checkstaff')->get()->toArray();
+        $this->vendors = $this->requisition->vendors()->select('id', 'vendor_name', 'amount', 'change_of_vote_no', 'batch_no', 'voucher_no', 'date_sent_checkstaff')->get()->toArray();
 
         //Add accordion view to each vendor
         foreach ($this->vendors as $key => $vendor) {

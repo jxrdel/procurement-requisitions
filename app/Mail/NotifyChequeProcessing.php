@@ -3,6 +3,8 @@
 namespace App\Mail;
 
 use App\Models\Requisition;
+use App\Models\RequisitionVendor;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -17,7 +19,7 @@ class NotifyChequeProcessing extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public Requisition $requisition)
+    public function __construct(public RequisitionVendor $vendor)
     {
         //
     }
@@ -28,7 +30,7 @@ class NotifyChequeProcessing extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Incoming Requisition | Procurement Requisition Application',
+            subject: 'Incoming Invoices | Procurement Requisition Application',
         );
     }
 
@@ -37,11 +39,16 @@ class NotifyChequeProcessing extends Mailable
      */
     public function content(): Content
     {
+        $requisition = $this->vendor->requisition;
+        $date_sent = Carbon::parse($this->vendor->ap->date_received)->format('F jS, Y');
+
         return new Content(
             markdown: 'emails.sent-to-cheque-processing',
             with: [
-                'requisiton' => $this->requisition,
-                'url' => route('cheque_processing.view', $this->requisition->cheque_processing_requisition->id),
+                'vendor' => $this->vendor,
+                'requisition' => $requisition,
+                'date_sent' => $date_sent,
+                'url' => route('cheque_processing.view', $this->vendor->chequeProcessing->id),
             ]
         );
     }

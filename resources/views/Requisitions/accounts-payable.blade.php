@@ -61,16 +61,16 @@
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "{{ route('getaccountspayable_requisitions') }}",
+                    "url": "{{ route('getaccountspayable_vendors') }}",
                     "type": "GET"
                 },
                 "columns": [{
-                        data: 'requisition_no',
-                        name: 'requisition_no'
+                        data: 'RequisitionNo',
+                        name: 'requisitions.requisition_no'
                     },
                     {
-                        data: 'RequestingUnit',
-                        name: 'departments.name'
+                        data: 'VendorName',
+                        name: 'requisition_vendors.vendor_name'
                     }, // Correct field for searching
                     {
                         data: 'ItemName',
@@ -78,13 +78,13 @@
                     },
                     {
                         data: 'ap_created_at',
-                        name: 'ap_requisitions.created_at'
+                        name: 'ap_vendors.created_at'
                     },
                     {
                         data: 'ap_completed',
-                        name: 'ap_requisitions.is_completed',
+                        name: 'ap_vendors.is_completed',
                         render: function(data, type, row) {
-                            var status = row.requisition_status ||
+                            var status = row.VendorStatus ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
                             if (status === 'Sent to Accounts Payable') {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Procurement</span></div>';
@@ -109,7 +109,7 @@
                     },
                     {
                         data: 'ap_id',
-                        name: 'ap_requisitions.id',
+                        name: 'ap_vendors.id',
                         visible: false // Hide the column but use it for sorting
                     }
                 ]
@@ -120,15 +120,15 @@
             var selectedOption = $("input[name='btnradio']:checked").attr('id');
             switch (selectedOption) {
                 case 'btn-in-progress':
-                    $('#myTable').DataTable().ajax.url('{{ route('getinprogressaccountspayable_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getinprogressaccountspayable_vendors') }}')
                         .load();
                     break;
                 case 'btn-completed':
-                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedaccountspayable_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedaccountspayable_vendors') }}')
                         .load();
                     break;
                 case 'btn-all':
-                    $('#myTable').DataTable().ajax.url('{{ route('getaccountspayable_requisitions') }}').load();
+                    $('#myTable').DataTable().ajax.url('{{ route('getaccountspayable_vendors') }}').load();
                     break;
             }
         });

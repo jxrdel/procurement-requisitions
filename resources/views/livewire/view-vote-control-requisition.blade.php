@@ -89,6 +89,10 @@
                                                 </div>
 
                                                 <div class="col">
+                                                    <label><strong>Vote Number:</strong>
+                                                        {{ $vendor['change_of_vote_no'] ?? $this->requisition->source_of_funds }}
+                                                    </label>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -142,6 +146,9 @@
                             </div>
 
                             <div class="col mx-5">
+                                <label><strong>Vote Number:</strong>
+                                    {{ $vendor['change_of_vote_no'] ?? $this->requisition->source_of_funds }}
+                                </label>
                             </div>
                         </div>
                     </div>

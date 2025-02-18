@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('requisition_vendors', function (Blueprint $table) {
             $table->id();
             $table->string('vendor_name');
-            $table->decimal('amount', 15, 2);
+            $table->decimal('amount', 20, 2);
+            $table->string('vendor_status')->nullable();
 
             //Procurement
             $table->string('purchase_order_no')->nullable();
@@ -23,6 +24,7 @@ return new class extends Migration
             $table->string('invoice_no')->nullable();
             $table->date('date_invoice_received')->nullable();
             $table->date('date_sent_ap')->nullable();
+            $table->boolean('sent_to_ap')->default(false);
 
             //Cost & Budgeting
             $table->date('date_sent_request_mof')->nullable();

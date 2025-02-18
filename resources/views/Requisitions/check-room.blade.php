@@ -34,7 +34,7 @@
                 <thead>
                     <tr>
                         <th>Requisition #</th>
-                        <th>Requesting Unit</th>
+                        <th>Vendor Name</th>
                         <th>Item</th>
                         <th>Date Received</th>
                         <th style="text-align: center">Status</th>
@@ -65,39 +65,26 @@
                     "type": "GET"
                 },
                 "columns": [{
-                        data: 'requisition_no',
-                        name: 'requisition_no'
+                        data: 'RequisitionNo',
+                        name: 'requisitions.requisition_no'
                     },
                     {
-                        data: 'RequestingUnit',
-                        name: 'departments.name'
-                    }, // Correct field for searching
+                        data: 'VendorName',
+                        name: 'requisition_vendors.vendor_name'
+                    },
                     {
                         data: 'ItemName',
                         name: 'requisitions.item'
                     },
                     {
-                        data: 'cr_created_at',
-                        name: 'check_room_requisitions.created_at',
-                        // render: function(data, type, row) {
-                        //     if (data) {
-                        //         var date = new Date(data);
-                        //         // Format the date as dd/mm/yyyy
-                        //         var day = ('0' + date.getDate()).slice(-
-                        //             2); // Add leading 0 if necessary
-                        //         var month = ('0' + (date.getMonth() + 1)).slice(-
-                        //             2); // Add leading 0, note months are 0-indexed
-                        //         var year = date.getFullYear();
-                        //         return day + '/' + month + '/' + year;
-                        //     }
-                        //     return ''; // Return an empty string if there's no date
-                        // }
+                        data: 'cs_created_at',
+                        name: 'check_staff_vendors.created_at',
                     },
                     {
-                        data: 'cr_completed',
-                        name: 'check_room_requisitions.is_completed',
+                        data: 'cs_completed',
+                        name: 'check_staff_vendors.is_completed',
                         render: function(data, type, row) {
-                            var status = row.requisition_status ||
+                            var status = row.VendorStatus ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
                             if (status === 'Sent to Check Staff') {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Vote Control</span></div>';
@@ -121,8 +108,8 @@
                         // }
                     },
                     {
-                        data: 'cr_id',
-                        name: 'check_room_requisitions.id',
+                        data: 'cs_id',
+                        name: 'check_staff_vendors.id',
                         visible: false // Hide the column but use it for sorting
                     }
                 ]
