@@ -2,8 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Mail\RequisitionCompleted;
 use App\Models\ChequeProcessingVendor;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
 class ViewChequeProcessingVendor extends Component
@@ -21,7 +24,7 @@ class ViewChequeProcessingVendor extends Component
 
     public function render()
     {
-        return view('livewire.view-cheque-processing-vendor');
+        return view('livewire.view-cheque-processing-vendor')->title($this->vendor->vendor_name . ' | View Vendor');
     }
 
     public function mount($id)
@@ -69,6 +72,10 @@ class ViewChequeProcessingVendor extends Component
             $this->date_sent_dispatch = null;
         }
 
+        if (trim($this->cheque_no) === '') {
+            $this->cheque_no = null;
+        }
+
         $status = $this->vendor->vendor_status;
 
         if (!$this->cp_vendor->is_completed) {
@@ -101,7 +108,7 @@ class ViewChequeProcessingVendor extends Component
 
         $status = 'At Cheque Processing';
 
-        if ($this->date_cheque_processed && !$this->cp_requisition->is_completed) {
+        if ($this->date_cheque_processed && !$this->cp_vendor->is_completed) {
             $status = 'Cheque Details to be Entered';
         }
 
@@ -114,5 +121,46 @@ class ViewChequeProcessingVendor extends Component
         }
 
         return $status;
+    }
+
+    public function getFormattedDate($date)
+    {
+        if ($date !== null) {
+            return Carbon::parse($date)->format('F jS, Y');
+        }
+    }
+
+    public function completeVendor()
+    {
+        sleep(1);
+        $this->cp_vendor->update([
+            'is_completed' => true,
+            'date_completed' => now(),
+        ]);
+
+        $this->vendor->update([
+            'vendor_status' => 'Completed',
+            'is_completed' => true,
+            'date_completed' => now(),
+        ]);
+
+
+        //Check if all vendor status are completed
+        if ($this->requisition->isCompleted()) {
+            $this->requisition->update([
+                'requisition_status' => 'Completed',
+            ]);
+
+            $assigned_to = $this->requisition->procurement_officer;
+            if ($assigned_to) {
+                Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
+            } else {
+                Mail::to('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
+            }
+        }
+
+        $this->dispatch('show-message', message: 'Vendor marked as completed');
+        $this->cp_vendor = $this->cp_vendor->fresh();
+        $this->vendor = $this->vendor->fresh();
     }
 }

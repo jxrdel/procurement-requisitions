@@ -85,12 +85,10 @@
             @else
                 false
             @endcan ;
+
         $(document).ready(function() {
             $('#myTable').DataTable({
                 "pageLength": 50,
-                // order: [
-                //     [0, 'asc']
-                // ],
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -101,10 +99,6 @@
                         data: 'requisition_no',
                         name: 'requisition_no'
                     },
-                    // {
-                    //     data: 'source_of_funds',
-                    //     name: 'source_of_funds'
-                    // },
                     {
                         data: 'RequestingUnit',
                         name: 'departments.name'
@@ -114,11 +108,16 @@
                         name: 'item'
                     },
                     {
-                        data: 'requisition_status',
-                        name: 'requisition_status',
+                        data: 'vendor_status',
+                        name: 'vendor_status',
                         render: function(data, type, row) {
+                            console.log(data);
                             var statusHtml = '';
-                            if (data === 'Completed') {
+
+                            if (data === 'Complex Status') {
+                                statusHtml =
+                                    '<span style="background-color: #ff5733 !important;" class="badge bg-danger">Complex</span>';
+                            } else if (data === 'Completed') {
                                 statusHtml =
                                     '<span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span>';
                             } else {
@@ -135,23 +134,30 @@
                         searchable: false,
                         render: function(data, type, row) {
                             var deleteButton = '';
-                            if (userCanDelete) { // Check if user can delete
+
+                            if (userCanDelete) {
                                 deleteButton =
                                     '<a class="btn btn-danger" href="#" onclick="showDelete(' + data
-                                    .id + ')"><i class="ri-delete-bin-2-line me-1"></i></a>';
+                                    .id + ')">' +
+                                    '<i class="ri-delete-bin-2-line me-1"></i></a>';
                             }
-                            return '<div style="text-align:center;"><a class="btn btn-primary" href="/requisitions/view/' +
-                                data.id + '" >View</a> ' + deleteButton + '</div>';
+
+                            return '<div style="text-align:center;">' +
+                                '<a class="btn btn-primary" href="/requisitions/view/' + data.id +
+                                '">View</a> ' +
+                                deleteButton +
+                                '</div>';
                         }
                     },
                     {
                         data: 'id',
                         name: 'id',
-                        visible: false // Hide the column but use it for sorting
+                        visible: false // Hidden but usable for sorting
                     }
                 ]
             });
         });
+
 
 
 

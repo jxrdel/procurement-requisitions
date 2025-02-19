@@ -629,7 +629,7 @@ class ViewRequisition extends Component
 
         unset($vendor);
 
-        $status = $this->requisition_status;
+        $this->updateVendorStatuses();
 
         $this->validate(
             [
@@ -642,24 +642,25 @@ class ViewRequisition extends Component
             ]
         );
 
-        if (!$this->requisition->vote_control_requisition) {
-            $status = $this->getProcurement2Status();
-        }
+        // if (!$this->requisition->vote_control_requisition) {
+        //     $status = $this->getProcurement2Status();
+        // }
 
         foreach ($this->vendors as $vendor) {
             $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                'vendor_status' => $vendor['vendor_status'],
                 'purchase_order_no' => $vendor['purchase_order_no'],
                 'eta' => $vendor['eta'],
-                'date_sent_commit' => $vendor['date_sent_commit'],
-                'invoice_no' => $vendor['invoice_no'],
-                'date_invoice_received' => $vendor['date_invoice_received'],
+                // 'date_sent_commit' => $vendor['date_sent_commit'],
+                // 'invoice_no' => $vendor['invoice_no'],
+                // 'date_invoice_received' => $vendor['date_invoice_received'],
                 'date_sent_ap' => $vendor['date_sent_ap'],
             ]);
         }
 
         if (!$this->requisition->is_completed) {
             $this->requisition->update([
-                'requisition_status' => $status,
+                // 'requisition_status' => $status,
                 'updated_by' => Auth::user()->username,
             ]);
         }
@@ -667,6 +668,7 @@ class ViewRequisition extends Component
         // $this->setRequisitionStatus();
 
         $this->isEditingProcurement2 = false;
+        $this->refreshVendors();
         $this->resetValidation();
         $this->dispatch('show-message', message: 'Requisition edited successfully');
     }
@@ -751,6 +753,7 @@ class ViewRequisition extends Component
     public function addVendor()
     {
         $this->vendors[] = [
+            'id' => null,
             'vendor_name' => '',
             'amount' => '0.00',
 
@@ -818,41 +821,83 @@ class ViewRequisition extends Component
     {
         return collect($this->vendors)->sum('amount');
     }
-    public function getProcurement2Status()
+    // public function getProcurement2Status()
+    // {
+    //     $priority = [
+    //         'Awaiting Invoice' => 1,
+    //         'To Be Sent to AP' => 2,
+    //     ];
+
+    //     $statuses = collect($this->vendors)->map(function ($vendor) {
+    //         if (
+    //             $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
+    //             !$vendor['invoice_no'] && !$vendor['date_invoice_received'] && !$vendor['date_sent_ap']
+    //         ) {
+    //             return 'Awaiting Invoice';
+    //         }
+
+    //         if (
+    //             $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
+    //             $vendor['invoice_no'] && $vendor['date_invoice_received'] && !$vendor['date_sent_ap']
+    //         ) {
+    //             return 'To Be Sent to AP';
+    //         }
+
+    //         if (
+    //             $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
+    //             $vendor['invoice_no'] && $vendor['date_invoice_received'] &&
+    //             $vendor['date_sent_ap'] && !$this->requisition->vote_control_requisition
+    //         ) {
+    //             return 'To Be Sent to AP';
+    //         }
+
+    //         return 'At Procurement'; // Default case if none of the conditions match
+    //     });
+
+    //     return $statuses->sortBy(fn($status) => $priority[$status] ?? PHP_INT_MAX)->first();
+    // }
+
+    public function updateVendorStatuses()
     {
-        $priority = [
-            'Awaiting Invoice' => 1,
-            'To Be Sent to AP' => 2,
-        ];
+        foreach ($this->vendors as &$vendor) {
+            $status = 'Awaiting Invoices'; // Default status
 
-        $statuses = collect($this->vendors)->map(function ($vendor) {
-            if (
-                $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
-                !$vendor['invoice_no'] && !$vendor['date_invoice_received'] && !$vendor['date_sent_ap']
-            ) {
-                return 'Awaiting Invoice';
+            if (!$this->requisition->vote_control_requisition) {
+                if (
+                    $vendor['purchase_order_no'] &&
+                    $vendor['eta'] &&
+                    $vendor['date_sent_commit'] &&
+                    !$vendor['invoice_no'] &&
+                    !$vendor['date_invoice_received'] &&
+                    !$vendor['date_sent_ap']
+                ) {
+                    $status = 'Awaiting Invoice';
+                } elseif (
+                    $vendor['purchase_order_no'] &&
+                    $vendor['eta'] &&
+                    $vendor['date_sent_commit'] &&
+                    $vendor['invoice_no'] &&
+                    $vendor['date_invoice_received'] &&
+                    !$vendor['date_sent_ap']
+                ) {
+                    $status = 'To Be Sent to AP';
+                } elseif (
+                    $vendor['purchase_order_no'] &&
+                    $vendor['eta'] &&
+                    $vendor['date_sent_commit'] &&
+                    $vendor['invoice_no'] &&
+                    $vendor['date_invoice_received'] &&
+                    $vendor['date_sent_ap'] &&
+                    !$this->requisition->vote_control_requisition
+                ) {
+                    $status = 'To Be Sent to AP';
+                }
             }
 
-            if (
-                $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
-                $vendor['invoice_no'] && $vendor['date_invoice_received'] && !$vendor['date_sent_ap']
-            ) {
-                return 'To Be Sent to AP';
-            }
-
-            if (
-                $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
-                $vendor['invoice_no'] && $vendor['date_invoice_received'] &&
-                $vendor['date_sent_ap'] && !$this->requisition->vote_control_requisition
-            ) {
-                return 'To Be Sent to AP';
-            }
-
-            return 'At Procurement'; // Default case if none of the conditions match
-        });
-
-        return $statuses->sortBy(fn($status) => $priority[$status] ?? PHP_INT_MAX)->first();
+            $vendor['vendor_status'] = $status;
+        }
     }
+
 
     public function addInvoice($index)
     {

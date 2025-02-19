@@ -53,6 +53,9 @@ class RequisitionVendor extends Model
         'date_cheque_processed',
         'date_sent_dispatch',
 
+        'is_completed',
+        'date_completed',
+
         'requisition_id', // Foreign key
     ];
 

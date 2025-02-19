@@ -34,7 +34,7 @@
                 <thead>
                     <tr>
                         <th>Requisition #</th>
-                        <th>Requesting Unit</th>
+                        <th>Vendor</th>
                         <th>Item</th>
                         <th>Date Received</th>
                         <th style="text-align: center">Status</th>
@@ -61,16 +61,16 @@
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "{{ route('getchequeprocessing_requisitions') }}",
+                    "url": "{{ route('getchequeprocessing_vendors') }}",
                     "type": "GET"
                 },
                 "columns": [{
-                        data: 'requisition_no',
-                        name: 'requisition_no'
+                        data: 'RequisitionNo',
+                        name: 'requisitions.requisition_no'
                     },
                     {
-                        data: 'RequestingUnit',
-                        name: 'departments.name'
+                        data: 'VendorName',
+                        name: 'requisition_vendors.vendor_name'
                     },
                     {
                         data: 'ItemName',
@@ -78,13 +78,13 @@
                     },
                     {
                         data: 'cp_created_at',
-                        name: 'cheque_processing_requisitions.created_at',
+                        name: 'cheque_processing_vendors.created_at',
                     },
                     {
                         data: 'cp_completed',
-                        name: 'cheque_processing_requisitions.is_completed',
+                        name: 'cheque_processing_vendors.is_completed',
                         render: function(data, type, row) {
-                            var status = row.requisition_status ||
+                            var status = row.VendorStatus ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
                             if (status === 'Sent to Cheque Processing') {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Check Staff</span></div>';
@@ -105,7 +105,7 @@
                     },
                     {
                         data: 'cp_id',
-                        name: 'cheque_processing_requisitions.id',
+                        name: 'cheque_processing_vendors.id',
                         visible: false // Hide the column but use it for sorting
                     }
                 ]
@@ -116,15 +116,15 @@
             var selectedOption = $("input[name='btnradio']:checked").attr('id');
             switch (selectedOption) {
                 case 'btn-in-progress':
-                    $('#myTable').DataTable().ajax.url('{{ route('getinprogresschequeprocessing_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getinprogresschequeprocessing_vendors') }}')
                         .load();
                     break;
                 case 'btn-completed':
-                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedchequeprocessing_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedchequeprocessing_vendors') }}')
                         .load();
                     break;
                 case 'btn-all':
-                    $('#myTable').DataTable().ajax.url('{{ route('getchequeprocessing_requisitions') }}').load();
+                    $('#myTable').DataTable().ajax.url('{{ route('getchequeprocessing_vendors') }}').load();
                     break;
             }
         });

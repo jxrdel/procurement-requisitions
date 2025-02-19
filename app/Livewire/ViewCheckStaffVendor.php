@@ -78,6 +78,7 @@ class ViewCheckStaffVendor extends Component
             return Carbon::parse($date)->format('F jS, Y');
         }
     }
+
     public function edit()
     {
         if ($this->date_received_from_vc === '') {

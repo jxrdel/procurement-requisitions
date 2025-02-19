@@ -61,7 +61,7 @@
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "{{ route('getcheckroom_requisitions') }}",
+                    "url": "{{ route('getcheckstaff_vendors') }}",
                     "type": "GET"
                 },
                 "columns": [{
@@ -120,15 +120,15 @@
             var selectedOption = $("input[name='btnradio']:checked").attr('id');
             switch (selectedOption) {
                 case 'btn-in-progress':
-                    $('#myTable').DataTable().ajax.url('{{ route('getcheckroom_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getcheckstaff_vendors') }}')
                         .load();
                     break;
                 case 'btn-completed':
-                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedcheckroom_requisitions') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getcompletedcheckstaff_vendors') }}')
                         .load();
                     break;
                 case 'btn-all':
-                    $('#myTable').DataTable().ajax.url('{{ route('getcheckroom_requisitions') }}').load();
+                    $('#myTable').DataTable().ajax.url('{{ route('getcheckstaff_vendors') }}').load();
                     break;
             }
         });

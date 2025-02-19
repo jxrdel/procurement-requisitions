@@ -15,13 +15,6 @@
                 </h1>
             </div>
 
-            <div class="row mt-2">
-
-                <div class="col mx-5">
-                    <label><strong>Date Received:</strong>
-                        {{ $this->requisition->cheque_processing_requisition->created_at->format('F jS, Y') }}</label>
-                </div>
-            </div>
             <div x-show="isEditing">
                 <form wire:submit.prevent="edit">
                     <div id="inputForm">
@@ -133,10 +126,10 @@
                             &nbsp;
                             @if (!$this->cp_vendor->is_completed)
                                 <button @disabled($this->isButtonDisabled)
-                                    wire:confirm="Are you sure you want to complete the requisition?"
-                                    wire:loading.attr="disabled" wire:click="completeRequisition"
-                                    class="btn btn-success waves-effect waves-light" style="width:270px">
-                                    <span class="ri-checkbox-circle-line me-1_5"></span>Complete Requisition
+                                    wire:confirm="Are you sure you want to complete the vendor?"
+                                    wire:loading.attr="disabled" wire:click="completeVendor"
+                                    class="btn btn-success waves-effect waves-light" style="width:220px">
+                                    <span class="ri-checkbox-circle-line me-1_5"></span>Complete Vendor
 
                                     <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
                                         role="status">

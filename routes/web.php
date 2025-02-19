@@ -15,6 +15,7 @@ use App\Livewire\ViewAccountsPayableVendor;
 use App\Livewire\ViewCheckRoomRequisition;
 use App\Livewire\ViewCheckStaffVendor;
 use App\Livewire\ViewChequeProcessingRequisition;
+use App\Livewire\ViewChequeProcessingVendor;
 use App\Livewire\ViewVoteControlRequisition;
 use App\Livewire\ViewRequisition;
 use App\Livewire\ViewVoteControlVendor;
@@ -54,15 +55,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/check_room', [CheckRoomController::class, 'index'])->name('check_room.index');
     Route::get('/check_room/view/{id}', ViewCheckStaffVendor::class)->name('check_room.view')->middleware('can:view-check-room-requisitions');
-    Route::get('/getcheckroom_requisitions', [CheckRoomController::class, 'getCheckStaffVendors'])->name('getcheckroom_requisitions');
-    Route::get('/getcompletedcheckroom_requisitions', [CheckRoomController::class, 'getCompletedCheckRoomRequisitions'])->name('getcompletedcheckroom_requisitions');
-    Route::get('/getinprogresscheckroom_requisitions', [CheckRoomController::class, 'getInProgressCheckRoomRequisitions'])->name('getinprogresscheckroom_requisitions');
+    Route::get('/getcheckstaff_vendors', [CheckRoomController::class, 'getCheckStaffVendors'])->name('getcheckstaff_vendors');
+    Route::get('/getcompletedcheckstaff_vendors', [CheckRoomController::class, 'getCompletedCheckRoomRequisitions'])->name('getcompletedcheckstaff_vendors');
+    Route::get('/getinprogresscheckstaff_vendors', [CheckRoomController::class, 'getInProgressCheckRoomRequisitions'])->name('getinprogresscheckstaff_vendors');
 
     Route::get('/cheque_processing', [ChequeProcessingController::class, 'index'])->name('cheque_processing.index');
-    Route::get('/cheque_processing/view/{id}', ViewChequeProcessingRequisition::class)->name('cheque_processing.view')->middleware('can:view-cheque-processing-requisitions');
-    Route::get('/getchequeprocessing_requisitions', [ChequeProcessingController::class, 'getChequeProcessingRequisitions'])->name('getchequeprocessing_requisitions');
-    Route::get('/getcompletedchequeprocessing_requisitions', [ChequeProcessingController::class, 'getCompletedChequeProcessingRequisitions'])->name('getcompletedchequeprocessing_requisitions');
-    Route::get('/getinprogresschequeprocessing_requisitions', [ChequeProcessingController::class, 'getInProgressChequeProcessingRequisitions'])->name('getinprogresschequeprocessing_requisitions');
+    Route::get('/cheque_processing/view/{id}', ViewChequeProcessingVendor::class)->name('cheque_processing.view')->middleware('can:view-cheque-processing-requisitions');
+    Route::get('/getchequeprocessing_vendors', [ChequeProcessingController::class, 'getChequeProcessingVendors'])->name('getchequeprocessing_vendors');
+    Route::get('/getcompletedchequeprocessing_vendors', [ChequeProcessingController::class, 'getCompletedChequeProcessingVendors'])->name('getcompletedchequeprocessing_vendors');
+    Route::get('/getinprogresschequeprocessing_vendors', [ChequeProcessingController::class, 'getInProgressChequeProcessingVendors'])->name('getinprogresschequeprocessing_vendors');
 
     Route::get('/users', [Controller::class, 'users'])->name('users');
     Route::get('/getusers', [Controller::class, 'getUsers'])->name('getusers');

@@ -124,4 +124,18 @@ class Requisition extends Model
         $requisition_no = 'REQ/' . date('Y') . '/' . str_pad($requisitions, 4, '0', STR_PAD_LEFT);
         return $requisition_no;
     }
+
+    //Check if all vendor status are completed
+    public function isCompleted()
+    {
+        $vendors = $this->vendors;
+
+        foreach ($vendors as $vendor) {
+            if (!$vendor->is_completed) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

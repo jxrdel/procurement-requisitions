@@ -57,6 +57,9 @@ return new class extends Migration
             $table->date('date_cheque_processed')->nullable();
             $table->date('date_sent_dispatch')->nullable();
 
+            $table->boolean('is_completed')->default(false);
+            $table->dateTime('date_completed')->nullable();
+
             $table->unsignedBigInteger('requisition_id');
 
 
