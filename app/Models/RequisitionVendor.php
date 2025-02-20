@@ -89,4 +89,9 @@ class RequisitionVendor extends Model
     {
         return $this->hasOne(ChequeProcessingVendor::class, 'vendor_id');
     }
+
+    public function cheques()
+    {
+        return $this->hasMany(Cheque::class, 'vendor_id');
+    }
 }

@@ -218,30 +218,47 @@ class ViewRequisition extends Component
         $this->cheque_no = $this->requisition->cheque_no;
         $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
 
-        if ($this->requisition->cost_budgeting_requisition && !$this->requisition->cost_budgeting_requisition->is_completed) {
-            $this->active_pane = 'cost_and_budgeting';
-        }
-
-        if ($this->requisition->cost_budgeting_requisition && $this->requisition->cost_budgeting_requisition->is_completed) {
-            $this->active_pane = 'procurement2';
-        }
-
-        if ($this->requisition->ap_requisition && !$this->requisition->ap_requisition->is_completed) {
-            $this->active_pane = 'accounts_payable';
-        }
-
-        if ($this->requisition->vote_control_requisition) {
-            $this->active_pane = 'votecontrol';
-        }
-
-        if ($this->requisition->vote_control_requisition && $this->requisition->vote_control_requisition->is_completed) {
-            $this->active_pane = 'checkroom';
-        }
-
-        if ($this->requisition->check_room_requisition && $this->requisition->check_room_requisition->is_completed) {
-            $this->active_pane = 'chequeprocessing';
-        }
+        $this->setActivePane();
     }
+
+    public function setActivePane()
+    {
+        $vendors = $this->requisition->vendors; // Assuming a `hasMany` relationship exists
+
+        if ($vendors->isEmpty()) {
+            // If no vendors exist, fallback to the existing requisition-based logic
+            if ($this->requisition->cost_budgeting_requisition && !$this->requisition->cost_budgeting_requisition->is_completed) {
+                $this->active_pane = 'cost_and_budgeting';
+            } elseif ($this->requisition->cost_budgeting_requisition && $this->requisition->cost_budgeting_requisition->is_completed) {
+                $this->active_pane = 'procurement2';
+            }
+            return;
+        }
+
+        // Define stage priorities in order
+        $stages = [
+            'cost_and_budgeting' => fn($vendor) => !$vendor->date_sent_request_mof,
+            'procurement2' => fn($vendor) => !$vendor->ap,
+            'accounts_payable' => fn($vendor) => !$vendor->ap || !$vendor->ap->is_completed,
+            'votecontrol' => fn($vendor) => !$vendor->voteControl || !$vendor->voteControl->is_completed,
+            'checkroom' => fn($vendor) => !$vendor->checkStaff || !$vendor->checkStaff->is_completed,
+            'chequeprocessing' => fn($vendor) => !$vendor->chequeProcessing || !$vendor->chequeProcessing->is_completed,
+        ];
+
+        // Iterate through vendors and find the least progressed stage
+        foreach ($stages as $stage => $condition) {
+            foreach ($vendors as $vendor) {
+                if ($condition($vendor)) {
+                    $this->active_pane = $stage;
+                    return; // Stop as soon as the least progressed stage is found
+                }
+            }
+        }
+
+        // If all vendors are completed, keep the last stage
+        $this->active_pane = 'chequeprocessing';
+    }
+
 
     public function edit()
     {
@@ -554,9 +571,6 @@ class ViewRequisition extends Component
         return
             empty(trim($vendor['purchase_order_no'])) ||
             empty($vendor['eta']) ||
-            empty($vendor['date_sent_commit']) ||
-            empty(trim($vendor['invoice_no'])) ||
-            empty($vendor['date_invoice_received']) ||
             empty($vendor['date_sent_ap']) ||
             empty($vendor['invoices']);
     }
@@ -701,14 +715,14 @@ class ViewRequisition extends Component
         $users = User::accountsPayable()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->send(new NotifyAccountsPayable($vendor));
+            // Mail::to($user->email)->send(new NotifyAccountsPayable($vendor));
         }
 
         // return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Accounts Payable');
 
         $this->refreshVendors();
 
-        $this->dispatch('show-message', message: 'Invoice added successfully');
+        $this->dispatch('show-message', message: 'Sent to AP successfully');
     }
 
     //Accounts

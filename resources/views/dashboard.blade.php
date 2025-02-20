@@ -233,7 +233,7 @@
                     },
                     {
                         data: 'source_of_funds',
-                        name: 'source_of_funds'
+                        name: 'requisitions.source_of_funds'
                     },
                     {
                         data: 'RequestingUnit',

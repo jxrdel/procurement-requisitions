@@ -37,7 +37,7 @@ class ViewVoteControlVendor extends Component
         $this->voucher_no = $this->vendor->voucher_no;
         $this->date_sent_checkstaff = $this->vendor->date_sent_checkstaff;
 
-        if ($this->batch_no !== null && $this->voucher_no !== null) {
+        if (($this->batch_no !== null || trim($this->batch_no) == '') && ($this->voucher_no !== null && trim($this->voucher_no) !== '')) {
             $this->isEditing = false;
         }
 
@@ -122,7 +122,7 @@ class ViewVoteControlVendor extends Component
         //Get Emails of Check Staff
         $checkStaff = User::checkStaff()->get();
         foreach ($checkStaff as $staff) {
-            Mail::to($staff->email)->queue(new NotifyCheckRoom($this->vendor));
+            // Mail::to($staff->email)->queue(new NotifyCheckRoom($this->vendor));
         }
 
         return redirect()->route('vote_control.index')->with('success', 'Sent to Check Staff successfully');

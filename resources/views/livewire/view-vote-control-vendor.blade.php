@@ -69,15 +69,21 @@
                             </div>
 
                             <div class="col">
+                                <label><strong>Vote Number:</strong>
+                                    {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
                             </div>
 
                         </div>
 
+                        <div class="row d-flex justify-content-center text-center mt-6">
 
-                        <div class="row">
-
-                            <button class="btn btn-primary waves-effect waves-light mx-auto mt-5" style="width:100px">
+                            <button class="btn btn-primary waves-effect waves-light mt-5" style="width:100px">
                                 <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                            </button>
+                            &nbsp;
+                            <button type="button" @click="isEditing = ! isEditing"
+                                class="btn btn-dark waves-effect waves-light mt-5" style="width: 100px">
+                                <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
                             </button>
                         </div>
                     </div>
@@ -104,6 +110,8 @@
                     </div>
 
                     <div class="col mx-5">
+                        <label><strong>Vote Number:</strong>
+                            {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
                     </div>
                 </div>
 

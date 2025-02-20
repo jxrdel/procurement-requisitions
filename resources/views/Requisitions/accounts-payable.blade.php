@@ -71,7 +71,7 @@
                     {
                         data: 'VendorName',
                         name: 'requisition_vendors.vendor_name'
-                    }, // Correct field for searching
+                    },
                     {
                         data: 'ItemName',
                         name: 'requisitions.item'

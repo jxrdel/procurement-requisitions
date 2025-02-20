@@ -149,18 +149,17 @@ class ViewChequeProcessingVendor extends Component
         if ($this->requisition->isCompleted()) {
             $this->requisition->update([
                 'requisition_status' => 'Completed',
+                'is_completed' => true,
+                'date_completed' => now(),
             ]);
 
             $assigned_to = $this->requisition->procurement_officer;
             if ($assigned_to) {
-                Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
+                Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
             } else {
-                Mail::to('maryann.basdeo@health.gov.tt')->queue(new RequisitionCompleted($this->requisition));
+                Mail::to('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
             }
         }
-
-        $this->dispatch('show-message', message: 'Vendor marked as completed');
-        $this->cp_vendor = $this->cp_vendor->fresh();
-        $this->vendor = $this->vendor->fresh();
+        return redirect()->route('cheque_processing.index')->with('success', 'Completed successfully');
     }
 }

@@ -229,6 +229,12 @@ class CostBudgetingRequisition extends Component
             'date_completed' => Carbon::now(),
         ]);
 
+        foreach ($this->vendors as $vendor) {
+            $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                'vendor_status' => 'Sent to Procurement',
+            ]);
+        }
+
         //Send email to assigned procurement officer
         $user = $this->requisition->procurement_officer;
         if ($user) {
@@ -237,7 +243,7 @@ class CostBudgetingRequisition extends Component
             // Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
         }
 
-        return redirect()->route('cost_and_budgeting.index')->with('success', 'Requisition sent to procurement successfully');
+        return redirect()->route('cost_and_budgeting.index')->with('success', 'Sent to procurement successfully');
     }
 
     public function getStatus()

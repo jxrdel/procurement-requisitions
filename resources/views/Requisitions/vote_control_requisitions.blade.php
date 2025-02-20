@@ -34,7 +34,7 @@
                 <thead>
                     <tr>
                         <th>Requisition #</th>
-                        <th>Requesting Unit</th>
+                        <th>Vendor</th>
                         <th>Item</th>
                         <th>Date Received</th>
                         <th style="text-align: center">Status</th>
@@ -69,9 +69,9 @@
                         name: 'requisitions.requisition_no'
                     },
                     {
-                        data: 'RequestingUnit',
-                        name: 'departments.name'
-                    }, // Correct field for searching
+                        data: 'VendorName',
+                        name: 'requisition_vendors.vendor_name'
+                    },
                     {
                         data: 'ItemName',
                         name: 'requisitions.item'

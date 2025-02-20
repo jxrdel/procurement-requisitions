@@ -34,7 +34,7 @@
                 <thead>
                     <tr>
                         <th>Requisition #</th>
-                        <th>Vendor Name</th>
+                        <th>Vendor</th>
                         <th>Item</th>
                         <th>Date Received</th>
                         <th style="text-align: center">Status</th>

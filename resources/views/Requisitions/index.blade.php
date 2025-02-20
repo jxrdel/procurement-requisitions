@@ -7,6 +7,7 @@
 @section('content')
     @livewire('delete-record-modal')
     @livewire('change-financial-year')
+    @livewire('view-status-modal')
     <div class="card">
         <div class="card-body">
 
@@ -111,12 +112,12 @@
                         data: 'vendor_status',
                         name: 'vendor_status',
                         render: function(data, type, row) {
-                            console.log(data);
                             var statusHtml = '';
 
                             if (data === 'Complex Status') {
                                 statusHtml =
-                                    '<span style="background-color: #ff5733 !important;" class="badge bg-danger">Complex</span>';
+                                    '<a class="btn btn-dark" href="#" onclick="showStatus(' + row.id + ')">' +
+                                    '<i class="fa-solid fa-asterisk"></i></a>';;
                             } else if (data === 'Completed') {
                                 statusHtml =
                                     '<span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span>';
@@ -139,7 +140,7 @@
                                 deleteButton =
                                     '<a class="btn btn-danger" href="#" onclick="showDelete(' + data
                                     .id + ')">' +
-                                    '<i class="ri-delete-bin-2-line me-1"></i></a>';
+                                    '<i class="ri-delete-bin-2-line"></i></a>';
                             }
 
                             return '<div style="text-align:center;">' +
@@ -181,6 +182,17 @@
                 id: id
             });
         }
+
+        //Show status
+        function showStatus(id) {
+            Livewire.dispatch('show-status-modal', {
+                id: id
+            });
+        }
+
+        window.addEventListener('display-status-modal', event => {
+            $('#viewStatusModal').modal('show');
+        })
 
         window.addEventListener('display-delete-modal', event => {
             $('#deleteRecordModal').modal('show');

@@ -79,7 +79,7 @@ class Controller
         // Calculate total time difference in days
         $totalTimeInDays = $completedRequisitions->reduce(function ($carry, $requisition) {
             $date_received_procurement = Carbon::parse($requisition->date_received_procurement);
-            $completed_at = Carbon::parse($requisition->vote_control_requisition->date_completed);
+            $completed_at = Carbon::parse($requisition->date_completed);
             $timeDifferenceInDays = $date_received_procurement->diffInDays($completed_at); // Get the difference in days
             return $carry + $timeDifferenceInDays;
         }, 0);
