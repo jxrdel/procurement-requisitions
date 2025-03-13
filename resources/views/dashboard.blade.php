@@ -19,6 +19,7 @@
 @endsection
 
 @section('content')
+    @livewire('view-status-modal')
     <div class="d-sm-flex align-items-center justify-content-between mb-7">
         <h1 class="h3 mb-0 text-gray-800" style="margin: auto"><strong><i class="fa-solid fa-gauge-high"></i> &nbsp;
                 Dashboard</strong></h1>
@@ -291,17 +292,24 @@
                         name: 'users.name'
                     },
                     {
-                        data: 'requisition_status',
-                        name: 'requisition_status',
+                        data: 'vendor_status',
+                        name: 'vendor_status',
+                        orderable: false,
+                        searchable: false,
                         render: function(data, type, row) {
                             var statusHtml = '';
-                            if (data === 'Completed') {
+
+                            if (data === 'Complex Status') {
+                                statusHtml =
+                                    '<a class="btn btn-dark" href="#" onclick="showStatus(' + row
+                                    .id + ')">' +
+                                    '<i class="fa-solid fa-asterisk"></i></a>';;
+                            } else if (data === 'Completed') {
                                 statusHtml =
                                     '<span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span>';
                             } else {
-                                statusHtml = data;
                                 statusHtml =
-                                    '<span style="background-color: #e09e03 !important;" class="badge bg-success">' +
+                                    '<span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
                                     data + '</span>';
                             }
                             return '<div style="text-align:center;">' + statusHtml + '</div>';
@@ -325,5 +333,17 @@
                 ]
             });
         });
+
+
+        //Show status
+        function showStatus(id) {
+            Livewire.dispatch('show-status-modal', {
+                id: id
+            });
+        }
+
+        window.addEventListener('display-status-modal', event => {
+            $('#viewStatusModal').modal('show');
+        })
     </script>
 @endsection

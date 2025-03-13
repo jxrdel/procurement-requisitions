@@ -2,12 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Mail\ErrorNotification;
 use App\Mail\NotifyCheckRoom;
 use App\Models\RequisitionVendor;
 use App\Models\User;
 use App\Models\VoteControlVendor;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -19,13 +22,15 @@ class ViewVoteControlVendor extends Component
     public $voucher_no;
     public $batch_no;
     public $date_sent_checkstaff;
+    public $invoices;
 
     public $isEditing = true;
-    public $accordionView = 'hide';
+    public $accordionView = 'show';
     public function mount($id)
     {
         $this->vc_vendor = VoteControlVendor::find($id);
         $this->vendor = $this->vc_vendor->vendor;
+        $this->invoices = $this->vendor->invoices;
 
         if (!$this->vc_vendor) {
             return abort(404);
@@ -67,30 +72,37 @@ class ViewVoteControlVendor extends Component
     }
     public function edit()
     {
-        //Check if the date_received_ap is empty and set it to null
-        if ($this->date_sent_checkstaff == '') {
-            $this->date_sent_checkstaff = null;
+        try {
+            //Check if the date_received_ap is empty and set it to null
+            if ($this->date_sent_checkstaff == '') {
+                $this->date_sent_checkstaff = null;
+            }
+
+            $status = $this->vendor->vendor_status;
+
+            if (!$this->vc_vendor->is_completed) {
+                $status = $this->getStatus();
+            }
+
+
+            $this->vendor->update([
+                'batch_no' => $this->batch_no,
+                'voucher_no' => $this->voucher_no,
+                'date_sent_checkstaff' => $this->date_sent_checkstaff,
+                'vendor_status' => $status,
+            ]);
+
+            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Vote Control');
+            $this->isEditing = false;
+            $this->resetValidation();
+            $this->dispatch('show-message', message: 'Record edited successfully');
+            $this->vendor = $this->vendor->fresh();
+            $this->vc_vendor = $this->vc_vendor->fresh();
+        } catch (Exception $e) {
+            Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition in Accounts Payable: ' . $e->getMessage());
+            Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
+            dd('Error editing requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
         }
-
-        $status = $this->vendor->vendor_status;
-
-        if (!$this->vc_vendor->is_completed) {
-            $status = $this->getStatus();
-        }
-
-
-        $this->vendor->update([
-            'batch_no' => $this->batch_no,
-            'voucher_no' => $this->voucher_no,
-            'date_sent_checkstaff' => $this->date_sent_checkstaff,
-            'vendor_status' => $status,
-        ]);
-
-        $this->isEditing = false;
-        $this->resetValidation();
-        $this->dispatch('show-message', message: 'Record edited successfully');
-        $this->vendor = $this->vendor->fresh();
-        $this->vc_vendor = $this->vc_vendor->fresh();
     }
 
     public function getStatus()
@@ -119,6 +131,8 @@ class ViewVoteControlVendor extends Component
             'date_received' => Carbon::now(),
         ]);
 
+        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Check Staff by ' . Auth::user()->name . ' from Vote Control');
+
         //Get Emails of Check Staff
         $checkStaff = User::checkStaff()->get();
         foreach ($checkStaff as $staff) {
@@ -126,5 +140,12 @@ class ViewVoteControlVendor extends Component
         }
 
         return redirect()->route('vote_control.index')->with('success', 'Sent to Check Staff successfully');
+    }
+
+    public function toggleAccordionView()
+    {
+        $this->accordionView = $this->accordionView === 'show' ? 'hide' : 'show';
+
+        $this->skipRender();
     }
 }

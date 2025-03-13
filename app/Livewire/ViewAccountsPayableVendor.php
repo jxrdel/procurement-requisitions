@@ -2,12 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Mail\ErrorNotification;
 use App\Mail\NotifyVoteControl;
 use App\Models\APVendor;
 use App\Models\RequisitionVendor;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -22,7 +25,7 @@ class ViewAccountsPayableVendor extends Component
     public $date_sent_vc;
 
     public $isEditing = true;
-    public $accordionView = 'hide';
+    public $accordionView = 'show';
 
     public function mount($id)
     {
@@ -75,18 +78,25 @@ class ViewAccountsPayableVendor extends Component
             ]
         );
 
-        $status = $this->getStatus();
+        try {
+            $status = $this->getStatus();
 
-        $this->vendor->update([
-            'requisition_status' => $status,
-            'date_received_ap' => $this->date_received_ap,
-            'date_sent_vc' => $this->date_sent_vc,
-        ]);
+            $this->vendor->update([
+                'requisition_status' => $status,
+                'date_received_ap' => $this->date_received_ap,
+                'date_sent_vc' => $this->date_sent_vc,
+            ]);
 
-        $this->isEditing = false;
-        $this->dispatch('show-message', message: 'Record edited successfully');
-        $this->requisition = $this->requisition->fresh();
-        $this->ap_vendor = $this->ap_vendor->fresh();
+            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Accounts Payable');
+            $this->isEditing = false;
+            $this->dispatch('show-message', message: 'Record edited successfully');
+            $this->requisition = $this->requisition->fresh();
+            $this->ap_vendor = $this->ap_vendor->fresh();
+        } catch (Exception $e) {
+            Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition in Accounts Payable: ' . $e->getMessage());
+            Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
+            dd('Error editing requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
+        }
     }
 
     public function getFormattedDate($date)
@@ -138,12 +148,14 @@ class ViewAccountsPayableVendor extends Component
         ]);
 
         //Send email to Vote Control
+        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
 
         //Get Vote Control users
         $users = User::voteControl()->get();
 
         foreach ($users as $user) {
             // Mail::to($user->email)->send(new NotifyVoteControl($this->vendor));
+            // Log::info('Email sent to ' . $user->email . ' to notify them of Requisition #' . $this->requisition->requisition_no . ' sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
         }
 
         return redirect()->route('accounts_payable.index')->with('success', 'Sent to Vote Control successfully');

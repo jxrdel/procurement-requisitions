@@ -111,12 +111,16 @@
                     {
                         data: 'vendor_status',
                         name: 'vendor_status',
+                        orderable: false,
+                        searchable: false,
                         render: function(data, type, row) {
                             var statusHtml = '';
 
                             if (data === 'Complex Status') {
                                 statusHtml =
-                                    '<a class="btn btn-dark" href="#" onclick="showStatus(' + row.id + ')">' +
+                                    '<a class="btn btn-dark" href="javascript:void(0);" onclick="showStatus(' +
+                                    row
+                                    .id + ')">' +
                                     '<i class="fa-solid fa-asterisk"></i></a>';;
                             } else if (data === 'Completed') {
                                 statusHtml =
@@ -138,7 +142,8 @@
 
                             if (userCanDelete) {
                                 deleteButton =
-                                    '<a class="btn btn-danger" href="#" onclick="showDelete(' + data
+                                    '<a class="btn btn-danger" href="javascript:void(0);" onclick="showDelete(' +
+                                    data
                                     .id + ')">' +
                                     '<i class="ri-delete-bin-2-line"></i></a>';
                             }

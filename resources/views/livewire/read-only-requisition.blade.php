@@ -188,53 +188,59 @@
         <div wire:ignore.self @class(['tab-pane fade', 'show active' => $this->panes === '2']) id="navs-justified-cost_budgeting" role="tabpanel">
             <div>
 
-                <div class="row mt-8">
 
-                    <div class="col mx-5">
-                        <label><strong>Date Request Sent to Ministry of Finance:
-                            </strong>{{ $this->getFormattedDate($this->date_sent_request_mof) }}</label>
+                @foreach ($vendors as $vendor)
+                    <div class="divider">
+                        <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
                     </div>
 
-                    <div class="col mx-5">
-                    </div>
-                </div>
-                <div class="row mt-7">
+                    <div class="row mt-8">
 
-                    <div class="col mx-5">
-                        <label><strong>Request Category:</strong> {{ $this->requisition->request_category }}</label>
-                    </div>
+                        <div class="col mx-5">
+                            <label><strong>Date Request Sent to Ministry of Finance:
+                                </strong>{{ $this->getFormattedDate($vendor['date_sent_request_mof']) }}</label>
+                        </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Request Number:</strong> {{ $this->request_no }}</label>
-                    </div>
-                </div>
-
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Release Type:</strong> {{ $this->requisition->release_type }}</label>
+                        <div class="col mx-5">
+                        </div>
                     </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Release Number:</strong> {{ $this->release_no }}</label>
+                    <div class="row mt-7">
+
+                        <div class="col mx-5">
+                            <label><strong>Request Category:</strong>
+                                {{ $vendor['request_category'] }}</label>
+                        </div>
+
+                        <div class="col mx-5">
+                            <label><strong>Request Number:</strong> {{ $vendor['request_no'] }}</label>
+                        </div>
                     </div>
 
-                </div>
+                    <div class="row mt-7">
 
-                <div class="row mt-7">
+                        <div class="col mx-5">
+                            <label><strong>Release Type:</strong> {{ $vendor['release_type'] }}</label>
+                        </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Release Date:</strong>
-                            {{ $this->getFormattedDate($this->release_date) }}</label>
+                        <div class="col mx-5">
+                            <label><strong>Release Number:</strong> {{ $vendor['release_no'] }}</label>
+                        </div>
                     </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Change of Vote Number:</strong>
-                            {{ $this->requisition->change_of_vote_no }}</label>
+                    <div class="row mt-7">
+
+                        <div class="col mx-5">
+                            <label><strong>Release Date:</strong>
+                                {{ $this->getFormattedDate($vendor['release_date']) }}
+                        </div>
+
+                        <div class="col mx-5">
+                            <label><strong>Change of Vote Number:</strong>
+                                {{ $vendor['change_of_vote_no'] }}</label>
+                        </div>
                     </div>
-
-                </div>
-
+                @endforeach
             </div>
         </div>
 
@@ -242,45 +248,42 @@
 
 
             <div>
-                <div class="row mt-8">
 
-                    <div class="col mx-5">
-                        <label><strong>Purchase Order Number:
-                            </strong>{{ $this->purchase_order_no }}</label>
+                @foreach ($vendors as $vendor)
+                    <div class="row">
+                        <div class="divider">
+                            <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}
+                            </div>
+                        </div>
+
+                        <div class="row mt-8">
+
+                            <div class="col mx-5">
+                                <label><strong>Purchase Order Number:
+                                    </strong>{{ $vendor['purchase_order_no'] }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>ETA:</strong>
+                                    {{ $this->getFormattedDate($vendor['eta']) }} </label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-7">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Sent to Commit:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_sent_commit']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Date Sent to AP:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_sent_ap']) }}</label>
+                            </div>
+                        </div>
+
                     </div>
-
-                    <div class="col mx-5">
-                        <label><strong>ETA:</strong> {{ $this->getFormattedDate($this->eta) }} </label>
-                    </div>
-                </div>
-
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Date Sent to Commit:</strong>
-                            {{ $this->getFormattedDate($this->date_sent_commit) }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Invoice Number:</strong> {{ $this->invoice_no }}</label>
-                    </div>
-
-                </div>
-
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Date of Invoice Received in the Department:</strong>
-                            {{ $this->getFormattedDate($this->date_invoice_received) }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Date Sent to AP:</strong>
-                            {{ $this->getFormattedDate($this->date_sent_ap) }}</label>
-                    </div>
-
-                </div>
-
+                @endforeach
             </div>
 
         </div>
@@ -288,18 +291,27 @@
         <div @class(['tab-pane fade', 'show active' => $this->panes === '4']) id="navs-justified-accounts-payable" role="tabpanel">
 
             <div>
-                <div class="row mt-8">
 
-                    <div class="col mx-5">
-                        <label><strong>Date Received From Procurement:
-                            </strong>{{ $this->getFormattedDate($this->requisition->date_received_ap) }}</label>
-                    </div>
+                @foreach ($vendors as $vendor)
+                    <div class="row mt-2">
+                        <div class="divider">
+                            <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
+                        </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Date Sent to Vote Control:</strong>
-                            {{ $this->getFormattedDate($this->requisition->date_sent_vc) }}</label>
+                        <div class="row mt-8">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Received From Procurement :</strong>
+                                    {{ $this->getFormattedDate($vendor['date_received_ap']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Date Sent to Vote Control:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_sent_vc']) }}</label>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                @endforeach
 
             </div>
         </div>
@@ -307,28 +319,35 @@
         <div @class(['tab-pane fade', 'show active' => $this->panes === '5']) id="navs-justified-vote-control" role="tabpanel">
 
             <div>
-                <div class="row mt-8">
+                @foreach ($vendors as $vendor)
+                    <div class="row mt-2">
+                        <div class="divider">
+                            <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
+                        </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Batch Number: </strong>{{ $this->batch_no }}</label>
+                        <div class="row mt-2">
+
+                            <div class="col mx-5">
+                                <label><strong>Batch Number:</strong> {{ $vendor['batch_no'] }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Voucher Number: </strong>{{ $vendor['voucher_no'] }}</label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-7">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Sent to Check Staff:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_sent_checkstaff']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Voucher Number:</strong> {{ $this->voucher_no }}</label>
-                    </div>
-                </div>
-
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Date Sent to Check Staff:</strong>
-                            {{ $this->getFormattedDate($this->requisition->date_sent_checkstaff) }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                    </div>
-                </div>
-
+                @endforeach
             </div>
         </div>
 
@@ -336,44 +355,54 @@
 
 
             <div>
-                <div class="row mt-8">
 
-                    <div class="col mx-5">
-                        <label><strong>Date Voucher Received from Vote Control:</strong>
-                            {{ $this->getFormattedDate($this->requisition->date_received_from_vc) }}</label>
-                    </div>
 
-                    <div class="col mx-5">
-                        <label><strong>Voucher Sent To: </strong>{{ $this->requisition->voucher_destination }}</label>
-                    </div>
-                </div>
-
-                @if ($this->requisition->voucher_destination == 'Internal Audit')
-                    <div class="row mt-8">
-
-                        <div class="col mx-5">
-                            <label><strong>Date Sent to Audit:</strong>
-                                {{ $this->getFormattedDate($this->requisition->date_sent_audit) }}</label>
+                @foreach ($vendors as $vendor)
+                    <div class="row">
+                        <div class="divider">
+                            <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
                         </div>
 
-                        <div class="col mx-5">
-                            <label><strong>Date Received from Audit:
-                                </strong>{{ $this->getFormattedDate($this->requisition->date_received_from_audit) }}</label>
+                        <div class="row mt-2">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Voucher Received from Vote Control:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_received_from_vc']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Voucher Sent To:
+                                    </strong>{{ $vendor['voucher_destination'] }}</label>
+                            </div>
+                        </div>
+
+                        @if ($vendor['voucher_destination'] == 'Internal Audit')
+                            <div class="row mt-8">
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Sent to Audit:</strong>
+                                        {{ $this->getFormattedDate($vendor['date_sent_audit']) }}</label>
+                                </div>
+
+                                <div class="col mx-5">
+                                    <label><strong>Date Received from Audit:
+                                        </strong>{{ $this->getFormattedDate($vendor['date_received_from_audit']) }}</label>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="row mt-8">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Voucher Sent to Cheque Processing:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_sent_chequeprocessing']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                            </div>
                         </div>
                     </div>
-                @endif
-
-                <div class="row mt-8">
-
-                    <div class="col mx-5">
-                        <label><strong>Date Voucher Sent to Cheque Processing:</strong>
-                            {{ $this->getFormattedDate($this->requisition->date_sent_chequeprocessing) }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                    </div>
-                </div>
-
+                @endforeach
             </div>
         </div>
 

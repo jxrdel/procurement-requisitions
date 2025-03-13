@@ -3,12 +3,15 @@
 namespace App\Livewire;
 
 use App\Mail\CostBudgetingCompleted;
+use App\Mail\ErrorNotification;
 use App\Models\CBRequisition;
 use App\Models\Requisition;
 use App\Models\User;
 use App\Models\Vote;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -76,7 +79,7 @@ class CostBudgetingRequisition extends Component
             ->get()->toArray();
         //Add accordion view to each vendor
         foreach ($this->vendors as $key => $vendor) {
-            $this->vendors[$key]['accordionView'] = 'hide';
+            $this->vendors[$key]['accordionView'] = 'show';
         }
         $this->total = $this->requisition->vendors()->sum('amount');
 
@@ -143,32 +146,39 @@ class CostBudgetingRequisition extends Component
 
         $status = $this->requisition->requisition_status;
 
-        //Get requisition status
-        if (!$this->requisition->vote_control_requisition && !$this->cb_requisition->is_completed) {
-            $status = $this->getStatus();
-        }
+        try {
+            //Get requisition status
+            if (!$this->requisition->vote_control_requisition && !$this->cb_requisition->is_completed) {
+                $status = $this->getStatus();
+            }
 
-        $this->requisition->update([
-            'requisition_status' => $status,
-        ]);
-
-        foreach ($this->vendors as $vendor) {
-            $this->requisition->vendors()->where('id', $vendor['id'])->update([
-                'date_sent_request_mof' => $vendor['date_sent_request_mof'],
-                'request_category' => $vendor['request_category'],
-                'request_no' => $vendor['request_no'],
-                'release_type' => $vendor['release_type'],
-                'release_no' => $vendor['release_no'],
-                'release_date' => $vendor['release_date'],
-                'change_of_vote_no' => $vendor['change_of_vote_no'],
+            $this->requisition->update([
+                'requisition_status' => $status,
             ]);
-        }
 
-        $this->isEditing = false;
-        $this->resetValidation();
-        $this->dispatch('show-message', message: 'Record edited successfully');
-        $this->requisition = $this->requisition->fresh();
-        $this->cb_requisition = $this->cb_requisition->fresh();
+            foreach ($this->vendors as $vendor) {
+                $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                    'date_sent_request_mof' => $vendor['date_sent_request_mof'],
+                    'request_category' => $vendor['request_category'],
+                    'request_no' => $vendor['request_no'],
+                    'release_type' => $vendor['release_type'],
+                    'release_no' => $vendor['release_no'],
+                    'release_date' => $vendor['release_date'],
+                    'change_of_vote_no' => $vendor['change_of_vote_no'],
+                ]);
+            }
+
+            Log::info('Cost & Budgeting Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
+            $this->isEditing = false;
+            $this->resetValidation();
+            $this->dispatch('show-message', message: 'Record edited successfully');
+            $this->requisition = $this->requisition->fresh();
+            $this->cb_requisition = $this->cb_requisition->fresh();
+        } catch (Exception $e) {
+            Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition in Cost & Budgeting: ' . $e->getMessage());
+            Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
+            dd('Error editing requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
+        }
     }
 
     public function getFormattedDateAssigned()
@@ -235,12 +245,16 @@ class CostBudgetingRequisition extends Component
             ]);
         }
 
+        Log::info('Cost & Budgeting Requisition #' . $this->requisition->requisition_no . ' was sent to Procurement by ' . Auth::user()->username);
+
         //Send email to assigned procurement officer
         $user = $this->requisition->procurement_officer;
         if ($user) {
             // Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+            // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
         } else {
             // Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+            // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
         }
 
         return redirect()->route('cost_and_budgeting.index')->with('success', 'Sent to procurement successfully');

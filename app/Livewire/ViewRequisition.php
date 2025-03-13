@@ -2,10 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Mail\ErrorNotification;
 use App\Mail\NotifyAccountsPayable;
 use App\Mail\NotifyCostBudgeting;
 use App\Mail\NotifyVoteControl;
 use App\Models\CBRequisition;
+use App\Models\Cheque;
 use App\Models\Department;
 use App\Models\Requisition;
 use App\Models\RequisitionVendor;
@@ -14,7 +16,9 @@ use App\Models\User;
 use App\Models\VendorInvoice;
 use App\Models\Vote;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -88,6 +92,9 @@ class ViewRequisition extends Component
     public $invoices = [];
     public $invoice_count = 0;
 
+    //Cheques
+    public $cheques;
+
     //Button Invoice Count
     public $invoice_count_buttons = [];
 
@@ -144,10 +151,12 @@ class ViewRequisition extends Component
         $this->date_completed = $this->requisition->date_completed;
         $this->vendors = $this->requisition->vendors()
             ->with('invoices')
+            ->with('ap')
             ->select(
                 'id',
                 'vendor_name',
                 'amount',
+                'vendor_status',
 
                 //Procurement
                 'purchase_order_no',
@@ -192,7 +201,7 @@ class ViewRequisition extends Component
             ->toArray();
 
         foreach ($this->vendors as $key => $vendor) {
-            $this->vendors[$key]['accordionView'] = 'hide';
+            $this->vendors[$key]['accordionView'] = 'show';
         }
 
         //Cost & Budgeting
@@ -218,12 +227,20 @@ class ViewRequisition extends Component
         $this->cheque_no = $this->requisition->cheque_no;
         $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
 
+        //Cheque Processing
+        $this->cheques = $this->requisition->vendors()->with('cheques')->get()->pluck('cheques')->flatten();
+
         $this->setActivePane();
     }
 
     public function setActivePane()
     {
         $vendors = $this->requisition->vendors; // Assuming a `hasMany` relationship exists
+
+        if (!$this->requisition->cost_budgeting_requisition) {
+            $this->active_pane = 'procurement1';
+            return;
+        }
 
         if ($vendors->isEmpty()) {
             // If no vendors exist, fallback to the existing requisition-based logic
@@ -262,65 +279,72 @@ class ViewRequisition extends Component
 
     public function edit()
     {
-
-        if ($this->date_assigned === '') {
-            $this->date_assigned = null;
-        }
-
-        if ($this->date_sent_dps === '') {
-            $this->date_sent_dps = null;
-        }
-
-        if ($this->date_received_procurement === '') {
-            $this->date_received_procurement = null;
-        }
-
-        if (!$this->validateForm()) {
-            return;  // Stop execution if form validation fails
-        }
-
-        Requisition::where('id', $this->requisition->id)->update([
-            'requisition_no' => $this->requisition_no,
-            'requesting_unit' => $this->requesting_unit,
-            'file_no' => $this->file_no,
-            'item' => $this->item,
-            'source_of_funds' => $this->source_of_funds,
-            'assigned_to' => $this->assigned_to,
-            'date_sent_dps' => $this->date_sent_dps,
-            'ps_approval' => $this->ps_approval,
-            'ps_approval_date' => $this->ps_approval_date,
-            'amount' => $this->amount,
-            'denied_note' => $this->denied_note,
-            'updated_by' => Auth::user()->username,
-        ]);
-
-        if (!$this->requisition->cost_budgeting_requisition) {
-            $this->setRequisitionStatus();
-        }
-
-        foreach ($this->deleted_vendors as $id) {
-            $this->requisition->vendors()->where('id', $id)->delete();
-        }
-
-        foreach ($this->vendors as $index => $vendor) {
-            if (isset($vendor['id'])) {
-                $this->requisition->vendors()->where('id', $vendor['id'])->update([
-                    'vendor_name' => $vendor['vendor_name'],
-                    'amount' => $vendor['amount'],
-                ]);
-            } else {
-                $newvendor = $this->requisition->vendors()->create([
-                    'vendor_name' => $vendor['vendor_name'],
-                    'amount' => $vendor['amount'],
-                ]);
-                $this->vendors[$index]['id'] = $newvendor->id;
+        try {
+            if ($this->date_assigned === '') {
+                $this->date_assigned = null;
             }
-        }
 
-        $this->isEditingProcurement1 = false;
-        $this->resetValidation();
-        $this->dispatch('show-message', message: 'Requisition edited successfully');
-        $this->requisition = $this->requisition->fresh();
+            if ($this->date_sent_dps === '') {
+                $this->date_sent_dps = null;
+            }
+
+            if ($this->date_received_procurement === '') {
+                $this->date_received_procurement = null;
+            }
+
+            if (!$this->validateForm()) {
+                return;  // Stop execution if form validation fails
+            }
+
+            Requisition::where('id', $this->requisition->id)->update([
+                'requisition_no' => $this->requisition_no,
+                'requesting_unit' => $this->requesting_unit,
+                'file_no' => $this->file_no,
+                'item' => $this->item,
+                'source_of_funds' => $this->source_of_funds,
+                'date_received_procurement' => $this->date_received_procurement,
+                'assigned_to' => $this->assigned_to,
+                'date_sent_dps' => $this->date_sent_dps,
+                'ps_approval' => $this->ps_approval,
+                'ps_approval_date' => $this->ps_approval_date,
+                'amount' => $this->amount,
+                'denied_note' => $this->denied_note,
+                'updated_by' => Auth::user()->username,
+            ]);
+
+            if (!$this->requisition->cost_budgeting_requisition) {
+                $this->setRequisitionStatus();
+            }
+
+            foreach ($this->deleted_vendors as $id) {
+                $this->requisition->vendors()->where('id', $id)->delete();
+            }
+
+            foreach ($this->vendors as $index => $vendor) {
+                if (isset($vendor['id'])) {
+                    $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                        'vendor_name' => $vendor['vendor_name'],
+                        'amount' => $vendor['amount'],
+                    ]);
+                } else {
+                    $newvendor = $this->requisition->vendors()->create([
+                        'vendor_name' => $vendor['vendor_name'],
+                        'amount' => $vendor['amount'],
+                    ]);
+                    $this->vendors[$index]['id'] = $newvendor->id;
+                }
+            }
+
+            Log::info('Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
+            $this->isEditingProcurement1 = false;
+            $this->resetValidation();
+            $this->dispatch('show-message', message: 'Requisition edited successfully');
+            $this->requisition = $this->requisition->fresh();
+        } catch (Exception $e) {
+            Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition: ' . $e->getMessage());
+            Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
+            dd('Error editing requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
+        }
     }
 
     public function validateForm()
@@ -536,6 +560,7 @@ class ViewRequisition extends Component
 
         foreach ($users as $user) {
             // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
+            // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
@@ -568,12 +593,20 @@ class ViewRequisition extends Component
 
     public function isProcurement2ButtonDisabled($vendor)
     {
+        if ($vendor['vendor_status'] === '') {
+            return true;
+        }
+
+        $totalInvoiceAmount = collect($vendor['invoices'])->sum('invoice_amount');
+
         return
             empty(trim($vendor['purchase_order_no'])) ||
             empty($vendor['eta']) ||
             empty($vendor['date_sent_ap']) ||
-            empty($vendor['invoices']);
+            empty($vendor['invoices']) ||
+            $totalInvoiceAmount != $vendor['amount']; // Ensure invoice amounts add up to the vendor amount
     }
+
 
 
 
@@ -607,84 +640,93 @@ class ViewRequisition extends Component
 
     public function editProcurement2()
     {
-        if ($this->eta === '') {
-            $this->eta = null;
-        }
-
-        if ($this->date_sent_commit === '') {
-            $this->date_sent_commit = null;
-        }
-
-        if ($this->date_invoice_received === '') {
-            $this->date_invoice_received = null;
-        }
-
-        if ($this->date_sent_ap === '') {
-            $this->date_sent_ap = null;
-        }
-
-        foreach ($this->vendors as &$vendor) {
-            if ($vendor['eta'] === '') {
-                $vendor['eta'] = null;
+        try {
+            if ($this->eta === '') {
+                $this->eta = null;
             }
 
-            if ($vendor['date_sent_commit'] === '') {
-                $vendor['date_sent_commit'] = null;
+            if ($this->date_sent_commit === '') {
+                $this->date_sent_commit = null;
             }
 
-            if ($vendor['date_invoice_received'] === '') {
-                $vendor['date_invoice_received'] = null;
+            if ($this->date_invoice_received === '') {
+                $this->date_invoice_received = null;
             }
 
-            if ($vendor['date_sent_ap'] === '') {
-                $vendor['date_sent_ap'] = null;
+            if ($this->date_sent_ap === '') {
+                $this->date_sent_ap = null;
             }
+
+            foreach ($this->vendors as &$vendor) {
+                if ($vendor['eta'] === '') {
+                    $vendor['eta'] = null;
+                }
+
+                if ($vendor['date_sent_commit'] === '') {
+                    $vendor['date_sent_commit'] = null;
+                }
+
+                if ($vendor['date_invoice_received'] === '') {
+                    $vendor['date_invoice_received'] = null;
+                }
+
+                if ($vendor['date_sent_ap'] === '') {
+                    $vendor['date_sent_ap'] = null;
+                }
+            }
+
+            unset($vendor);
+
+            $this->updateVendorStatuses();
+
+            $this->validate(
+                [
+                    'vendors.*.eta' => 'nullable|date|after_or_equal:today',
+                    'vendors.*.date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+                ],
+                [
+                    'vendors.*.eta.after_or_equal' => 'ETA must be a date after or equal to today',
+                    'vendors.*.date_sent_commit.after_or_equal' => 'Date sent to Commitment must be a date after or equal to the date sent to DPS',
+                ]
+            );
+
+            foreach ($this->vendors as $vendor) {
+                $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                    'purchase_order_no' => $vendor['purchase_order_no'],
+                    'eta' => $vendor['eta'],
+                    'date_sent_commit' => $vendor['date_sent_commit'],
+                    // 'invoice_no' => $vendor['invoice_no'],
+                    // 'date_invoice_received' => $vendor['date_invoice_received'],
+                    'date_sent_ap' => $vendor['date_sent_ap'],
+                ]);
+
+                if (!$vendor['ap']) {
+
+                    $this->requisition->vendors()->where('id', $vendor['id'])->update([
+                        'vendor_status' => $vendor['vendor_status'],
+                    ]);
+                }
+            }
+
+            if (!$this->requisition->is_completed) {
+                $this->requisition->update([
+                    // 'requisition_status' => $status,
+                    'updated_by' => Auth::user()->username,
+                ]);
+            }
+
+            // $this->setRequisitionStatus();
+
+            Log::info('Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
+            $this->isEditingProcurement2 = false;
+            $this->refreshVendors();
+            $this->resetValidation();
+            $this->dispatch('show-message', message: 'Requisition edited successfully');
+        } catch (Exception $e) {
+            Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition: ' . $e->getMessage());
+            Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
+            dd('Error editing requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
         }
-
-        unset($vendor);
-
-        $this->updateVendorStatuses();
-
-        $this->validate(
-            [
-                'vendors.*.eta' => 'nullable|date|after_or_equal:today',
-                'vendors.*.date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-            ],
-            [
-                'vendors.*.eta.after_or_equal' => 'ETA must be a date after or equal to today',
-                'vendors.*.date_sent_commit.after_or_equal' => 'Date sent to Commitment must be a date after or equal to the date sent to DPS',
-            ]
-        );
-
-        // if (!$this->requisition->vote_control_requisition) {
-        //     $status = $this->getProcurement2Status();
-        // }
-
-        foreach ($this->vendors as $vendor) {
-            $this->requisition->vendors()->where('id', $vendor['id'])->update([
-                'vendor_status' => $vendor['vendor_status'],
-                'purchase_order_no' => $vendor['purchase_order_no'],
-                'eta' => $vendor['eta'],
-                // 'date_sent_commit' => $vendor['date_sent_commit'],
-                // 'invoice_no' => $vendor['invoice_no'],
-                // 'date_invoice_received' => $vendor['date_invoice_received'],
-                'date_sent_ap' => $vendor['date_sent_ap'],
-            ]);
-        }
-
-        if (!$this->requisition->is_completed) {
-            $this->requisition->update([
-                // 'requisition_status' => $status,
-                'updated_by' => Auth::user()->username,
-            ]);
-        }
-
-        // $this->setRequisitionStatus();
-
-        $this->isEditingProcurement2 = false;
-        $this->refreshVendors();
-        $this->resetValidation();
-        $this->dispatch('show-message', message: 'Requisition edited successfully');
     }
 
     public function sendToAP($vendorID)
@@ -710,12 +752,14 @@ class ViewRequisition extends Component
         // ]);
 
         //Send email to Accounts Payable
+        Log::info('Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username);
 
         //Get Accounts Payable users
         $users = User::accountsPayable()->get();
 
         foreach ($users as $user) {
             // Mail::to($user->email)->send(new NotifyAccountsPayable($vendor));
+            // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }
 
         // return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Accounts Payable');
@@ -774,43 +818,43 @@ class ViewRequisition extends Component
             // Procurement
             'vendor_status' => '',
             'purchase_order_no' => '',
-            'eta' => '',
-            'date_sent_commit' => '',
+            'eta' => null,
+            'date_sent_commit' => null,
             'invoice_no' => '',
-            'date_invoice_received' => '',
-            'date_sent_ap' => '',
+            'date_invoice_received' => null,
+            'date_sent_ap' => null,
             'sent_to_ap' => false,
 
             // Cost & Budgeting
-            'date_sent_request_mof' => '',
+            'date_sent_request_mof' => null,
             'release_type' => '',
             'request_category' => '',
             'request_no' => '',
             'release_no' => '',
-            'release_date' => '',
+            'release_date' => null,
             'change_of_vote_no' => '',
 
             // AP
-            'date_received_ap' => '',
-            'date_sent_vc' => '',
+            'date_received_ap' => null,
+            'date_sent_vc' => null,
 
             // Vote Control
             'batch_no' => '',
             'voucher_no' => '',
-            'date_sent_checkstaff' => '',
+            'date_sent_checkstaff' => null,
 
             // Check Staff
-            'date_received_from_vc' => '',
+            'date_received_from_vc' => null,
             'voucher_destination' => '',
-            'date_sent_audit' => '',
-            'date_received_from_audit' => '',
-            'date_sent_chequeprocessing' => '',
+            'date_sent_audit' => null,
+            'date_received_from_audit' => null,
+            'date_sent_chequeprocessing' => null,
 
             // Cheque Processing
-            'date_of_cheque' => '',
+            'date_of_cheque' => null,
             'cheque_no' => '',
-            'date_cheque_processed' => '',
-            'date_sent_dispatch' => '',
+            'date_cheque_processed' => null,
+            'date_sent_dispatch' => null,
 
             'accordionView' => 'hide',
         ];
@@ -936,11 +980,28 @@ class ViewRequisition extends Component
 
     public function saveInvoice()
     {
-        // dd($this->invoice_amount);
         $this->validate([
-            'invoice_no' => 'required',
-            'invoice_amount' => 'required',
-            'date_invoice_received' => 'required',
+            'invoice_no' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($this->vendor->invoices()->where('invoice_no', $value)->exists()) {
+                        $fail('The invoice number must be unique for this vendor.');
+                    }
+                }
+            ],
+            'invoice_amount' => [
+                'required',
+                'numeric',
+                function ($attribute, $value, $fail) {
+                    $totalInvoices = $this->vendor->invoices()->sum('invoice_amount');
+                    $newTotal = $totalInvoices + $value;
+
+                    if ($newTotal > $this->vendor->amount) {
+                        $fail('The total of all invoices cannot exceed the vendor\'s amount of ' . number_format($this->vendor->amount, 2));
+                    }
+                }
+            ],
+            'date_invoice_received' => 'required|date',
         ]);
 
         $this->vendor->invoices()->create([
@@ -987,6 +1048,7 @@ class ViewRequisition extends Component
 
         $this->vendors = $this->requisition->vendors()
             ->with('invoices')
+            ->with('ap')
             ->select(
                 'id',
                 'vendor_name',

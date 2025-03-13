@@ -2,12 +2,16 @@
 
 namespace App\Livewire;
 
+use App\Mail\ErrorNotification;
 use App\Models\CurrentFinancialYear;
 use App\Models\Department;
 use App\Models\Requisition;
 use App\Models\User;
 use App\Models\Vote;
+use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -63,92 +67,99 @@ class CreateRequisition extends Component
 
     public function save()
     {
+        try {
 
-        if ($this->date_assigned === '') {
-            $this->date_assigned = null;
-        }
-
-        if ($this->date_sent_dps === '') {
-            $this->date_sent_dps = null;
-        }
-
-        if ($this->date_received_procurement === '') {
-            $this->date_received_procurement = null;
-        }
-
-        if (!$this->validateForm()) {
-            return;  // Stop execution if form validation fails
-        }
-
-        if ($this->ps_approval === 'Not Sent') {
-            $this->requisition_status = 'To be Sent to DPS';
-        }
-
-        if ($this->ps_approval === 'Pending') {
-            $this->requisition_status = 'Pending PS Approval';
-        }
-
-        if ($this->ps_approval === 'Approval Denied') {
-            $this->requisition_status = 'Denied by PS';
-        }
-
-        if ($this->ps_approval === 'Approved') {
-            $this->requisition_status = 'Approved by PS';
-        }
-
-        if ($this->assigned_to === '') {
-            $this->assigned_to = null;
-        }
-
-        $newrequisition = Requisition::create([
-            'requisition_status' => $this->requisition_status,
-            'requisition_no' => $this->requisition_no,
-            'requesting_unit' => $this->requesting_unit,
-            'file_no' => $this->file_no,
-            'item' => $this->item,
-            'source_of_funds' => $this->source_of_funds,
-            'assigned_to' => $this->assigned_to,
-            'date_assigned' => $this->date_assigned,
-            'date_received_procurement' => $this->date_received_procurement,
-            'date_sent_dps' => $this->date_sent_dps,
-            'ps_approval' => $this->ps_approval,
-            'ps_approval_date' => $this->ps_approval_date,
-            'vendor_name' => $this->vendor_name,
-            'amount' => $this->amount,
-            'denied_note' => $this->denied_note,
-            'created_by' => Auth::user()->username,
-        ]);
-
-        if (count($this->vendors) > 0) {
-            foreach ($this->vendors as $vendor) {
-                $newrequisition->vendors()->create([
-                    'vendor_name' => $vendor['vendor_name'],
-                    'amount' => $vendor['amount'],
-                ]);
+            if ($this->date_assigned === '') {
+                $this->date_assigned = null;
             }
-        }
 
-        foreach ($this->logs as $log) {
-            $newrequisition->statuslogs()->create([
-                'details' => $log,
+            if ($this->date_sent_dps === '') {
+                $this->date_sent_dps = null;
+            }
+
+            if ($this->date_received_procurement === '') {
+                $this->date_received_procurement = null;
+            }
+
+            if (!$this->validateForm()) {
+                return;  // Stop execution if form validation fails
+            }
+
+            if ($this->ps_approval === 'Not Sent') {
+                $this->requisition_status = 'To be Sent to DPS';
+            }
+
+            if ($this->ps_approval === 'Pending') {
+                $this->requisition_status = 'Pending PS Approval';
+            }
+
+            if ($this->ps_approval === 'Approval Denied') {
+                $this->requisition_status = 'Denied by PS';
+            }
+
+            if ($this->ps_approval === 'Approved') {
+                $this->requisition_status = 'Approved by PS';
+            }
+
+            if ($this->assigned_to === '') {
+                $this->assigned_to = null;
+            }
+
+            $newrequisition = Requisition::create([
+                'requisition_status' => $this->requisition_status,
+                'requisition_no' => $this->requisition_no,
+                'requesting_unit' => $this->requesting_unit,
+                'file_no' => $this->file_no,
+                'item' => $this->item,
+                'source_of_funds' => $this->source_of_funds,
+                'assigned_to' => $this->assigned_to,
+                'date_assigned' => $this->date_assigned,
+                'date_received_procurement' => $this->date_received_procurement,
+                'date_sent_dps' => $this->date_sent_dps,
+                'ps_approval' => $this->ps_approval,
+                'ps_approval_date' => $this->ps_approval_date,
+                'vendor_name' => $this->vendor_name,
+                'amount' => $this->amount,
+                'denied_note' => $this->denied_note,
                 'created_by' => Auth::user()->username,
             ]);
-        }
 
+            if (count($this->vendors) > 0) {
+                foreach ($this->vendors as $vendor) {
+                    $newrequisition->vendors()->create([
+                        'vendor_name' => $vendor['vendor_name'],
+                        'amount' => $vendor['amount'],
+                    ]);
+                }
+            }
 
-        if (!is_null($this->uploads)) {
-            foreach ($this->uploads as $photo) {
-                $filename = $photo->getClientOriginalName();
-                $path = $photo->store('file_uploads', 'public');
-                $newrequisition->file_uploads()->create([
-                    'file_name' => $filename,
-                    'file_path' => $path,
-                    // 'uploaded_by' => auth()->user()->username,
+            foreach ($this->logs as $log) {
+                $newrequisition->statuslogs()->create([
+                    'details' => $log,
+                    'created_by' => Auth::user()->username,
                 ]);
             }
-        }
 
-        return redirect()->route('requisitions.index')->with('success', 'Requisition created successfully');
+
+            if (!is_null($this->uploads)) {
+                foreach ($this->uploads as $photo) {
+                    $filename = $photo->getClientOriginalName();
+                    $path = $photo->store('file_uploads', 'public');
+                    $newrequisition->file_uploads()->create([
+                        'file_name' => $filename,
+                        'file_path' => $path,
+                        // 'uploaded_by' => auth()->user()->username,
+                    ]);
+                }
+            }
+
+            Log::info('Requisition #' . $this->requisition_no . ' was created by ' . Auth::user()->name);
+            return redirect()->route('requisitions.index')->with('success', 'Requisition created successfully');
+        } catch (Exception $e) {
+            Log::error('Error from user ' . Auth::user()->username . ' while creating a requisition: ' . $e->getMessage());
+            Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
+            dd('Error creating requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
+        }
     }
 
     public function validateForm()

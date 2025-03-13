@@ -3,9 +3,11 @@
 namespace App\Livewire;
 
 use App\Mail\RequisitionCompleted;
+use App\Models\Cheque;
 use App\Models\ChequeProcessingVendor;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -14,12 +16,16 @@ class ViewChequeProcessingVendor extends Component
     public $vendor;
     public $requisition;
     public $cp_vendor;
+    public $cheques;
+    public $deleted_cheques = [];
 
     public $date_cheque_processed;
     public $cheque_no;
     public $date_of_cheque;
     public $date_sent_dispatch;
+    public $invoices;
 
+    public $accordionView = 'show';
     public $isEditing = true;
 
     public function render()
@@ -31,9 +37,20 @@ class ViewChequeProcessingVendor extends Component
     {
         $this->cp_vendor = ChequeProcessingVendor::find($id);
         $this->vendor = $this->cp_vendor->vendor;
+        $this->invoices = $this->vendor->invoices;
 
         if (!$this->cp_vendor) {
             return abort(404);
+        }
+
+        $this->cheques = $this->vendor->cheques()->get()->toArray();
+
+        if (count($this->cheques) > 0) {
+            $this->isEditing = false;
+        }
+
+        if (count($this->cheques) === 0) { //Adds a cheque if there are none
+            $this->addCheque();
         }
 
         $this->requisition = $this->vendor->requisition;
@@ -43,10 +60,6 @@ class ViewChequeProcessingVendor extends Component
         $this->date_of_cheque = $this->vendor->date_of_cheque;
         $this->date_sent_dispatch = $this->vendor->date_sent_dispatch;
 
-        if ($this->date_cheque_processed !== null && $this->cheque_no !== null && $this->date_of_cheque !== null && $this->date_sent_dispatch !== null) {
-            $this->isEditing = false;
-        }
-
         if (Auth::user()->role->name === 'Viewer') {
             $this->isEditing = false;
         }
@@ -54,8 +67,32 @@ class ViewChequeProcessingVendor extends Component
 
     public function getIsButtonDisabledProperty()
     {
-        return $this->date_cheque_processed === null || $this->cheque_no === null || $this->date_of_cheque === null || $this->date_sent_dispatch === null;
+        if (count($this->cheques) === 0) {
+            return true; // Disable if no cheques exist
+        }
+
+        $totalChequeAmount = collect($this->cheques)->sum('cheque_amount');
+
+        foreach ($this->cheques as $cheque) {
+            if (
+                empty($cheque['date_cheque_processed']) ||
+                empty($cheque['cheque_no']) ||
+                empty($cheque['date_of_cheque']) ||
+                empty($cheque['date_sent_dispatch'])
+            ) {
+                return true; // Disable the button if any cheque is incomplete
+            }
+        }
+
+        // Disable the button if the total cheque amount does not match the vendor amount
+        if ($totalChequeAmount !== (float) $this->vendor->amount) {
+            return true;
+        }
+
+        return false; // Enable the button if all conditions are met
     }
+
+
 
     public function edit()
     {
@@ -82,25 +119,73 @@ class ViewChequeProcessingVendor extends Component
             $status = $this->getStatus();
         }
 
-        $this->validate([
-            'date_cheque_processed' => 'nullable|date',
-            'date_of_cheque' => 'nullable|date',
-            'date_sent_dispatch' => 'nullable|date',
-        ]);
+        // Get the list of existing cheque numbers and count occurrences
+        $chequeNumberCounts = array_count_values(collect(Cheque::all())->pluck('cheque_no')->toArray());
+        // dd($chequeNumberCounts);
 
-        $this->vendor->update([
-            'vendor_status' => $status,
-            'date_cheque_processed' => $this->date_cheque_processed,
-            'cheque_no' => $this->cheque_no,
-            'date_of_cheque' => $this->date_of_cheque,
-            'date_sent_dispatch' => $this->date_sent_dispatch,
-        ]);
+        // Get the total existing cheque amount
+        $totalChequeAmount = collect($this->cheques)->sum('cheque_amount');
+        if ($totalChequeAmount > $this->vendor->amount) {
+            $this->addError('cheques.0.cheque_amount', 'The total cheque amount must not exceed the vendor amount.');
+            return;
+        }
 
+        $this->validate(
+            [
+                'cheques.*.date_cheque_processed' => 'nullable|date|after_or_equal:' . $this->requisition->date_received_procurement,
+                'cheques.*.cheque_no' => [
+                    'nullable',
+                    function ($attribute, $value, $fail) use ($chequeNumberCounts) {
+                        if (!empty($value) && isset($chequeNumberCounts[$value]) && $chequeNumberCounts[$value] > 1) {
+                            $fail('The cheque number must be unique.');
+                        }
+                    }
+                ],
+                'cheques.*.cheque_amount' => 'required|numeric',
+                'cheques.*.date_of_cheque' => 'nullable|date|after_or_equal:' . $this->requisition->date_received_procurement,
+                'cheques.*.date_sent_dispatch' => 'nullable|date|after_or_equal:date_of_cheque',
+            ],
+            [
+                'cheques.*.date_cheque_processed.after_or_equal' => 'Please check date',
+                'cheques.*.date_of_cheque.after_or_equal' => 'Please check date',
+                'cheques.*.date_sent_dispatch.after_or_equal' => 'Please check date',
+            ]
+        );
+
+
+        if ($this->deleted_cheques) {
+            $this->vendor->cheques()->whereIn('id', $this->deleted_cheques)->delete();
+        }
+
+        foreach ($this->cheques as $cheque) {
+            $this->vendor->cheques()->updateOrCreate(
+                ['id' => $cheque['id']],
+                [
+                    'date_cheque_processed' => $cheque['date_cheque_processed'],
+                    'cheque_no' => $cheque['cheque_no'],
+                    'cheque_amount' => $cheque['cheque_amount'],
+                    'date_of_cheque' => $cheque['date_of_cheque'],
+                    'date_sent_dispatch' => $cheque['date_sent_dispatch'],
+                    'invoice_no' => $cheque['invoice_no'],
+                ]
+            );
+        }
+
+        // $this->vendor->update([
+        //     'vendor_status' => $status,
+        //     'date_cheque_processed' => $this->date_cheque_processed,
+        //     'cheque_no' => $this->cheque_no,
+        //     'date_of_cheque' => $this->date_of_cheque,
+        //     'date_sent_dispatch' => $this->date_sent_dispatch,
+        // ]);
+
+        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Cheque Processing');
         $this->isEditing = false;
         $this->resetValidation();
         $this->dispatch('show-message', message: 'Record edited successfully');
         $this->vendor = $this->vendor->fresh();
         $this->cp_vendor = $this->cp_vendor->fresh();
+        $this->cheques = $this->vendor->cheques()->get()->toArray();
     }
 
     public function getStatus()
@@ -132,7 +217,6 @@ class ViewChequeProcessingVendor extends Component
 
     public function completeVendor()
     {
-        sleep(1);
         $this->cp_vendor->update([
             'is_completed' => true,
             'date_completed' => now(),
@@ -147,6 +231,7 @@ class ViewChequeProcessingVendor extends Component
 
         //Check if all vendor status are completed
         if ($this->requisition->isCompleted()) {
+            Log::info('Requisition #' . $this->requisition->requisition_no . ' was completed by ' . Auth::user()->name . ' from Cheque Processing');
             $this->requisition->update([
                 'requisition_status' => 'Completed',
                 'is_completed' => true,
@@ -155,11 +240,42 @@ class ViewChequeProcessingVendor extends Component
 
             $assigned_to = $this->requisition->procurement_officer;
             if ($assigned_to) {
-                Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
+                // Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
             } else {
-                Mail::to('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
+                // Mail::to('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
             }
         }
         return redirect()->route('cheque_processing.index')->with('success', 'Completed successfully');
+    }
+
+    public function addCheque()
+    {
+        $this->cheques[] = [
+            'id' => null,
+            'date_cheque_processed' => null,
+            'cheque_amount' => "0.00",
+            'cheque_no' => '',
+            'invoice_no' => '',
+            'date_of_cheque' => null,
+            'date_sent_dispatch' => null,
+        ];
+    }
+
+    public function removeCheque($index)
+    {
+        $cheque = $this->cheques[$index];
+
+        if ($cheque['id']) {
+            $this->deleted_cheques[] = $cheque['id'];
+        }
+
+        unset($this->cheques[$index]);
+    }
+
+    public function toggleAccordionView()
+    {
+        $this->accordionView = $this->accordionView === 'show' ? 'hide' : 'show';
+
+        $this->skipRender();
     }
 }

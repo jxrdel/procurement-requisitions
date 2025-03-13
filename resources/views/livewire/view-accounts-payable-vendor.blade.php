@@ -135,7 +135,7 @@
                                     @forelse ($invoices as $invoice)
                                         <tr>
                                             <td>{{ $invoice->invoice_no }}</td>
-                                            <td>{{ $invoice->invoice_amount }}</td>
+                                            <td>${{ number_format($invoice->invoice_amount, 2) }}</td>
                                         </tr>
                                     @empty
                                         <tr>

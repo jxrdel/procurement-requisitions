@@ -620,6 +620,17 @@
                                                 </div>
                                             </div>
 
+
+                                            <div>
+                                                <div class="col mx-5">
+                                                    <a href="javascript:void(0);"
+                                                        wire:click="displayInvoicesModal({{ $vendor['id'] }})">
+                                                        Invoices
+                                                        ({{ $invoice_count_buttons[$vendor['id']] ?? 0 }})
+                                                    </a>
+                                                </div>
+                                            </div>
+
                                             <div class="row mt-8">
 
                                                 <div class="col mx-5">
@@ -641,23 +652,11 @@
                                                 </div>
 
                                                 <div class="col mx-5">
-                                                    <label><strong>Invoice Number:</strong>
-                                                        {{ $vendor['invoice_no'] }}</label>
-                                                </div>
-                                            </div>
-
-                                            <div class="row mt-7">
-
-                                                <div class="col mx-5">
-                                                    <label><strong>Date of Invoice Received in the Department:</strong>
-                                                        {{ $this->getFormattedDate($vendor['date_invoice_received']) }}</label>
-                                                </div>
-
-                                                <div class="col mx-5">
                                                     <label><strong>Date Sent to AP:</strong>
                                                         {{ $this->getFormattedDate($vendor['date_sent_ap']) }}</label>
                                                 </div>
                                             </div>
+
                                         </div>
 
                                         <div class="row mt-5">
@@ -704,7 +703,8 @@
                                                         data-bs-target="#collapse{{ $index }}"
                                                         aria-expanded="true"
                                                         aria-controls="collapse{{ $index }}">
-                                                        <strong>Vendor: {{ $vendor['vendor_name'] }} </strong>
+                                                        <strong>Vendor: {{ $vendor['vendor_name'] }} |
+                                                            ${{ number_format($vendor['amount'], 2) }}</strong>
                                                     </button>
                                                 </h2>
                                                 <div id="collapse{{ $index }}"
@@ -764,41 +764,6 @@
                                                                 @enderror
                                                             </div>
 
-                                                            <div class="col-md-6">
-                                                                <div class="form-floating form-floating-outline">
-                                                                    <input autocomplete="off"
-                                                                        wire:model="vendors.{{ $index }}.invoice_no"
-                                                                        type="text"
-                                                                        class="form-control @error('vendors.' . $index . '.invoice_no')is-invalid @enderror"
-                                                                        id="floatingInput"
-                                                                        placeholder="Invoice Number"
-                                                                        aria-describedby="floatingInputHelp" />
-                                                                    <label for="floatingInput">Invoice
-                                                                        Number</label>
-                                                                </div>
-                                                                @error('vendors.' . $index . '.invoice_no')
-                                                                    <div class="text-danger"> {{ $message }} </div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row mt-7">
-
-                                                            <div class="col-md-6">
-                                                                <div class="form-floating form-floating-outline">
-                                                                    <input autocomplete="off"
-                                                                        wire:model="vendors.{{ $index }}.date_invoice_received"
-                                                                        type="date"
-                                                                        class="form-control @error('vendors.' . $index . '.date_invoice_received')is-invalid @enderror"
-                                                                        id="floatingInput"
-                                                                        aria-describedby="floatingInputHelp" />
-                                                                    <label for="floatingInput">Date of Invoice
-                                                                        Received in the Department</label>
-                                                                </div>
-                                                                @error('vendors.' . $index . '.date_invoice_received')
-                                                                    <div class="text-danger"> {{ $message }} </div>
-                                                                @enderror
-                                                            </div>
 
                                                             <div class="col-md-6">
                                                                 <div class="form-floating form-floating-outline">
@@ -816,7 +781,6 @@
                                                                 @enderror
                                                             </div>
                                                         </div>
-
 
                                                         <div class="d-flex justify-content-center mt-8">
                                                             <button type="button"
@@ -990,38 +954,39 @@
 
                         <div>
 
-                            @foreach ($vendors as $vendor)
-                                <div class="row mt-1">
-                                    <div class="divider">
-                                        <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
-                                    </div>
 
-                                    <div class="row mt-2">
-
-                                        <div class="col mx-5">
-                                            <label><strong>Date Cheque Processed:</strong>
-                                                {{ $this->getFormattedDate($vendor['date_cheque_processed']) }}</label>
-                                        </div>
-
-                                        <div class="col mx-5">
-                                            <label><strong>Cheque Number: </strong>{{ $vendor['cheque_no'] }}</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mt-2">
-
-                                        <div class="col mx-5">
-                                            <label><strong>Cheque Date:</strong>
-                                                {{ $this->getFormattedDate($vendor['date_of_cheque']) }}</label>
-                                        </div>
-
-                                        <div class="col mx-5">
-                                            <label><strong>Date Cheque Sent to Cheque Dispatch:
-                                                </strong>{{ $this->getFormattedDate($vendor['date_sent_dispatch']) }}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
+                            <h5>Cheques ({{ count($this->cheques) }})</h5>
+                            <table class="table table-bordered table-hover" style="margin-top: 10px">
+                                <thead class="text-center">
+                                    <tr>
+                                        <th>Vendor</th>
+                                        <th>Cheque Number</th>
+                                        <th>Cheque Amount </th>
+                                        <th>Cheque Date</th>
+                                        <th>Date Processed</th>
+                                        <th>Date Sent to Dispatch</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($this->cheques as $cheque)
+                                        <tr class="text-center">
+                                            <td>{{ $cheque->vendor->vendor_name }}</td>
+                                            <td>{{ $cheque->cheque_no }}</td>
+                                            <td>${{ number_format($cheque->cheque_amount, 2) }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($cheque->date_of_cheque)->format('d/m/Y') }}
+                                            </td>
+                                            <td>{{ \Carbon\Carbon::parse($cheque->date_cheque_processed)->format('d/m/Y') }}
+                                            </td>
+                                            <td>{{ \Carbon\Carbon::parse($cheque->date_sent_dispatch)->format('d/m/Y') }}
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" style="text-align: center;">No cheques entered</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
 
 
                             @if ($this->requisition->is_completed)
@@ -1222,10 +1187,6 @@
 
         $('#addLogModal').on('shown.bs.modal', function() {
             $('#detailsInput').focus()
-        })
-
-        $('#invoiceModal').on('hidden.bs.modal', function() {
-            // $wire.refreshVendors();
         })
     </script>
 @endscript

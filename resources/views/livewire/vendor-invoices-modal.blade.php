@@ -5,7 +5,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5 text-center" id="invoiceModalLabel" style="color: black; text-align:center">
-                    {{ $this->vendor_name ?? '' }} Invoices
+                    {{ $this->vendor_name ?? '' }} Invoices | Total:
+                    ${{ number_format((float) ($this->vendor->amount ?? 0), 2) }}
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -16,7 +17,7 @@
 
                         <div class="col">
                             <div class="form-floating form-floating-outline">
-                                <input required wire:model.blur="date_invoice_received" type="date"
+                                <input required wire:model="date_invoice_received" type="date"
                                     class="form-control @error('date_invoice_received')is-invalid @enderror"
                                     autocomplete="off" id="date_invoice_receivedInput" placeholder="firstname.lastname"
                                     aria-describedby="date_invoice_receivedInputHelp" />
@@ -29,7 +30,7 @@
 
                         <div class="col">
                             <div class="form-floating form-floating-outline">
-                                <input required wire:model.blur="invoice_no" type="text"
+                                <input required wire:model="invoice_no" type="text"
                                     class="form-control @error('invoice_no')is-invalid @enderror" autocomplete="off"
                                     id="invoice_noInput" placeholder="Invoice Number"
                                     aria-describedby="invoice_noInputHelp" />
@@ -42,7 +43,7 @@
 
                         <div class="col">
                             <div class="form-floating form-floating-outline">
-                                <input required wire:model.blur="invoice_amount" type="number"
+                                <input required wire:model="invoice_amount" type="number" step="0.01"
                                     class="form-control @error('invoice_amount')is-invalid @enderror" autocomplete="off"
                                     id="invoice_amountInput" placeholder="Invoice Amount"
                                     aria-describedby="invoice_amountInputHelp" />
@@ -78,7 +79,8 @@
                                     <td>{{ $invoice['invoice_no'] }}</td>
                                     <td>{{ $invoice['invoice_amount'] }}</td>
                                     <td>
-                                        <button class="btn btn-danger" wire:click="deleteInvoice({{ $invoice['id'] }})">
+                                        <button class="btn btn-danger" wire:click="deleteInvoice({{ $invoice['id'] }})"
+                                            wire:confirm="Are you sure you want to delete this invoice?">
                                             Remove
                                         </button>
                                     </td>

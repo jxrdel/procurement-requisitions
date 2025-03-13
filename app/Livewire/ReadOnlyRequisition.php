@@ -55,6 +55,9 @@ class ReadOnlyRequisition extends Component
     public $cheque_no;
     public $date_sent_chequeprocessing;
 
+    //Cheque Processing
+    public $cheques = [];
+
     public $date_completed;
     public $total;
 
@@ -86,17 +89,51 @@ class ReadOnlyRequisition extends Component
         $this->date_completed = $this->requisition->date_completed;
 
         $this->vendors = $this->requisition->vendors()
+            ->with('invoices')
             ->select(
                 'id',
                 'vendor_name',
                 'amount',
+
+                //Procurement
+                'purchase_order_no',
+                'eta',
+                'date_sent_commit',
+                'invoice_no',
+                'date_invoice_received',
+                'date_sent_ap',
+                'sent_to_ap',
+
+                // Cost & Budgeting
                 'date_sent_request_mof',
+                'release_type',
                 'request_category',
                 'request_no',
-                'release_type',
                 'release_no',
                 'release_date',
-                'change_of_vote_no'
+                'change_of_vote_no',
+
+                // AP
+                'date_received_ap',
+                'date_sent_vc',
+
+                // Vote Control
+                'batch_no',
+                'voucher_no',
+                'date_sent_checkstaff',
+
+                // Check Staff
+                'date_received_from_vc',
+                'voucher_destination',
+                'date_sent_audit',
+                'date_received_from_audit',
+                'date_sent_chequeprocessing',
+
+                // Cheque Processing
+                'date_of_cheque',
+                'cheque_no',
+                'date_cheque_processed',
+                'date_sent_dispatch',
             )
             ->get()->toArray();
 
@@ -123,6 +160,9 @@ class ReadOnlyRequisition extends Component
         $this->date_of_cheque = $this->requisition->date_of_cheque;
         $this->cheque_no = $this->requisition->cheque_no;
         $this->date_sent_chequeprocessing = $this->requisition->date_sent_chequeprocessing;
+
+        //Cheque Processing
+        $this->cheques = $this->requisition->vendors()->with('cheques')->get()->pluck('cheques')->flatten();
 
         $this->panes = $view;
     }

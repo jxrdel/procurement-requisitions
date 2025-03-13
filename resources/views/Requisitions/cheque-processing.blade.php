@@ -88,6 +88,9 @@
                                 'In Progress'; // Fallback in case `requisition_status` is empty
                             if (status === 'Sent to Cheque Processing') {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Check Staff</span></div>';
+                            } else if (status === 'Incomplete') {
+                                return '<div style="text-align:center;"><span style="background-color: #e00303 !important;" class="badge bg-danger">' +
+                                    status + '</span></div>';
                             } else if (data === false || data == 0) {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
                                     status + '</span></div>';

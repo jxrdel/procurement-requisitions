@@ -42,10 +42,10 @@ class AddLog extends Component
 
         $procuremenent_officer = $this->requisition->procurement_officer;
 
-        if($procuremenent_officer){
-            Mail::to($procuremenent_officer->email)->cc('maryann.basdeo@health.gov.tt')->queue(new LogNotification($newlog));
-        }else{
-            Mail::to('maryann.basdeo@health.gov.tt')->queue(new LogNotification($newlog));
+        if ($procuremenent_officer) {
+            // Mail::to($procuremenent_officer->email)->cc('maryann.basdeo@health.gov.tt')->queue(new LogNotification($newlog));
+        } else {
+            // Mail::to('maryann.basdeo@health.gov.tt')->queue(new LogNotification($newlog));
         }
 
         $this->logdetails = null;

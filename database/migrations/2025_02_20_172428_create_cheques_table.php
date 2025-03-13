@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('cheques', function (Blueprint $table) {
             $table->id();
             $table->date('date_cheque_processed')->nullable();
+            $table->decimal('cheque_amount', 20, 2);
             $table->string('cheque_no')->nullable();
             $table->date('date_of_cheque')->nullable();
             $table->date('date_sent_dispatch')->nullable();
+            $table->string('invoice_no')->nullable();
             $table->unsignedBigInteger('vendor_id');
 
             $table->foreign('vendor_id')->references('id')->on('requisition_vendors')->onDelete('cascade');
-            $table->unique('vendor_id');
             $table->timestamps();
         });
     }

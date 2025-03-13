@@ -14,7 +14,6 @@ class RequisitionController extends Controller
     {
         return view('requisitions.index');
     }
-
     public function getRequisitions()
     {
         $requisitions = Requisition::leftJoin('users', 'requisitions.assigned_to', '=', 'users.id')
@@ -27,7 +26,7 @@ class RequisitionController extends Controller
                 'requisitions.item',
                 'users.name as EmployeeName',
                 'departments.name as RequestingUnit',
-                'requisitions.requisition_status' // Add requisition_status to the select
+                'requisitions.requisition_status'
             ])
             ->selectRaw("
                 CAST(cost_budgeting_requisitions.is_completed AS INT) AS is_completed,
@@ -43,10 +42,9 @@ class RequisitionController extends Controller
                 'requisitions.item',
                 'users.name',
                 'departments.name',
-                'requisitions.requisition_status', // Group by requisition_status as well
+                'requisitions.requisition_status',
                 'cost_budgeting_requisitions.is_completed'
             ]);
-
 
         // Restrict for Viewers (not Procurement or PS Office)
         if (Auth::user()->role->name === 'Viewer' && Auth::user()->department !== 'Procurement' && Auth::user()->department !== 'PS Office') {
@@ -55,20 +53,29 @@ class RequisitionController extends Controller
 
         return DataTables::of($requisitions)
             ->editColumn('vendor_status', function ($row) {
-                if ($row->vendor_count > 1 && $row->is_completed) {
-                    return "Complex Status"; // More than 1 vendor and completed
+                // If cost budgeting requisition is NOT completed, return requisition_status
+                if (!$row->is_completed) {
+                    return $row->requisition_status ?? "No Status";
                 }
-                // If no vendors, return requisition_status instead of vendor_status
-                if ($row->vendor_count == 0) {
-                    return $row->requisition_status ?? "No Status"; // Fallback to requisition_status
+
+                // Convert vendor statuses into an array
+                $vendorStatuses = explode(', ', $row->vendor_status);
+
+                // Remove empty values
+                $vendorStatuses = array_filter($vendorStatuses);
+
+                // If no vendors exist, return requisition_status
+                if (empty($vendorStatuses)) {
+                    return $row->requisition_status ?? "No Status";
                 }
-                if ($row->vendor_count == 1 && $row->is_completed) {
-                    return $row->vendor_status ?? "No Status"; // If there is only 1 vendor and the Cost Budgeting Requisition is completed, display the vendor status
+
+                // If all vendors have the same status, return that status
+                if (count(array_unique($vendorStatuses)) === 1) {
+                    return $vendorStatuses[0]; // All vendors share the same status
                 }
-                if ($row->vendor_count == 1) {
-                    return $row->requisition_status ?? "No Status"; // Fallback to requisition_status
-                }
-                return $row->vendor_status ?? "No Vendor"; // Show single vendor status or "No Vendor"
+
+                // If vendors have mixed statuses, return "Complex Status"
+                return "Complex Status";
             })
             ->orderColumn('requisition_no', function ($query, $order) {
                 $query->orderBy('year_start', $order)
@@ -83,6 +90,7 @@ class RequisitionController extends Controller
             })
             ->make(true);
     }
+
 
     public function getCompletedRequisitions()
     {
@@ -165,12 +173,13 @@ class RequisitionController extends Controller
             ->select([
                 'requisitions.id',
                 'requisitions.requisition_no',
-                'requisitions.source_of_funds',
                 'requisitions.item',
+                'requisitions.source_of_funds',
                 'users.name as EmployeeName',
                 'departments.name as RequestingUnit',
-                'requisitions.requisition_status' // Add requisition_status to the select
+                'requisitions.requisition_status'
             ])
+            ->where('requisitions.is_completed', '!=', true)
             ->selectRaw("
                 CAST(cost_budgeting_requisitions.is_completed AS INT) AS is_completed,
                 STRING_AGG(requisition_vendors.vendor_status, ', ') AS vendor_status, 
@@ -179,18 +188,16 @@ class RequisitionController extends Controller
                 CAST(SUBSTRING(requisitions.requisition_no, CHARINDEX('-', requisitions.requisition_no) + 1, 2) AS INT) AS year_start,
                 CAST(RIGHT(requisitions.requisition_no, 2) AS INT) AS year_end
             ")
-            ->where('requisitions.is_completed', '!=', true)
             ->groupBy([
                 'requisitions.id',
                 'requisitions.requisition_no',
-                'requisitions.source_of_funds',
                 'requisitions.item',
+                'requisitions.source_of_funds',
                 'users.name',
                 'departments.name',
-                'requisitions.requisition_status', // Group by requisition_status as well
+                'requisitions.requisition_status',
                 'cost_budgeting_requisitions.is_completed'
             ]);
-
 
         // Restrict for Viewers (not Procurement or PS Office)
         if (Auth::user()->role->name === 'Viewer' && Auth::user()->department !== 'Procurement' && Auth::user()->department !== 'PS Office') {
@@ -199,20 +206,29 @@ class RequisitionController extends Controller
 
         return DataTables::of($requisitions)
             ->editColumn('vendor_status', function ($row) {
-                if ($row->vendor_count > 1 && $row->is_completed) {
-                    return "Complex Status"; // More than 1 vendor and completed
+                // If cost budgeting requisition is NOT completed, return requisition_status
+                if (!$row->is_completed) {
+                    return $row->requisition_status ?? "No Status";
                 }
-                // If no vendors, return requisition_status instead of vendor_status
-                if ($row->vendor_count == 0) {
-                    return $row->requisition_status ?? "No Status"; // Fallback to requisition_status
+
+                // Convert vendor statuses into an array
+                $vendorStatuses = explode(', ', $row->vendor_status);
+
+                // Remove empty values
+                $vendorStatuses = array_filter($vendorStatuses);
+
+                // If no vendors exist, return requisition_status
+                if (empty($vendorStatuses)) {
+                    return $row->requisition_status ?? "No Status";
                 }
-                if ($row->vendor_count == 1 && $row->is_completed) {
-                    return $row->vendor_status ?? "No Status"; // If there is only 1 vendor and the Cost Budgeting Requisition is completed, display the vendor status
+
+                // If all vendors have the same status, return that status
+                if (count(array_unique($vendorStatuses)) === 1) {
+                    return $vendorStatuses[0]; // All vendors share the same status
                 }
-                if ($row->vendor_count == 1) {
-                    return $row->vendor_status ?? "No Status"; // Fallback to requisition_status
-                }
-                return $row->vendor_status ?? "No Vendor"; // Show single vendor status or "No Vendor"
+
+                // If vendors have mixed statuses, return "Complex Status"
+                return "Complex Status";
             })
             ->orderColumn('requisition_no', function ($query, $order) {
                 $query->orderBy('year_start', $order)
