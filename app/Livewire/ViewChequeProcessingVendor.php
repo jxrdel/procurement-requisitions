@@ -96,7 +96,7 @@ class ViewChequeProcessingVendor extends Component
 
     public function edit()
     {
-
+        $this->resetErrorBag();
         if ($this->date_cheque_processed === '') {
             $this->date_cheque_processed = null;
         }
@@ -127,6 +127,11 @@ class ViewChequeProcessingVendor extends Component
         $totalChequeAmount = collect($this->cheques)->sum('cheque_amount');
         if ($totalChequeAmount > $this->vendor->amount) {
             $this->addError('cheques.0.cheque_amount', 'The total cheque amount must not exceed the vendor amount.');
+            return;
+        }
+
+        if ($this->hasDuplicateChequeNumbers()) {
+            $this->addError('cheques.0.cheque_no', 'Cheque number must be unique.');
             return;
         }
 
@@ -229,6 +234,7 @@ class ViewChequeProcessingVendor extends Component
         ]);
 
 
+        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was completed by ' . Auth::user()->name . ' from Cheque Processing');
         //Check if all vendor status are completed
         if ($this->requisition->isCompleted()) {
             Log::info('Requisition #' . $this->requisition->requisition_no . ' was completed by ' . Auth::user()->name . ' from Cheque Processing');
@@ -277,5 +283,17 @@ class ViewChequeProcessingVendor extends Component
         $this->accordionView = $this->accordionView === 'show' ? 'hide' : 'show';
 
         $this->skipRender();
+    }
+
+    public function hasDuplicateChequeNumbers(): bool
+    {
+        $chequeNumbers = array_column($this->cheques, 'cheque_no');
+
+        // Count occurrences of each cheque number
+        $duplicateCheques = array_filter(array_count_values($chequeNumbers), function ($count) {
+            return $count > 1;
+        });
+
+        return !empty($duplicateCheques);
     }
 }
