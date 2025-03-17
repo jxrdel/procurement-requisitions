@@ -254,7 +254,7 @@ class ViewRequisition extends Component
 
         // Define stage priorities in order
         $stages = [
-            'cost_and_budgeting' => fn($vendor) => !$vendor->date_sent_request_mof,
+            'cost_and_budgeting' => fn($vendor) => !$vendor->release_no,
             'procurement2' => fn($vendor) => !$vendor->ap,
             'accounts_payable' => fn($vendor) => !$vendor->ap || !$vendor->ap->is_completed,
             'votecontrol' => fn($vendor) => !$vendor->voteControl || !$vendor->voteControl->is_completed,
@@ -559,7 +559,7 @@ class ViewRequisition extends Component
         $users = User::costBudgeting()->get();
 
         foreach ($users as $user) {
-            // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
+            Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
             // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }
 
@@ -640,56 +640,56 @@ class ViewRequisition extends Component
 
     public function editProcurement2()
     {
+        if ($this->eta === '') {
+            $this->eta = null;
+        }
+
+        if ($this->date_sent_commit === '') {
+            $this->date_sent_commit = null;
+        }
+
+        if ($this->date_invoice_received === '') {
+            $this->date_invoice_received = null;
+        }
+
+        if ($this->date_sent_ap === '') {
+            $this->date_sent_ap = null;
+        }
+
+        foreach ($this->vendors as &$vendor) {
+            if ($vendor['eta'] === '') {
+                $vendor['eta'] = null;
+            }
+
+            if ($vendor['date_sent_commit'] === '') {
+                $vendor['date_sent_commit'] = null;
+            }
+
+            if ($vendor['date_invoice_received'] === '') {
+                $vendor['date_invoice_received'] = null;
+            }
+
+            if ($vendor['date_sent_ap'] === '') {
+                $vendor['date_sent_ap'] = null;
+            }
+        }
+
+        unset($vendor);
+
+        $this->updateVendorStatuses();
+
+        $this->validate(
+            [
+                'vendors.*.eta' => 'nullable|date|after_or_equal:today',
+                'vendors.*.date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+            ],
+            [
+                'vendors.*.eta.after_or_equal' => 'ETA must be a date after or equal to today',
+                'vendors.*.date_sent_commit.after_or_equal' => 'Date sent to Commitment must be a date after or equal to the date sent to DPS',
+            ]
+        );
+
         try {
-            if ($this->eta === '') {
-                $this->eta = null;
-            }
-
-            if ($this->date_sent_commit === '') {
-                $this->date_sent_commit = null;
-            }
-
-            if ($this->date_invoice_received === '') {
-                $this->date_invoice_received = null;
-            }
-
-            if ($this->date_sent_ap === '') {
-                $this->date_sent_ap = null;
-            }
-
-            foreach ($this->vendors as &$vendor) {
-                if ($vendor['eta'] === '') {
-                    $vendor['eta'] = null;
-                }
-
-                if ($vendor['date_sent_commit'] === '') {
-                    $vendor['date_sent_commit'] = null;
-                }
-
-                if ($vendor['date_invoice_received'] === '') {
-                    $vendor['date_invoice_received'] = null;
-                }
-
-                if ($vendor['date_sent_ap'] === '') {
-                    $vendor['date_sent_ap'] = null;
-                }
-            }
-
-            unset($vendor);
-
-            $this->updateVendorStatuses();
-
-            $this->validate(
-                [
-                    'vendors.*.eta' => 'nullable|date|after_or_equal:today',
-                    'vendors.*.date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                ],
-                [
-                    'vendors.*.eta.after_or_equal' => 'ETA must be a date after or equal to today',
-                    'vendors.*.date_sent_commit.after_or_equal' => 'Date sent to Commitment must be a date after or equal to the date sent to DPS',
-                ]
-            );
-
             foreach ($this->vendors as $vendor) {
                 $this->requisition->vendors()->where('id', $vendor['id'])->update([
                     'purchase_order_no' => $vendor['purchase_order_no'],
@@ -758,7 +758,7 @@ class ViewRequisition extends Component
         $users = User::accountsPayable()->get();
 
         foreach ($users as $user) {
-            // Mail::to($user->email)->send(new NotifyAccountsPayable($vendor));
+            Mail::to($user->email)->send(new NotifyAccountsPayable($vendor));
             // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }
 

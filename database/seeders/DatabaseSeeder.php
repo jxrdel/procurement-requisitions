@@ -85,14 +85,15 @@ class DatabaseSeeder extends Seeder
             'Veterinary Public Health',
         ];
 
-        foreach ($departments as $department) {
-            Department::create(['name' => $department]);
-        }
+        // foreach ($departments as $department) {
+        //     Department::create(['name' => $department]);
+        // }
 
         $roles = [
             ['name' => 'Super Admin'],
             ['name' => 'Admin'],
             ['name' => 'User'],
+            ['name' => 'Viewer']
         ];
 
         foreach ($roles as $role) {
@@ -216,9 +217,9 @@ class DatabaseSeeder extends Seeder
 
         ];
 
-        foreach ($users as $user) {
-            User::create($user);
-        }
+        // foreach ($users as $user) {
+        //     User::create($user);
+        // }
 
         $votes = [
             // General Administration

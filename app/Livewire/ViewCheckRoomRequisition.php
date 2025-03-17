@@ -232,7 +232,7 @@ class ViewCheckRoomRequisition extends Component
         //Get Cheque Processing Staff
         $chequeProcessingStaff = User::chequeProcessing()->get();
         foreach ($chequeProcessingStaff as $staff) {
-            // Mail::to($staff->email)->queue(new NotifyChequeProcessing($this->requisition));
+            Mail::to($staff->email)->queue(new NotifyChequeProcessing($this->requisition));
         }
 
         return redirect()->route('check_room.index')->with('success', 'Requisition sent to Cheque Processing successfully');

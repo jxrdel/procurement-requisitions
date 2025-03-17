@@ -246,9 +246,9 @@ class ViewChequeProcessingVendor extends Component
 
             $assigned_to = $this->requisition->procurement_officer;
             if ($assigned_to) {
-                // Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
+                Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
             } else {
-                // Mail::to('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
+                Mail::to('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
             }
         }
         return redirect()->route('cheque_processing.index')->with('success', 'Completed successfully');

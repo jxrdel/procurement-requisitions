@@ -145,7 +145,7 @@ class ViewAccountsPayableRequisition extends Component
         $users = User::voteControl()->get();
 
         foreach ($users as $user) {
-            // Mail::to($user->email)->queue(new NotifyVoteControl($this->requisition));
+            Mail::to($user->email)->queue(new NotifyVoteControl($this->requisition));
         }
 
         return redirect()->route('accounts_payable.index')->with('success', 'Requisition sent to Vote Control successfully');

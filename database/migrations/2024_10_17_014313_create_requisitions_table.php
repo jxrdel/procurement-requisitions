@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('requesting_unit');
             $table->date('date_received_procurement')->nullable();
             $table->string('file_no')->nullable();
-            $table->string('item')->nullable();
+            $table->text('item')->nullable();
             $table->string('source_of_funds')->nullable();
             $table->unsignedBigInteger('assigned_to')->nullable();
             $table->date('date_assigned')->nullable();

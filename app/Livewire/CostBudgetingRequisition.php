@@ -250,10 +250,10 @@ class CostBudgetingRequisition extends Component
         //Send email to assigned procurement officer
         $user = $this->requisition->procurement_officer;
         if ($user) {
-            // Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+            Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
             // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
         } else {
-            // Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+            Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
             // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
         }
 

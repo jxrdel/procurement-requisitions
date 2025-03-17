@@ -154,7 +154,7 @@ class ViewAccountsPayableVendor extends Component
         $users = User::voteControl()->get();
 
         foreach ($users as $user) {
-            // Mail::to($user->email)->send(new NotifyVoteControl($this->vendor));
+            Mail::to($user->email)->send(new NotifyVoteControl($this->vendor));
             // Log::info('Email sent to ' . $user->email . ' to notify them of Requisition #' . $this->requisition->requisition_no . ' sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
         }
 
