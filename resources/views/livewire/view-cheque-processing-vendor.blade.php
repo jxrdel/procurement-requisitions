@@ -11,7 +11,8 @@
                 </a>
                 <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
                     <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i>
-                        {{ $this->vendor->vendor_name }} | ${{ number_format($this->vendor->amount, 2) }}</strong>
+                        {{ $this->vendor->vendor_name }} |
+                        ${{ number_format($this->invoices->sum('invoice_amount'), 2) }}</strong>
                 </h1>
             </div>
 

@@ -27,8 +27,14 @@ class NotifyCostBudgeting extends Mailable
      */
     public function envelope(): Envelope
     {
+        $subject = '';
+        if ($this->requisition->file_no === null) {
+            $subject = 'Incoming Requisition | Procurement Requisition Application';
+        } else {
+            $subject = 'Incoming Requisition | ' . $this->requisition->file_no .  ' | Procurement Requisition Application';
+        }
         return new Envelope(
-            subject: 'Incoming Requisition | Procurement Requisition Application',
+            subject: $subject,
         );
     }
 

@@ -603,8 +603,7 @@ class ViewRequisition extends Component
             empty(trim($vendor['purchase_order_no'])) ||
             empty($vendor['eta']) ||
             empty($vendor['date_sent_ap']) ||
-            empty($vendor['invoices']) ||
-            $totalInvoiceAmount != $vendor['amount']; // Ensure invoice amounts add up to the vendor amount
+            empty($vendor['invoices']);
     }
 
 

@@ -85,7 +85,7 @@ class ViewChequeProcessingVendor extends Component
         }
 
         // Disable the button if the total cheque amount does not match the vendor amount
-        if ($totalChequeAmount !== (float) $this->vendor->amount) {
+        if ($totalChequeAmount !== (float) $this->invoices->sum('invoice_amount')) {
             return true;
         }
 
@@ -125,7 +125,7 @@ class ViewChequeProcessingVendor extends Component
 
         // Get the total existing cheque amount
         $totalChequeAmount = collect($this->cheques)->sum('cheque_amount');
-        if ($totalChequeAmount > $this->vendor->amount) {
+        if ($totalChequeAmount > $this->invoices->sum('invoice_amount')) {
             $this->addError('cheques.0.cheque_amount', 'The total cheque amount must not exceed the vendor amount.');
             return;
         }
@@ -139,6 +139,7 @@ class ViewChequeProcessingVendor extends Component
             [
                 'cheques.*.date_cheque_processed' => 'nullable|date|after_or_equal:' . $this->requisition->date_received_procurement,
                 'cheques.*.cheque_no' => [
+                    'regex:/^[A-Za-z]{1}[0-9]{8}$/', // Check if cheque number is in the format A12345678
                     'nullable',
                     function ($attribute, $value, $fail) use ($chequeNumberCounts) {
                         if (!empty($value) && isset($chequeNumberCounts[$value]) && $chequeNumberCounts[$value] > 1) {
@@ -151,6 +152,7 @@ class ViewChequeProcessingVendor extends Component
                 'cheques.*.date_sent_dispatch' => 'nullable|date|after_or_equal:date_of_cheque',
             ],
             [
+                'cheques.*.cheque_no.regex' => 'Cheque number must be in the format A12345678',
                 'cheques.*.date_cheque_processed.after_or_equal' => 'Please check date',
                 'cheques.*.date_of_cheque.after_or_equal' => 'Please check date',
                 'cheques.*.date_sent_dispatch.after_or_equal' => 'Please check date',
