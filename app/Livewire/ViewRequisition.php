@@ -553,7 +553,7 @@ class ViewRequisition extends Component
             'date_received' => Carbon::now(),
         ]);
 
-        //Send email to Cost & Budgeting
+        Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Cost & Budgeting by ' . Auth::user()->name);
 
         //Get Cost & Budgeting users
         $users = User::costBudgeting()->get();
