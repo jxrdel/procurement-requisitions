@@ -38,7 +38,11 @@ class LoginForm extends Component
                 // dd($ADuser);
                 if ($ADuser) {
                     if ($connection->auth()->attempt($ADuser['distinguishedname'][0], $this->password)) { //Authenticate User
-                        // dd('Success');
+                        if ($user->is_active == 0) {
+                            $this->resetValidation();
+                            $this->addError('username', 'User is inactive');
+                            return;
+                        }
                         Auth::login($user);
                         redirect()->intended('/');
                     } else {

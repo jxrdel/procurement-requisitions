@@ -15,6 +15,7 @@ class EditUserModal extends Component
     public $email;
     public $department;
     public $roles;
+    public $is_active;
     public $role_id;
 
     public function render()
@@ -31,6 +32,7 @@ class EditUserModal extends Component
         $this->username = $this->user->username;
         $this->email = $this->user->email;
         $this->department = $this->user->department;
+        $this->is_active = $this->user->is_active == 1 ? true : false;
         $this->role_id = $this->user->role_id;
         $this->dispatch('display-edit-modal');
     }
@@ -50,6 +52,7 @@ class EditUserModal extends Component
             'username' => $this->username,
             'email' => $this->email,
             'department' => $this->department,
+            'is_active' => $this->is_active,
             'role_id' => $this->role_id
         ]);
 

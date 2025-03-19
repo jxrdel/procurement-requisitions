@@ -84,6 +84,18 @@
                         @enderror
                     </div>
 
+                    <div class="row mt-4">
+
+                        <div class="form-check form-switch mb-2 mx-3">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked"
+                                wire:model="is_active" />
+                            <label class="form-check-label" for="flexSwitchCheckChecked">Active</label>
+                        </div>
+                        @error('role_id')
+                            <div class="text-danger"> {{ $message }} </div>
+                        @enderror
+                    </div>
+
 
 
 
