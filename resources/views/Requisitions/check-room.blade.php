@@ -120,7 +120,7 @@
             var selectedOption = $("input[name='btnradio']:checked").attr('id');
             switch (selectedOption) {
                 case 'btn-in-progress':
-                    $('#myTable').DataTable().ajax.url('{{ route('getcheckstaff_vendors') }}')
+                    $('#myTable').DataTable().ajax.url('{{ route('getinprogresscheckstaff_vendors') }}')
                         .load();
                     break;
                 case 'btn-completed':

@@ -56,8 +56,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/check_room', [CheckRoomController::class, 'index'])->name('check_room.index');
     Route::get('/check_room/view/{id}', ViewCheckStaffVendor::class)->name('check_room.view')->middleware('can:view-check-room-requisitions');
     Route::get('/getcheckstaff_vendors', [CheckRoomController::class, 'getCheckStaffVendors'])->name('getcheckstaff_vendors');
-    Route::get('/getcompletedcheckstaff_vendors', [CheckRoomController::class, 'getCompletedCheckRoomRequisitions'])->name('getcompletedcheckstaff_vendors');
-    Route::get('/getinprogresscheckstaff_vendors', [CheckRoomController::class, 'getInProgressCheckRoomRequisitions'])->name('getinprogresscheckstaff_vendors');
+    Route::get('/getcompletedcheckstaff_vendors', [CheckRoomController::class, 'getCompletedCheckStaffVendors'])->name('getcompletedcheckstaff_vendors');
+    Route::get('/getinprogresscheckstaff_vendors', [CheckRoomController::class, 'getInProgressCheckStaffVendors'])->name('getinprogresscheckstaff_vendors');
 
     Route::get('/cheque_processing', [ChequeProcessingController::class, 'index'])->name('cheque_processing.index');
     Route::get('/cheque_processing/view/{id}', ViewChequeProcessingVendor::class)->name('cheque_processing.view')->middleware('can:view-cheque-processing-requisitions');
