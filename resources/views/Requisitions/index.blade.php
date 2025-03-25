@@ -89,7 +89,7 @@
 
         $(document).ready(function() {
             $('#myTable').DataTable({
-                "pageLength": 50,
+                "pageLength": 100,
                 "processing": true,
                 "serverSide": true,
                 "ajax": {

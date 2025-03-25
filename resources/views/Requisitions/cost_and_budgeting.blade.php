@@ -55,7 +55,7 @@
     <script>
         $(document).ready(function() {
             $('#myTable').DataTable({
-                "pageLength": 10,
+                "pageLength": 100,
                 order: [
                     [6, 'desc']
                 ], // Sorting by the hidden `created_at` column (index 5)
