@@ -11,6 +11,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class NotifyCheckRoom extends Mailable
 {
@@ -21,7 +22,7 @@ class NotifyCheckRoom extends Mailable
      */
     public function __construct(public RequisitionVendor $vendor)
     {
-        //
+        Log::info('Email sent to Check Staff for Requisition ' . $this->vendor->requisition->requisition_no . ' from queue');
     }
 
     /**

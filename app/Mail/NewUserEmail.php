@@ -2,9 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Requisition;
-use App\Models\RequisitionVendor;
-use Carbon\Carbon;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,16 +11,16 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class NotifyChequeProcessing extends Mailable
+class NewUserEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public RequisitionVendor $vendor)
+    public function __construct(public User $user)
     {
-        Log::info('Notification sent to Check Processing for Requisition ' . $this->vendor->requisition->requisition_no . ' from queue');
+        Log::info('New User Email sent to ' . $this->user->email . ' from queue');
     }
 
     /**
@@ -31,7 +29,7 @@ class NotifyChequeProcessing extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Incoming Invoices | Procurement Requisition Application',
+            subject: 'Access Granted | Procurement Requisition Application',
         );
     }
 
@@ -40,17 +38,11 @@ class NotifyChequeProcessing extends Mailable
      */
     public function content(): Content
     {
-        $requisition = $this->vendor->requisition;
-        $date_sent = Carbon::parse($this->vendor->ap->date_received)->format('F jS, Y');
-
         return new Content(
-            markdown: 'emails.sent-to-cheque-processing',
+            markdown: 'new-user-email',
             with: [
-                'vendor' => $this->vendor,
-                'requisition' => $requisition,
-                'date_sent' => $date_sent,
-                'url' => route('cheque_processing.view', $this->vendor->chequeProcessing->id),
-            ]
+                'username' => $this->user->username,
+            ],
         );
     }
 

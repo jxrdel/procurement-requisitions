@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class NotifyCostBudgeting extends Mailable
 {
@@ -19,7 +20,7 @@ class NotifyCostBudgeting extends Mailable
      */
     public function __construct(public Requisition $requisition)
     {
-        //
+        Log::info('Notification sent to Cost & Budgeting for Requisition ' . $this->requisition->requisition_no . ' from queue');
     }
 
     /**

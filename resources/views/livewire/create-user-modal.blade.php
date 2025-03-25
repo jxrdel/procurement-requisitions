@@ -84,6 +84,14 @@
                         @enderror
                     </div>
 
+                    <div class="row mt-4">
+                        <div class="form-check mt-4 mx-3">
+                            <input wire:model="sendEmail" class="form-check-input" type="checkbox" value=""
+                                id="emailCheck" />
+                            <label class="form-check-label" for="emailCheck"> Send Email </label>
+                        </div>
+                    </div>
+
 
 
 
