@@ -122,6 +122,9 @@
                                     row
                                     .id + ')">' +
                                     '<i class="fa-solid fa-asterisk"></i></a>';;
+                            } else if (data === 'Sent to Procurement') {
+                                statusHtml =
+                                    '<span style="background-color: #e30b0b !important;" class="badge bg-danger">Sent to Procurement</span>';
                             } else if (data === 'Completed') {
                                 statusHtml =
                                     '<span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span>';
