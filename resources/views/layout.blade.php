@@ -101,6 +101,16 @@
                                 <div data-i18n="Basic">Requisitions</div>
                             </a>
                         </li>
+
+                        <li @class([
+                            'menu-item',
+                            'active' => request()->routeIs('requisition_forms.*'),
+                        ])>
+                            <a href="{{ route('requisition_forms.index') }}" class="menu-link">
+                                <i class="menu-icon ri-file-edit-line"></i>
+                                <div data-i18n="Basic">Requisition Forms</div>
+                            </a>
+                        </li>
                     @endcan
 
                     @can('view-users-page')

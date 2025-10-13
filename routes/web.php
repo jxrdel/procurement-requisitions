@@ -7,9 +7,12 @@ use App\Http\Controllers\CheckRoomController;
 use App\Http\Controllers\ChequeProcessingController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\RequisitionController;
+use App\Http\Controllers\RequisitionFormController;
 use App\Livewire\CostBudgetingRequisition;
 use App\Livewire\CreateRequisition;
+use App\Livewire\CreateRequisitionRequestForm;
 use App\Livewire\LoginForm;
+use App\Livewire\RequisitionRequestForm;
 use App\Livewire\ViewAccountsPayableRequisition;
 use App\Livewire\ViewAccountsPayableVendor;
 use App\Livewire\ViewCheckRoomRequisition;
@@ -18,6 +21,7 @@ use App\Livewire\ViewChequeProcessingRequisition;
 use App\Livewire\ViewChequeProcessingVendor;
 use App\Livewire\ViewVoteControlRequisition;
 use App\Livewire\ViewRequisition;
+use App\Livewire\ViewRequisitionForm;
 use App\Livewire\ViewVoteControlVendor;
 use App\Models\VoteControlRequisition;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +38,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getrequisitions', [RequisitionController::class, 'getRequisitions'])->name('getrequisitions');
     Route::get('/getinprogressrequisitions', [RequisitionController::class, 'getInProgressRequisitions'])->name('getinprogressrequisitions');
     Route::get('/getcompletedrequisitions', [RequisitionController::class, 'getCompletedRequisitions'])->name('getcompletedrequisitions');
+
+    Route::get('/requisitions/forms', [RequisitionFormController::class, 'index'])->name('requisition_forms.index');
+    Route::get('/requisitions/forms/create', CreateRequisitionRequestForm::class)->name('requisition_forms.create');
+    Route::get('/requisitions/forms/view/{id}', ViewRequisitionForm::class)->name('requisition_forms.view');
+    Route::get('/requisitions/forms/getforms', [RequisitionFormController::class, 'getForms'])->name('getrequisition_forms');
 
     Route::get('/cost_and_budgeting', [CBRequisitionController::class, 'index'])->name('cost_and_budgeting.index');
     Route::get('/cost_and_budgeting/view/{id}', CostBudgetingRequisition::class)->name('cost_and_budgeting.view')->middleware('can:view-cost-budgeting-requisitions');

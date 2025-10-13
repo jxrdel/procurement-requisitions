@@ -58,7 +58,61 @@
         body #toast-container>div {
             opacity: 1;
         }
+
+        /* CSS to improve readability of disabled fields */
+        .card-body :disabled {
+            /* Set a brighter background color, e.g., a very light grey or white */
+            background-color: #f8f8f8 !important;
+            /* Set text color to a darker shade for better contrast */
+            color: #333333 !important;
+            /* Optionally remove or soften the border */
+            border-color: #dee2e6 !important;
+            /* Ensure text is not transparent/faded (opacity: 1) */
+            opacity: 1 !important;
+        }
+
+        /* Specific fix for floating labels when inputs are disabled */
+        .form-floating-outline :disabled~label {
+            /* Set label color to be readable */
+            color: #6c757d !important;
+        }
+
+        /* CSS to improve readability of disabled text/select fields */
+        .card-body :disabled {
+            background-color: #f0f0f0 !important;
+            color: #212529 !important;
+            opacity: 1 !important;
+            border-color: #ced4da !important;
+        }
+
+        /* Specific fix for floating labels when inputs are disabled */
+        .form-floating-outline :disabled~label {
+            color: #6c757d !important;
+            opacity: 1 !important;
+        }
+
+        /* --- CRITICAL CHECKBOX FIX --- */
+
+        /* 1. Target the specific state: checked AND disabled */
+        .form-check-input:checked[disabled] {
+            /* Set background color to your desired primary color (assuming purple/blue) */
+            background-color: #8c57ff !important;
+
+            /* Force the checkmark (tick) SVG data URI to be used. */
+            /* This is a standard white/light checkmark SVG data URI. */
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+
+            /* Ensure the tick and box are fully visible */
+            opacity: 1 !important;
+        }
+
+        /* 2. Fix the non-checked disabled background */
+        .form-check-input[disabled] {
+            background-color: #e9ecef !important;
+            opacity: 1 !important;
+        }
     </style>
+
 </head>
 
 <body>
@@ -98,6 +152,16 @@
                             <a href="{{ route('requisitions.index') }}" class="menu-link">
                                 <i class="menu-icon ri-file-edit-line"></i>
                                 <div data-i18n="Basic">Requisitions</div>
+                            </a>
+                        </li>
+
+                        <li @class([
+                            'menu-item',
+                            'active' => request()->routeIs('requisition_forms.*'),
+                        ])>
+                            <a href="{{ route('requisition_forms.index') }}" class="menu-link">
+                                <i class="menu-icon ri-file-edit-line"></i>
+                                <div data-i18n="Basic">Requisition Forms</div>
                             </a>
                         </li>
                     @endcan
