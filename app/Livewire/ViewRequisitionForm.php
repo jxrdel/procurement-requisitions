@@ -5,7 +5,15 @@ namespace App\Livewire;
 use App\Models\Department;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
+use App\Notifications\ApprovedByReportingOfficer;
+use App\Notifications\DeclinedByHOD;
+use App\Notifications\DeclinedByReportingOfficer;
+use App\Notifications\RequestForHODApproval;
+use App\Notifications\RequestForReportingOfficerApproval;
 use App\RequestFormStatus;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -54,6 +62,13 @@ class ViewRequisitionForm extends Component
 
     public $isEditing = false;
 
+    public $details;
+
+    //HOD Approval/Denial Modal
+    public $selectedOfficer;
+    public $reportingOfficers;
+    public $declineReason;
+
     public function mount($id)
     {
         $this->requisitionForm = RequisitionRequestForm::with('items')->findOrFail($id);
@@ -74,6 +89,8 @@ class ViewRequisitionForm extends Component
         $this->vote_no = $this->requisitionForm->vote_no;
 
         $this->items = $this->requisitionForm->items->toArray();
+
+        $this->reportingOfficers = User::reportingOfficers()->orderBy('name')->get();
     }
 
     public function save()
@@ -185,9 +202,179 @@ class ViewRequisitionForm extends Component
     public function sendToHOD()
     {
         $this->requisitionForm->status = RequestFormStatus::SENT_TO_HOD;
+        $this->requisitionForm->date_sent_to_hod = now();
         $this->requisitionForm->save();
 
+        $hod = $this->requisitionForm->headOfDepartment;
+        if ($hod) {
+            // Notification::send($hod, new RequestForHODApproval($this->requisitionForm));
+        }
+
+        $this->requisitionForm->logs()->create([
+            'details' => 'Requisition form sent to Head of Department for approval by ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
+
         $this->dispatch('show-message', message: 'Requisition form sent to Head of Department for approval.');
+    }
+
+    public function saveLog()
+    {
+        $this->validate([
+            'details' => 'required',
+        ]);
+
+        $this->requisitionForm->logs()->create([
+            'details' => $this->details,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->reset('details');
+
+        $this->dispatch('close-log-modal');
+        $this->dispatch('show-message', message: 'Log added successfully.');
+    }
+
+    public function approveRequisitionHOD()
+    {
+        $this->validate([
+            'selectedOfficer' => 'required|exists:users,id',
+        ], [
+            'selectedOfficer.required' => 'Please select a Reporting Officer to send the form to.',
+            'selectedOfficer.exists' => 'The selected Reporting Officer is invalid.',
+        ]);
+
+        $reportingOfficer = User::find($this->selectedOfficer);
+        if ($reportingOfficer->reporting_officer_role == 'Permanent Secretary') {
+            $this->requisitionForm->status = RequestFormStatus::SENT_TO_PS;
+        } elseif ($reportingOfficer->reporting_officer_role == 'Deputy Permanent Secretary') {
+            $this->requisitionForm->status = RequestFormStatus::SENT_TO_DPS;
+        } elseif ($reportingOfficer->reporting_officer_role == 'Chief Medical Officer') {
+            $this->requisitionForm->status = RequestFormStatus::SENT_TO_CMO;
+        }
+
+        $this->requisitionForm->hod_approval = true;
+        $this->requisitionForm->hod_approval_date = now();
+        $this->requisitionForm->reporting_officer_id = $this->selectedOfficer;
+        $this->requisitionForm->save();
+
+        if ($reportingOfficer) {
+            // Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
+        }
+
+        $this->requisitionForm->logs()->create([
+            'details' => 'Requisition form approved by ' . Auth::user()->name . ' and sent to ' . $reportingOfficer->reporting_officer_role . ' ' . $reportingOfficer->name . ' for approval.',
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->reset('selectedOfficer');
+        $this->dispatch('close-hod-approval-modal');
+        $this->dispatch('show-message', message: 'Requisition form approved and sent to Reporting Officer for approval.');
+    }
+
+    public function approveRequisitionReportingOfficer()
+    {
+        $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
+        $this->requisitionForm->reporting_officer_approval = true;
+        $this->requisitionForm->reporting_officer_approval_date = now();
+        $this->requisitionForm->save();
+
+        $this->requisitionForm->logs()->create([
+            'details' => 'Requisition form approved by ' . Auth::user()->reporting_officer_role . ' ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        // Get user where the name is Marryann Basdeo
+        $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
+        if ($procurementHOD) {
+            Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
+        }
+        
+
+        $this->dispatch('show-message', message: 'Requisition form approved successfully.');
+    }
+
+
+    public function declineRequisition()
+    {
+        $this->validate([
+            'declineReason' => 'required',
+        ]);
+
+        if (Auth::user()->id == $this->requisitionForm->head_of_department_id) {
+            $this->requisitionForm->status = RequestFormStatus::DENIED_BY_HOD;
+            $this->requisitionForm->hod_approval = false;
+            $this->requisitionForm->hod_reason_for_denial = $this->declineReason;
+            //Reset approval flags
+            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByHOD($this->requisitionForm));
+        }
+
+        if (Auth::user()->id == $this->requisitionForm->reporting_officer_id && Auth::user()->is_reporting_officer) {
+            //Change status based on role
+            if (Auth::user()->reporting_officer_role == 'Permanent Secretary') {
+                $this->requisitionForm->status = RequestFormStatus::DENIED_BY_PS;
+            } elseif (Auth::user()->reporting_officer_role == 'Deputy Permanent Secretary') {
+                $this->requisitionForm->status = RequestFormStatus::DENIED_BY_DPS;
+            } elseif (Auth::user()->reporting_officer_role == 'Chief Medical Officer') {
+                $this->requisitionForm->status = RequestFormStatus::DENIED_BY_CMO;
+            }
+
+            $this->requisitionForm->reporting_officer_approval = false;
+            $this->requisitionForm->reporting_officer_reason_for_denial = $this->declineReason;
+            //Reset approval flags
+            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
+        }
+        $this->requisitionForm->save();
+
+        $this->requisitionForm->logs()->create([
+            'details' => 'Requisition form declined by ' . Auth::user()->name . '. Reason: ' . $this->declineReason,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->reset('declineReason');
+
+        $this->dispatch('close-decline-modal');
+        $this->dispatch('show-message', message: 'Requisition form declined successfully.');
+    }
+
+    public function uploadFiles()
+    {
+        $this->validate([
+            'uploads.*' => 'file|mimes:pdf,doc,docx,jpg,png|max:5120',
+        ], [
+            'uploads.*.mimes' => 'Each file must be a PDF, DOC, DOCX, JPG, or PNG.',
+            'uploads.*.max' => 'Each file must not exceed 5MB in size.',
+        ]);
+
+        if ($this->uploads) {
+            foreach ($this->uploads as $upload) {
+                $filename = $upload->getClientOriginalName();
+                $uploadPath = $upload->store('file_uploads', 'public');
+                $this->requisitionForm->uploads()->create([
+                    'file_name' => $filename,
+                    'file_path' => $uploadPath,
+                    'uploaded_by' => Auth::user()->username ?? null,
+                ]);
+            }
+        }
+
+        $this->reset('uploads');
+
+        $this->dispatch('show-message', message: 'Files uploaded successfully.');
+    }
+
+    public function deleteFile($fileId)
+    {
+        $file = $this->requisitionForm->uploads()->find($fileId);
+        if ($file) {
+            // Delete the file from storage
+            Storage::disk('public')->delete($file->file_path);
+            // Delete the database record
+            $file->delete();
+            $this->dispatch('show-message', message: 'File deleted successfully.');
+        } else {
+            $this->dispatch('show-error', message: 'File not found.');
+        }
     }
 
     public function render()

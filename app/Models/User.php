@@ -23,7 +23,13 @@ class User extends Authenticatable
         'username',
         'department',
         'is_active',
-        'role_id'
+        'role_id',
+        'is_reporting_officer',
+        'reporting_officer_role',
+    ];
+
+    protected $casts = [
+        'is_reporting_officer' => 'boolean',
     ];
 
     public function scopeProcurement($query)
@@ -59,6 +65,11 @@ class User extends Authenticatable
     public function scopeChequeProcessing($query)
     {
         return $query->where('department', 'Cheque Processing')->where('is_active', true);
+    }
+
+    public function scopeReportingOfficers($query)
+    {
+        $query->where('is_reporting_officer', true);
     }
 
     public function role()

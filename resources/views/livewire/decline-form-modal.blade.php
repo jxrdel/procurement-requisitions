@@ -21,8 +21,8 @@
                             <div class="form-floating form-floating-outline mb-3">
                                 {{-- Textarea for decline reason --}}
                                 <textarea required wire:model="declineReason" class="form-control @error('declineReason')is-invalid @enderror"
-                                    placeholder="Reason for decline" id="declineReasonInput" style="height: 150px"></textarea>
-                                <label for="declineReasonInput">Reason for Decline</label>
+                                    placeholder="State the issues here" id="declineReasonInput" style="height: 150px"></textarea>
+                                <label for="declineReasonInput">Issues</label>
                             </div>
 
                             @error('declineReason')

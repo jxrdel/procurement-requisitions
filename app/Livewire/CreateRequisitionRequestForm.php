@@ -128,7 +128,13 @@ class CreateRequisitionRequestForm extends Component
             }
         }
 
-        return redirect()->route('requisition_forms.index')->with('success', 'Requisition Request Form created successfully.');
+        //Create log entry
+        $form->logs()->create([
+            'details' => 'Form Created by ' . (Auth::user()->name),
+            'created_by' => Auth::user()->username ?? null,
+        ]);
+
+        return redirect()->route('requisition_forms.view', ['id' => $form->id])->with('success', 'Requisition form created successfully.');
     }
 
     public function addItem()

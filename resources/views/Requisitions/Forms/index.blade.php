@@ -16,17 +16,15 @@
                         Requisition Forms</strong></h1>
             </div>
 
-            @can('create-requisitions')
-                <div class="row mb-4 align-items-center">
+            <div class="row mb-4 align-items-center">
 
-                    <!-- Centered Create Requisition Button -->
-                    <div class="col d-flex justify-content-center">
-                        <a href="{{ route('requisition_forms.create') }}" class="btn btn-primary waves-effect waves-light">
-                            <span class="ri-add-circle-line me-1_5"></span>Create Requisition Form
-                        </a>
-                    </div>
+                <!-- Centered Create Requisition Button -->
+                <div class="col d-flex justify-content-center">
+                    <a href="{{ route('requisition_forms.create') }}" class="btn btn-primary waves-effect waves-light">
+                        <span class="ri-add-circle-line me-1_5"></span>Create Requisition Form
+                    </a>
                 </div>
-            @endcan
+            </div>
 
             {{-- <div class="row mb-4">
                 <!-- Button group aligned to the right -->

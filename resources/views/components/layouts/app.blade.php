@@ -96,7 +96,7 @@
         /* 1. Target the specific state: checked AND disabled */
         .form-check-input:checked[disabled] {
             /* Set background color to your desired primary color (assuming purple/blue) */
-            background-color: #8c57ff !important;
+            background-color: #9a87c2 !important;
 
             /* Force the checkmark (tick) SVG data URI to be used. */
             /* This is a standard white/light checkmark SVG data URI. */

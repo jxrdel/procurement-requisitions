@@ -6,6 +6,7 @@ enum RequestFormStatus
 {
     public const CREATED = 'Created';
     public const APPROVED_BY_HOD = 'Approved By HOD';
+    public const DENIED_BY_HOD = 'Denied By HOD';
     public const SENT_TO_HOD = 'Sent to HOD';
     public const SENT_TO_PS = 'Sent to PS';
     public const APPROVED_BY_PS = 'Approved by PS';
