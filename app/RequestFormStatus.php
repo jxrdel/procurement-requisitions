@@ -18,4 +18,7 @@ enum RequestFormStatus
     public const APPROVED_BY_CMO = 'Approved by CMO';
     public const DENIED_BY_CMO = 'Denied by CMO';
     public const SENT_TO_PROCUREMENT = 'Sent to Procurement';
+    public const APPROVED_BY_PROCUREMENT = 'Approved by Procurement';
+    public const DENIED_BY_PROCUREMENT = 'Denied by Procurement';
+    public const COMPLETED = 'Completed';
 }

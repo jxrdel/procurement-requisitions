@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class DeclinedByReportingOfficer extends Notification
+class DeclinedByProcurement extends Notification
 {
     use Queueable;
 
@@ -48,9 +48,9 @@ class DeclinedByReportingOfficer extends Notification
             $ccRecipients[] = $this->form->contactPerson->email;
         }
         return (new MailMessage)
-            ->subject('Requisition Form Declined by ' . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ' | PRA')
+            ->subject('Requisition Form Declined by Procurement | PRA')
             ->cc($ccRecipients)
-            ->markdown('emails.declined-by-reporting-officer', [
+            ->markdown('emails.declined-by-procurement', [
                 "recipient" => $notifiable->name,
                 "form" => $this->form,
                 "url" => route("requisition_forms.view", ["id" => $this->form->id])
@@ -65,8 +65,8 @@ class DeclinedByReportingOfficer extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "title" => "Requisition Form Denied by Reporting Officer",
-            "message" => "A requisition form ({$this->form->form_code}) has been denied by the " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ".",
+            "title" => "Requisition Form Denied by Procurement",
+            "message" => "A requisition form ({$this->form->form_code}) has been denied by Procurement')",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

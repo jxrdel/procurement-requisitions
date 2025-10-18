@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class DeclinedByReportingOfficer extends Notification
+class RequestForProcurementApproval extends Notification
 {
     use Queueable;
 
@@ -17,7 +17,7 @@ class DeclinedByReportingOfficer extends Notification
      */
     public function __construct(protected RequisitionRequestForm $form)
     {
-        $this->form->loadMissing(['headOfDepartment', 'contactPerson']);
+        //
     }
 
     /**
@@ -35,22 +35,9 @@ class DeclinedByReportingOfficer extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        // 1. Collect the emails of people to be CC'd
-        $ccRecipients = [];
-
-        // Assuming 'headOfDepartment' is the relation for head_of_department_id
-        if ($this->form->headOfDepartment) {
-            $ccRecipients[] = $this->form->headOfDepartment->email;
-        }
-
-        // Assuming 'contactPerson' is the relation for contact_person_id
-        if ($this->form->contactPerson) {
-            $ccRecipients[] = $this->form->contactPerson->email;
-        }
         return (new MailMessage)
-            ->subject('Requisition Form Declined by ' . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ' | PRA')
-            ->cc($ccRecipients)
-            ->markdown('emails.declined-by-reporting-officer', [
+            ->subject('Requisition Form Sent for Approval | PRA')
+            ->markdown('emails.request-for-procurement-approval', [
                 "recipient" => $notifiable->name,
                 "form" => $this->form,
                 "url" => route("requisition_forms.view", ["id" => $this->form->id])
@@ -65,8 +52,8 @@ class DeclinedByReportingOfficer extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "title" => "Requisition Form Denied by Reporting Officer",
-            "message" => "A requisition form ({$this->form->form_code}) has been denied by the " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ".",
+            "title" => "Requisition Form Sent for Approval",
+            "message" => "A requisition form ({$this->form->form_code}) has been updated as requested and has been resubmitted for your review and approval",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

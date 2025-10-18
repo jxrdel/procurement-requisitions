@@ -5,10 +5,13 @@ namespace App\Livewire;
 use App\Models\Department;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
+use App\Notifications\ApprovedByProcurement;
 use App\Notifications\ApprovedByReportingOfficer;
 use App\Notifications\DeclinedByHOD;
+use App\Notifications\DeclinedByProcurement;
 use App\Notifications\DeclinedByReportingOfficer;
 use App\Notifications\RequestForHODApproval;
+use App\Notifications\RequestForProcurementApproval;
 use App\Notifications\RequestForReportingOfficerApproval;
 use App\RequestFormStatus;
 use Illuminate\Support\Facades\Auth;
@@ -141,6 +144,11 @@ class ViewRequisitionForm extends Component
 
         $this->requisitionForm->items()->delete();
         $this->requisitionForm->items()->createMany($this->items);
+
+        $this->requisitionForm->logs()->create([
+            'details' => 'Requisition form edited by ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
 
         $this->dispatch('show-message', message: 'Requisition form updated successfully.');
         $this->isEditing = false;
@@ -287,9 +295,27 @@ class ViewRequisitionForm extends Component
         // Get user where the name is Marryann Basdeo
         $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
         if ($procurementHOD) {
-            Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
+            // Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
         }
-        
+
+
+        $this->dispatch('show-message', message: 'Requisition form approved successfully.');
+    }
+
+    public function approveRequisitionProcurement()
+    {
+        $this->requisitionForm->status = RequestFormStatus::APPROVED_BY_PROCUREMENT;
+        $this->requisitionForm->procurement_approval = true;
+        $this->requisitionForm->procurement_approval_date = now();
+        $this->requisitionForm->save();
+
+        $this->requisitionForm->logs()->create([
+            'details' => 'Requisition form approved by Procurement Officer ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        Notification::send($this->requisitionForm->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
+
 
         $this->dispatch('show-message', message: 'Requisition form approved successfully.');
     }
@@ -324,6 +350,14 @@ class ViewRequisitionForm extends Component
             //Reset approval flags
             // Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
         }
+
+        if (Auth::user()->department == 'Procurement') {
+            $this->requisitionForm->status = RequestFormStatus::DENIED_BY_PROCUREMENT;
+            $this->requisitionForm->procurement_approval = false;
+            $this->requisitionForm->procurement_reason_for_denial = $this->declineReason;
+            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByProcurement($this->requisitionForm));
+        }
+
         $this->requisitionForm->save();
 
         $this->requisitionForm->logs()->create([
@@ -335,6 +369,25 @@ class ViewRequisitionForm extends Component
 
         $this->dispatch('close-decline-modal');
         $this->dispatch('show-message', message: 'Requisition form declined successfully.');
+    }
+
+    public function sendToProcurement()
+    {
+        $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
+        $this->requisitionForm->save();
+
+        // Get user where the name is Marryann Basdeo
+        $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
+        if ($procurementHOD) {
+            // Notification::send($procurementHOD, new RequestForProcurementApproval($this->requisitionForm));
+        }
+
+        $this->requisitionForm->logs()->create([
+            'details' => 'Requisition form sent to Procurement by ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->dispatch('show-message', message: 'Requisition form sent to Procurement successfully.');
     }
 
     public function uploadFiles()

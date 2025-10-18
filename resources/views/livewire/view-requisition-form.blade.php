@@ -35,8 +35,8 @@
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_HOD ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
-                                $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO)
-                            {{-- Default: Show Edit/Save buttons if HOD has NOT approved yet --}}
+                                $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO ||
+                                $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT)
                             <button type="submit" x-show="isEditing" class="btn btn-sm btn-primary"
                                 x-bind:class="isEditing ? '' : 'd-none'"> <i class="fa-solid fa-save me-1"></i> Save
                             </button>
@@ -48,45 +48,60 @@
                                 <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
                             </button>
                         @elseif($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD)
-                            {{-- HOD Buttons: This block should logically handle the initial HOD approval if necessary. --}}
-                            {{-- Assuming this is the HOD's turn BEFORE Reporting Officer approval. --}}
-                            {{-- NOTE: This structure implies this is the final 'catch-all' condition, which is risky. --}}
-                            {{-- I am using the structure you gave me, but renaming the HOD section's 'if' to 'else' --}}
-                            <button data-bs-toggle="modal" data-bs-target="#approveRequisitionFormHOD" type="button"
-                                class="btn btn-sm btn-primary"> <i class="fa-solid fa-file-circle-check me-1"></i>
-                                Approve
+                            <button type="button" style="width: 8.5rem"
+                                wire:confirm="Are you sure you want to approve this requisition form?"
+                                wire:loading.attr="disabled" wire:target="approveRequisitionHOD"
+                                wire:click="approveRequisitionHOD" class="btn btn-sm btn-success">
+                                <span wire:loading.remove>
+                                    <i class="ri-checkbox-circle-line me-1"></i> Approve
+                                </span>
+                                <span wire:loading>
+                                    <i class="ri-loader-2-line ri-spin me-1"></i>
+                                </span>
                             </button>
                             <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
-                                class="btn btn-sm btn-danger"> <i class="fa-solid fa-file-circle-xmark me-1"></i>
+                                class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
                                 Decline
                             </button>
                         @elseif (
                             $requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_DPS ||
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO)
-                            {{-- Reporting Officer Buttons: Show if HOD HAS approved AND Reporting Officer has NOT approved --}}
-                            <button type="button"
+                            <button type="button" style="width: 8.5rem"
                                 wire:confirm="Are you sure you want to approve this requisition form?"
-                                wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-primary"> <i
-                                    class="fa-solid fa-file-circle-check me-1"></i>
-                                Approve
+                                wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
+                                wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-success">
+                                <span wire:loading.remove>
+                                    <i class="ri-checkbox-circle-line me-1"></i> Approve
+                                </span>
+                                <span wire:loading>
+                                    <i class="ri-loader-2-line ri-spin me-1"></i>
+                                </span>
                             </button>
                             <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
-                                class="btn btn-sm btn-danger"> <i class="fa-solid fa-file-circle-xmark me-1"></i>
+                                class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
                                 Decline
                             </button>
                         @elseif ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_PROCUREMENT)
-                            {{-- Procurement Buttons: Show if Reporting Officer HAS approved AND Procurement has NOT approved --}}
-                            <button type="button"
+                            <button type="button" style="width: 8.5rem"
                                 wire:confirm="Are you sure you want to approve this requisition form?"
-                                wire:click="approveRequisitionProcurement" class="btn btn-sm btn-success"> <i
-                                    class="fa-solid fa-file-circle-check me-1"></i>
-                                Approve
+                                wire:loading.attr="disabled" wire:target="approveRequisitionProcurement"
+                                wire:click="approveRequisitionProcurement" class="btn btn-sm btn-success">
+                                <span wire:loading.remove>
+                                    <i class="ri-checkbox-circle-line me-1"></i> Approve
+                                </span>
+                                <span wire:loading>
+                                    <i class="ri-loader-2-line ri-spin me-1"></i>
+                                </span>
                             </button>
                             <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
-                                class="btn btn-sm btn-danger"> <i class="fa-solid fa-file-circle-xmark me-1"></i>
+                                class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
                                 Decline
                             </button>
+                        @elseif ($requisitionForm->status === \App\RequestFormStatus::APPROVED_BY_PROCUREMENT)
+                            <a href="{{ route('requisitions.create') }}" class="btn btn-sm btn-success">
+                                <i class="fa-solid fa-plus-circle me-1"></i> Create Requisition
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -109,6 +124,16 @@
                                 {{ $requisitionForm->reportingOfficer->reporting_officer_role }}</strong>
                         </div>
                         <ul class="mt-1">{{ $requisitionForm->reporting_officer_reason_for_denial }}</ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @elseif (
+                    $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT &&
+                        $requisitionForm->procurement_reason_for_denial)
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <div class="text-center">
+                            <strong>Requisition Declined!</strong>
+                        </div>
+                        <ul class="mt-1">{{ $requisitionForm->procurement_reason_for_denial }}</ul>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
@@ -377,6 +402,24 @@
                                 <i class="tf-icons ri-mail-send-line me-1_5"></i>
                                 <span>Send to Head of Department</span>
                                 <div wire:loading wire:target="sendToHOD"
+                                    class="spinner-border spinner-border-sm text-secondary mx-1" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                @endif
+
+                @if ($requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT)
+                    <div class="row mt-8" x-show="!isEditing">
+                        <div class="text-center m-auto">
+                            <button type="button" class="btn btn-sm btn-info" wire:loading.attr="disabled"
+                                wire:target="sendToProcurement"
+                                wire:confirm="Are you sure you want to send this form to Procurement for approval?"
+                                wire:click="sendToProcurement">
+                                <i class="tf-icons ri-mail-send-line me-1_5"></i>
+                                <span>Send to Procurement</span>
+                                <div wire:loading wire:target="sendToProcurement"
                                     class="spinner-border spinner-border-sm text-secondary mx-1" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
