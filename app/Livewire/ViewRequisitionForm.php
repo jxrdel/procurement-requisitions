@@ -352,7 +352,7 @@ class ViewRequisitionForm extends Component
             // Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
         }
 
-        if (Auth::user()->department == 'Procurement') {
+        if (Auth::user()->department->name == 'Procurement Unit') {
             $this->requisitionForm->status = RequestFormStatus::DENIED_BY_PROCUREMENT;
             $this->requisitionForm->procurement_approval = false;
             $this->requisitionForm->procurement_reason_for_denial = $this->declineReason;

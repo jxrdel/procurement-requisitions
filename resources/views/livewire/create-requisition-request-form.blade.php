@@ -10,7 +10,7 @@
                     <i class="ri-arrow-left-circle-line me-1"></i> Back
                 </a>
                 <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
-                    <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i> Procurement
+                    <strong style="margin-right: 90px"><i class="fa-solid fa-file-pen"></i> Procurement
                         Requisition Form</strong>
                 </h1>
             </div>
@@ -21,7 +21,7 @@
                     <div class="mb-3 row">
                         <label for="requesting_unit_label" class="col-md-4 col-form-label">Requesting Unit</label>
                         <div class="col-md-8">
-                            <select required wire:model="requesting_unit"
+                            <select disabled required wire:model="requesting_unit"
                                 class="form-select @error('requesting_unit')is-invalid @enderror"
                                 id="requesting_unit_label" aria-label="Requesting Unit Select">
                                 <option value="">Select a Unit</option>
@@ -41,7 +41,7 @@
                     <div class="mb-3 row">
                         <label for="head_of_department_label" class="col-md-4 col-form-label">Head of Department</label>
                         <div class="col-md-8">
-                            <select required wire:model="head_of_department"
+                            <select disabled required wire:model="head_of_department"
                                 class="form-select @error('head_of_department')is-invalid @enderror"
                                 id="head_of_department_label" aria-label="Head of Department Select">
                                 <option value="">Select a User</option>
@@ -63,7 +63,7 @@
                     <div class="mb-3 row">
                         <label for="contact_person_id_label" class="col-md-4 col-form-label">Contact Person</label>
                         <div class="col-md-8">
-                            <select required wire:model="contact_person_id"
+                            <select disabled required wire:model="contact_person_id"
                                 class="form-select @error('contact_person_id')is-invalid @enderror"
                                 id="contact_person_id_label" aria-label="Contact Person Select">
                                 <option value="">Select a User</option>
@@ -100,7 +100,7 @@
                     <div class="mb-3 row">
                         <label for="date_input" class="col-md-4 col-form-label">Date Created</label>
                         <div class="col-md-8">
-                            <input autocomplete="off" wire:model="date" type="date"
+                            <input disabled autocomplete="off" wire:model="date" type="date"
                                 class="form-control @error('date')is-invalid @enderror" id="date_input"
                                 aria-describedby="date_input_help" />
                             @error('date')

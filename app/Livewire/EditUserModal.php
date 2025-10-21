@@ -31,7 +31,7 @@ class EditUserModal extends Component
         $this->name = $this->user->name;
         $this->username = $this->user->username;
         $this->email = $this->user->email;
-        $this->department = $this->user->department;
+        $this->department = $this->user->department->name;
         $this->is_active = $this->user->is_active == 1 ? true : false;
         $this->role_id = $this->user->role_id;
         $this->dispatch('display-edit-modal');

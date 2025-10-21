@@ -328,7 +328,8 @@
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-0 small">{{ Auth::user()->name }}</h6>
-                                                    <small class="text-muted">{{ Auth::user()->department }}</small>
+                                                    <small
+                                                        class="text-muted">{{ Auth::user()->department->name }}</small>
                                                 </div>
                                             </div>
                                         </a>

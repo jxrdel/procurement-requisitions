@@ -66,6 +66,8 @@ class CreateRequisitionRequestForm extends Component
         $this->units = Department::orderBy('name')->get();
         $this->users = User::orderBy('name')->get();
         $this->contact_person_id = Auth::user()->id;
+        $this->requesting_unit = Auth::user()->department_id;
+        $this->head_of_department = Auth::user()->department->head_of_department_id ?? null;
         $this->votes = Vote::orderBy('number')->get();
     }
 

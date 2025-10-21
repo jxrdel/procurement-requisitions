@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -21,7 +22,6 @@ class User extends Authenticatable
         'name',
         'email',
         'username',
-        'department',
         'is_active',
         'role_id',
         'is_reporting_officer',
@@ -87,5 +87,10 @@ class User extends Authenticatable
         }
 
         return rtrim($initials, '.');
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 }

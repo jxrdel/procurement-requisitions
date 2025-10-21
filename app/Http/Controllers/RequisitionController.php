@@ -46,9 +46,9 @@ class RequisitionController extends Controller
                 'cost_budgeting_requisitions.is_completed'
             ]);
 
-        // Restrict for Viewers (not Procurement or PS Office)
-        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department !== 'Procurement' && Auth::user()->department !== 'PS Office') {
-            $requisitions->where('departments.name', Auth::user()->department);
+        // Restrict for Viewers (not Procurement or Office of the Permanent Secretary)
+        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
+            $requisitions->where('departments.name', Auth::user()->department->name);
         }
 
         return DataTables::of($requisitions)
@@ -110,9 +110,9 @@ class RequisitionController extends Controller
             ->where('requisitions.is_completed', true);
 
 
-        // Restrict for Viewers (not Procurement or PS Office)
-        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department !== 'Procurement' && Auth::user()->department !== 'PS Office') {
-            $requisitions->where('departments.name', Auth::user()->department);
+        // Restrict for Viewers (not Procurement or Office of the Permanent Secretary)
+        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
+            $requisitions->where('departments.name', Auth::user()->department->name);
         }
 
         return DataTables::of($requisitions)
@@ -165,9 +165,9 @@ class RequisitionController extends Controller
                 'cost_budgeting_requisitions.is_completed'
             ]);
 
-        // Restrict for Viewers (not Procurement or PS Office)
-        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department !== 'Procurement' && Auth::user()->department !== 'PS Office') {
-            $requisitions->where('departments.name', Auth::user()->department);
+        // Restrict for Viewers (not Procurement or Office of the Permanent Secretary)
+        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
+            $requisitions->where('departments.name', Auth::user()->department->name);
         }
 
         return DataTables::of($requisitions)

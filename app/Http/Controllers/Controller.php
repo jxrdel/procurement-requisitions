@@ -14,15 +14,15 @@ class Controller
 {
     public function index()
     {
-        if (Auth::user()->department === 'Cost & Budgeting') {
+        if (Auth::user()->department->name === 'Cost & Budgeting') {
             return redirect()->route('cost_and_budgeting.index');
-        } elseif (Auth::user()->department === 'Vote Control') {
+        } elseif (Auth::user()->department->name === 'Vote Control') {
             return redirect()->route('vote_control.index');
-        } elseif (Auth::user()->department === 'Check Staff') {
+        } elseif (Auth::user()->department->name === 'Check Staff') {
             return redirect()->route('check_room.index');
-        } elseif (Auth::user()->department === 'Cheque Processing') {
+        } elseif (Auth::user()->department->name === 'Cheque Processing') {
             return redirect()->route('cheque_processing.index');
-        } elseif (Auth::user()->department === 'Accounts Payable') {
+        } elseif (Auth::user()->department->name === 'Accounts Payable') {
             return redirect()->route('accounts_payable.index');
         }
         //Count of all requisitions
@@ -34,20 +34,20 @@ class Controller
         //Count of requisitions in progress
         $inprogressRequisitionsCount = Requisition::where('is_completed', false)->count();
 
-        //If the user is a Viewer and not in Procurement or PS Office, only show their department's requisitions i.e. For Jesse's account
-        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department !== 'Procurement' && Auth::user()->department !== 'PS Office') {
+        //If the user is a Viewer and not in Procurement or Office of the Permanent Secretary, only show their department's requisitions i.e. For Jesse's account
+        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
             $allRequisitionsCount = Requisition::join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
-                ->where('departments.name', Auth::user()->department)
+                ->where('departments.name', Auth::user()->department->name)
                 ->count();
 
             $completedRequisitionsCount = Requisition::where('is_completed', true)
                 ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
-                ->where('departments.name', Auth::user()->department)
+                ->where('departments.name', Auth::user()->department->name)
                 ->count();
 
             $inprogressRequisitionsCount = Requisition::where('is_completed', false)
                 ->join('departments', 'requisitions.requesting_unit', '=', 'departments.id')
-                ->where('departments.name', Auth::user()->department)
+                ->where('departments.name', Auth::user()->department->name)
                 ->count();
         }
 
