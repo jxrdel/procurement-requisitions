@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Department;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
+use App\Models\Vote;
 use App\RequestFormStatus;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
@@ -40,6 +41,7 @@ class CreateRequisitionRequestForm extends Component
     public $users;
 
     public $items = [];
+    public $votes;
     public $item_name;
     public $qty_in_stock = 0;
     public $qty_requesting = 1;
@@ -50,6 +52,7 @@ class CreateRequisitionRequestForm extends Component
     public $other;
 
     public $uploads;
+    public $selected_votes = [];
 
 
     public function render()
@@ -63,10 +66,12 @@ class CreateRequisitionRequestForm extends Component
         $this->units = Department::orderBy('name')->get();
         $this->users = User::orderBy('name')->get();
         $this->contact_person_id = Auth::user()->id;
+        $this->votes = Vote::orderBy('number')->get();
     }
 
     public function save()
     {
+        dd($this->selected_votes);
         // Validate the main form fields
         try {
             $this->validate([
@@ -75,12 +80,10 @@ class CreateRequisitionRequestForm extends Component
                 'contact_person_id' => 'required|exists:users,id',
                 'date' => 'required|date|date_format:Y-m-d',
                 'contact_info' => 'nullable|string|max:255',
-                'justification' => 'required|file|mimes:pdf,doc,docx|max:5120',
+                'justification' => 'required|string',
                 'location_of_delivery' => 'nullable|string|max:255',
                 'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
                 'estimated_value' => 'nullable|numeric|min:0',
-            ], [
-                'justification.required' => 'Please upload a covering memo explaining the request',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->dispatch('scrollToError');
@@ -99,6 +102,7 @@ class CreateRequisitionRequestForm extends Component
             'date' => $this->date,
             'contact_info' => $this->contact_info,
             'location_of_delivery' => $this->location_of_delivery,
+            'justification' => $this->justification,
             'date_required_by' => $this->date_required_by,
             'estimated_value' => $this->estimated_value,
             'availability_of_funds' => $this->availability_of_funds,
@@ -110,10 +114,9 @@ class CreateRequisitionRequestForm extends Component
             $form->items()->create($item);
         }
 
-        if ($this->justification) {
-            $justificationPath = $this->justification->store('justifications', 'public');
-            $form->justification_path = $justificationPath;
-            $form->save();
+        //Attach selected votes
+        if (!empty($this->selected_votes)) {
+            $form->votes()->attach($this->selected_votes);
         }
 
         if (!empty($this->uploads)) {

@@ -76,4 +76,16 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
+    public function getInitialsAttribute()
+    {
+        $names = explode(' ', $this->name);
+        $initials = '';
+
+        foreach ($names as $name) {
+            $initials .= strtoupper(substr($name, 0, 1)) . '.';
+        }
+
+        return rtrim($initials, '.');
+    }
 }

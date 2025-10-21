@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Department;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
+use App\Models\Vote;
 use App\Notifications\ApprovedByProcurement;
 use App\Notifications\ApprovedByReportingOfficer;
 use App\Notifications\DeclinedByHOD;
@@ -52,6 +53,7 @@ class ViewRequisitionForm extends Component
     public $users;
 
     public $items = [];
+    public $selected_votes = [];
     public $item_name;
     public $qty_in_stock = 0;
     public $qty_requesting = 1;
@@ -62,6 +64,7 @@ class ViewRequisitionForm extends Component
     public $other;
 
     public $uploads;
+    public $votes;
 
     public $isEditing = false;
 
@@ -78,12 +81,14 @@ class ViewRequisitionForm extends Component
 
         $this->units = Department::orderBy('name')->get();
         $this->users = User::orderBy('name')->get();
+        $this->votes = Vote::orderBy('number')->get();
 
         $this->requesting_unit = $this->requisitionForm->requesting_unit;
         $this->head_of_department = $this->requisitionForm->head_of_department_id;
         $this->contact_person_id = $this->requisitionForm->contact_person_id;
         $this->date = $this->requisitionForm->date ? $this->requisitionForm->date->format('Y-m-d') : null;
         $this->contact_info = $this->requisitionForm->contact_info;
+        $this->justification = $this->requisitionForm->justification;
         $this->location_of_delivery = $this->requisitionForm->location_of_delivery;
         $this->date_required_by = $this->requisitionForm->date_required_by ? $this->requisitionForm->date_required_by->format('Y-m-d') : null;
         $this->estimated_value = $this->requisitionForm->estimated_value;
@@ -92,6 +97,7 @@ class ViewRequisitionForm extends Component
         $this->vote_no = $this->requisitionForm->vote_no;
 
         $this->items = $this->requisitionForm->items->toArray();
+        $this->selected_votes = $this->requisitionForm->votes()->pluck('vote_id')->toArray();
 
         $this->reportingOfficers = User::reportingOfficers()->orderBy('name')->get();
     }
@@ -105,7 +111,7 @@ class ViewRequisitionForm extends Component
                 'contact_person_id' => 'required|exists:users,id',
                 'date' => 'required|date|date_format:Y-m-d',
                 'contact_info' => 'nullable|string|max:255',
-                'justification' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+                'justification' => 'required|string',
                 'location_of_delivery' => 'nullable|string|max:255',
                 'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
                 'estimated_value' => 'nullable|numeric|min:0',
@@ -126,6 +132,7 @@ class ViewRequisitionForm extends Component
             'contact_person_id' => $this->contact_person_id,
             'date' => $this->date,
             'contact_info' => $this->contact_info,
+            'justification' => $this->justification,
             'location_of_delivery' => $this->location_of_delivery,
             'date_required_by' => $this->date_required_by,
             'estimated_value' => $this->estimated_value,
@@ -135,15 +142,9 @@ class ViewRequisitionForm extends Component
         ];
 
         $this->requisitionForm->update($data);
-
-        if ($this->justification) {
-            $justificationPath = $this->justification->store('justifications', 'public');
-            $this->requisitionForm->justification_path = $justificationPath;
-            $this->requisitionForm->save();
-        }
-
         $this->requisitionForm->items()->delete();
         $this->requisitionForm->items()->createMany($this->items);
+        $this->requisitionForm->votes()->sync($this->selected_votes);
 
         $this->requisitionForm->logs()->create([
             'details' => 'Requisition form edited by ' . Auth::user()->name,

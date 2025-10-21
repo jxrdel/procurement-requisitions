@@ -138,178 +138,236 @@
                     </div>
                 @endif
                 <div class="row mt-6">
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <select required wire:model="requesting_unit" disabled
-                                class="form-select @error('requesting_unit')is-invalid @enderror"
-                                id="exampleFormControlSelect1" aria-label="Default select example">
-                                <option value="">Select a Unit</option>
-                                @foreach ($units as $unit)
-                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="exampleFormControlSelect1">Requesting Unit</label>
-                            @error('requesting_unit')
-                                <div class="text-danger"> {{ $message }} </div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <select required wire:model="head_of_department" disabled
-                                class="form-select @error('head_of_department')is-invalid @enderror"
-                                id="exampleFormControlSelect1" aria-label="Default select example">
-                                <option value="">Select a User</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="exampleFormControlSelect1">Head of Department</label>
-                            @error('head_of_department')
-                                <div class="text-danger"> {{ $message }} </div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mt-6">
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <select required wire:model="contact_person_id" disabled
-                                class="form-select @error('contact_person_id')is-invalid @enderror"
-                                id="exampleFormControlSelect1" aria-label="Default select example">
-                                <option value="">Select a User</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="exampleFormControlSelect1">Contact Person</label>
-                            @error('contact_person_id')
-                                <div class="text-danger"> {{ $message }} </div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="contact_info" type="text"
-                                x-bind:disabled="!isEditing"
-                                class="form-control @error('contact_info')is-invalid @enderror" id="floatingInput"
-                                placeholder="Contact Person Info" aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Contact Person Info</label>
-                        </div>
-                        @error('contact_info')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row mt-6">
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="date" type="date" disabled
-                                class="form-control @error('date')is-invalid @enderror" id="floatingInput"
-                                aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Date Created</label>
-                        </div>
-                        @error('date')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
-                    </div>
-
-                    <div class="col">
-                    </div>
-                </div>
-
-                <div class="row mt-6">
-
-                    <div class="col">
-                        @if ($requisitionForm->justification_path)
-                            <div class="mt-2">
-                                <a href="{{ Storage::url($requisitionForm->justification_path) }}" target="_blank"
-                                    class="text-primary">
-                                    View Justification Document <i
-                                        class="fa-solid fa-arrow-up-right-from-square mx-1"></i>
-                                </a>
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="requesting_unit_label" class="col-md-4 col-form-label">Requesting Unit</label>
+                            <div class="col-md-8">
+                                <select required wire:model="requesting_unit" disabled
+                                    class="form-select @error('requesting_unit')is-invalid @enderror"
+                                    id="requesting_unit_label" aria-label="Requesting Unit Select">
+                                    <option value="">Select a Unit</option>
+                                    @foreach ($units as $unit)
+                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('requesting_unit')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
                             </div>
-                        @else
-                            <div class="form-floating form-floating-outline">
-                                <input autocomplete="off" wire:model="justification" type="file"
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="head_of_department_label" class="col-md-4 col-form-label">Head of
+                                Department</label>
+                            <div class="col-md-8">
+                                <select required wire:model="head_of_department" disabled
+                                    class="form-select @error('head_of_department')is-invalid @enderror"
+                                    id="head_of_department_label" aria-label="Head of Department Select">
+                                    <option value="">Select a User</option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('head_of_department')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-6">
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="contact_person_id_label" class="col-md-4 col-form-label">Contact
+                                Person</label>
+                            <div class="col-md-8">
+                                <select required wire:model="contact_person_id" disabled
+                                    class="form-select @error('contact_person_id')is-invalid @enderror"
+                                    id="contact_person_id_label" aria-label="Contact Person Select">
+                                    <option value="">Select a User</option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('contact_person_id')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="contact_info_input" class="col-md-4 col-form-label">Contact Person
+                                Info</label>
+                            <div class="col-md-8">
+                                <input autocomplete="off" wire:model="contact_info" type="text"
                                     x-bind:disabled="!isEditing"
-                                    class="form-control @error('justification')is-invalid @enderror"
-                                    id="floatingInput" aria-describedby="floatingInputHelp" />
-                                <label for="floatingInput">Justification for Request <span
-                                        class="text-danger">*</span></label>
+                                    class="form-control @error('contact_info')is-invalid @enderror"
+                                    id="contact_info_input" placeholder="Contact Person Info"
+                                    aria-describedby="contact_info_help" />
+                                @error('contact_info')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
                             </div>
-                            @error('justification')
-                                <div class="text-danger"> {{ $message }} </div>
-                            @enderror
-                        @endif
-                    </div>
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="location_of_delivery" type="text"
-                                x-bind:disabled="!isEditing"
-                                class="form-control @error('location_of_delivery')is-invalid @enderror"
-                                id="floatingInput" placeholder="Location of Delivery"
-                                aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Location of Delivery</label>
                         </div>
-                        @error('location_of_delivery')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
                     </div>
                 </div>
 
                 <div class="row mt-6">
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="date_required_by" type="date"
-                                x-bind:disabled="!isEditing"
-                                class="form-control @error('date_required_by')is-invalid @enderror" id="floatingInput"
-                                aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Date Required By</label>
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="date_input" class="col-md-4 col-form-label">Date Created</label>
+                            <div class="col-md-8">
+                                <input autocomplete="off" wire:model="date" type="date" disabled
+                                    class="form-control @error('date')is-invalid @enderror" id="date_input"
+                                    aria-describedby="date_input_help" />
+                                @error('date')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
                         </div>
-                        @error('date_required_by')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
                     </div>
 
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="estimated_value" type="number" step="0.01"
-                                x-bind:disabled="!isEditing"
-                                class="form-control @error('estimated_value')is-invalid @enderror" id="floatingInput"
-                                placeholder="Estimated Value" aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Estimated Value</label>
-                        </div>
-                        @error('estimated_value')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
+                    <div class="col-md-6">
                     </div>
                 </div>
 
                 <div class="divider mt-6">
-                    <div class="divider-text fw-bold fs-5"><i class="ri-file-text-line me-2"></i>Items</div>
+                    <div class="divider-text fw-bold fs-5"><i class="ri-file-text-line me-2"></i>Procurement Request
+                    </div>
+                </div>
+
+                <p class="mt-6 fw-medium text-center">Please ensure this form is submitted with a covering memo
+                    explaining the
+                    request</p>
+
+                <div class="row mt-6">
+                    <div class="col-md-12">
+                        <div class="mb-3 row">
+                            <label for="justification_textarea" class="col-md-2 col-form-label">Justification for
+                                Request <span class="text-danger">*</span></label>
+                            <div class="col-md-10">
+                                <textarea wire:model="justification" x-bind:disabled="!isEditing"
+                                    class="form-control @error('justification')is-invalid @enderror" id="justification_textarea" rows="4"></textarea>
+                                @error('justification')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-6">
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="location_of_delivery_input" class="col-md-4 col-form-label">Location of
+                                Delivery</label>
+                            <div class="col-md-8">
+                                <input autocomplete="off" wire:model="location_of_delivery" type="text"
+                                    x-bind:disabled="!isEditing"
+                                    class="form-control @error('location_of_delivery')is-invalid @enderror"
+                                    id="location_of_delivery_input" placeholder="Location of Delivery"
+                                    aria-describedby="location_of_delivery_help" />
+                                @error('location_of_delivery')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="date_required_by_input" class="col-md-4 col-form-label">Date Required
+                                By</label>
+                            <div class="col-md-8">
+                                <input autocomplete="off" wire:model="date_required_by" type="date"
+                                    x-bind:disabled="!isEditing"
+                                    class="form-control @error('date_required_by')is-invalid @enderror"
+                                    id="date_required_by_input" aria-describedby="date_required_by_help" />
+                                @error('date_required_by')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-6">
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="estimated_value_input" class="col-md-4 col-form-label">Estimated Value</label>
+                            <div class="col-md-8">
+                                <input autocomplete="off" wire:model="estimated_value" type="number" step="0.01"
+                                    x-bind:disabled="!isEditing"
+                                    class="form-control @error('estimated_value')is-invalid @enderror"
+                                    id="estimated_value_input" placeholder="Estimated Value"
+                                    aria-describedby="estimated_value_help" />
+                                @error('estimated_value')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                    </div>
+                </div>
+
+                <p class="text-center mt-6 fw-medium">Please contact the Finance & Accounts department to
+                    obtain the
+                    following information <span class="text-danger">*</span></p>
+
+                <div class="row mt-6">
+                    <div class="col">
+                        <div class="form-check mt-4">
+                            <label class="form-check-label" for="defaultCheck1"> Availability of Funds </label>
+                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
+                                x-bind:disabled="!isEditing" wire:model="availability_of_funds">
+                        </div>
+                        <div class="form-check mt-4">
+                            <label class="form-check-label" for="defaultCheck2"> Verified by Accounts </label>
+                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck2"
+                                x-bind:disabled="!isEditing" wire:model="verified_by_accounts">
+                        </div>
+                    </div>
+
+                    <div wire:ignore class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="vote_no_input" class="col-md-4 col-form-label">Vote Number(s)</label>
+                            <div class="col mt-3">
+                                <select x-bind:disabled="!isEditing" style="width: 100%;" id="voteSelect"
+                                    class="js-example-basic-multiple" multiple="multiple">
+
+                                    @foreach ($votes as $vote)
+                                        <option value="{{ $vote->id }}">{{ $vote->number }} |
+                                            {{ $vote->name }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider mt-6">
+                    <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
                 </div>
 
                 @if (!$requisitionForm->hod_approval)
                     <div class="row">
                         <button type="button" data-bs-toggle="modal" data-bs-target="#addItemModal"
-                            x-bind:class="{ 'pointer-events-none opacity-50': !isEditing }" x-bind:disabled="!isEditing"
-                            class="btn btn-primary waves-effect waves-light w-25 m-auto">
+                            x-bind:class="{ 'pointer-events-none opacity-50': !isEditing }"
+                            x-bind:disabled="!isEditing" class="btn btn-primary waves-effect waves-light w-25 m-auto">
                             <span class="fa-solid fa-file-circle-plus me-1_5"></span>Add Item
                         </button>
                     </div>
                 @endif
 
-                <p class="mt-6 fw-medium">For items with multiple specifications, please attach additional
+                <p class="mt-6 fw-medium text-center">For items with multiple specifications, please attach additional
                     documentation
                     as necessary <span class="text-danger">*</span></p>
 
@@ -356,37 +414,11 @@
                     </table>
                 </div>
 
-                <p class="text-center mt-6 fw-medium">Please contact the Finance & Accounts department to
-                    obtain the
-                    following information <span class="text-danger">*</span></p>
-
-                <div class="row mt-6">
-                    <div class="col">
-                        <div class="form-check mt-4">
-                            <label class="form-check-label" for="defaultCheck1"> Availability of Funds </label>
-                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
-                                x-bind:disabled="!isEditing" wire:model="availability_of_funds">
-                        </div>
-                        <div class="form-check mt-4">
-                            <label class="form-check-label" for="defaultCheck2"> Verified by Accounts </label>
-                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck2"
-                                x-bind:disabled="!isEditing" wire:model="verified_by_accounts">
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="vote_no" type="text"
-                                x-bind:disabled="!isEditing"
-                                class="form-control @error('vote_no')is-invalid @enderror" id="floatingInput"
-                                placeholder="Vote Number" aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Vote Number</label>
-                        </div>
-                        @error('vote_no')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
-                    </div>
+                <div class="divider mt-6">
+                    <div class="divider-text fw-bold fs-5"><i class="fa-solid fa-user-tie me-2"></i>Requesting Head of
+                        Department/Unit/Division</div>
                 </div>
+
                 @if (
                     !$requisitionForm->date_sent_to_hod ||
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_HOD ||
@@ -408,6 +440,37 @@
                             </button>
                         </div>
                     </div>
+                @elseif ($requisitionForm->hod_approval)
+                    <div class="row mt-4">
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th style="width: 33%;">Name</th>
+                                    <th style="width: 33%;">Signature</th>
+                                    <th style="width: 33%;">Date Approved</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        @if ($requisitionForm->headOfDepartment)
+                                            {{ $requisitionForm->headOfDepartment->name }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($requisitionForm->headOfDepartment)
+                                            {{ $requisitionForm->headOfDepartment->initials }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($requisitionForm->headOfDepartment)
+                                            {{ $requisitionForm->hod_approval_date->format('d/m/Y H:i:s') }}
+                                        @endif
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 @endif
 
                 @if ($requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT)
@@ -424,6 +487,100 @@
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </button>
+                        </div>
+                    </div>
+                @endif
+
+
+                @if ($requisitionForm->reporting_officer_approval)
+                    <div class="divider mt-6">
+                        <div class="divider-text fw-bold fs-5"><i class="fa-solid fa-user-tie me-2"></i>
+                            Non-Objection Required From</div>
+                        <div class="row mt-4">
+                            <table class="table table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 25%;">Position</th>
+                                        <th style="width: 25%;">Name</th>
+                                        <th style="width: 25%;">Signature</th>
+                                        <th style="width: 25%;">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Permanent Secretary</td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
+                                                {{ $requisitionForm->reportingOfficer->name }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
+                                                {{ $requisitionForm->reportingOfficer->initials }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
+                                                {{ $requisitionForm->reporting_officer_approval_date->format('d/m/Y H:i:s') }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Deputy Permanent Secretary</td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
+                                                {{ $requisitionForm->reportingOfficer->name }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
+                                                {{ $requisitionForm->reportingOfficer->initials }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
+                                                {{ $requisitionForm->reporting_officer_approval_date->format('d/m/Y H:i:s') }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Chief Medical Officer</td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
+                                                {{ $requisitionForm->reportingOfficer->name }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
+                                                {{ $requisitionForm->reportingOfficer->initials }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if (
+                                                $requisitionForm->reportingOfficer &&
+                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
+                                                {{ $requisitionForm->reporting_officer_approval_date->format('d/m/Y H:i:s') }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 @endif
@@ -602,6 +759,14 @@
             window.addEventListener('close-decline-modal', event => {
                 $('#declineRequisitionForm').modal('hide');
             })
+        });
+
+        $('#voteSelect').select2();
+        $('#voteSelect').val(@json($this->selected_votes)).trigger('change');
+
+        $('#voteSelect').on('change', function() {
+            var selectedValues = $(this).val();
+            $wire.set('selected_votes', selectedValues);
         });
 
         $wire.on('scrollToError', () => {

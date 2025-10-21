@@ -10,154 +10,230 @@
                     <i class="ri-arrow-left-circle-line me-1"></i> Back
                 </a>
                 <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
-                    <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i> Create
+                    <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i> Procurement
                         Requisition Form</strong>
                 </h1>
             </div>
 
             <div class="row mt-6">
-
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <select required wire:model="requesting_unit"
-                            class="form-select @error('requesting_unit')is-invalid @enderror"
-                            id="exampleFormControlSelect1" aria-label="Default select example">
-                            <option value="">Select a Unit</option>
-                            @foreach ($units as $unit)
-                                <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                            @endforeach
-                        </select>
-                        <label for="exampleFormControlSelect1">Requesting Unit</label>
-                        @error('requesting_unit')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
+                {{-- Requesting Unit --}}
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="requesting_unit_label" class="col-md-4 col-form-label">Requesting Unit</label>
+                        <div class="col-md-8">
+                            <select required wire:model="requesting_unit"
+                                class="form-select @error('requesting_unit')is-invalid @enderror"
+                                id="requesting_unit_label" aria-label="Requesting Unit Select">
+                                <option value="">Select a Unit</option>
+                                @foreach ($units as $unit)
+                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('requesting_unit')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <select required wire:model="head_of_department"
-                            class="form-select @error('head_of_department')is-invalid @enderror"
-                            id="exampleFormControlSelect1" aria-label="Default select example">
-                            <option value="">Select a User</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                        <label for="exampleFormControlSelect1">Head of Department</label>
-                        @error('head_of_department')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
+                {{-- Head of Department --}}
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="head_of_department_label" class="col-md-4 col-form-label">Head of Department</label>
+                        <div class="col-md-8">
+                            <select required wire:model="head_of_department"
+                                class="form-select @error('head_of_department')is-invalid @enderror"
+                                id="head_of_department_label" aria-label="Head of Department Select">
+                                <option value="">Select a User</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('head_of_department')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="row mt-6">
-
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <select required wire:model="contact_person_id"
-                            class="form-select @error('contact_person_id')is-invalid @enderror"
-                            id="exampleFormControlSelect1" aria-label="Default select example">
-                            <option value="">Select a User</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                        <label for="exampleFormControlSelect1">Contact Person</label>
-                        @error('contact_person_id')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
+                {{-- Contact Person --}}
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="contact_person_id_label" class="col-md-4 col-form-label">Contact Person</label>
+                        <div class="col-md-8">
+                            <select required wire:model="contact_person_id"
+                                class="form-select @error('contact_person_id')is-invalid @enderror"
+                                id="contact_person_id_label" aria-label="Contact Person Select">
+                                <option value="">Select a User</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('contact_person_id')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <input autocomplete="off" wire:model="contact_info" type="text"
-                            class="form-control @error('contact_info')is-invalid @enderror" id="floatingInput"
-                            placeholder="Contact Person Info" aria-describedby="floatingInputHelp" />
-                        <label for="floatingInput">Contact Person Info</label>
+                {{-- Contact Person Info (Input) --}}
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="contact_info_input" class="col-md-4 col-form-label">Contact Person Info</label>
+                        <div class="col-md-8">
+                            <input autocomplete="off" wire:model="contact_info" type="text"
+                                class="form-control @error('contact_info')is-invalid @enderror" id="contact_info_input"
+                                placeholder="Contact Person Info" aria-describedby="contact_info_help" />
+                            @error('contact_info')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
                     </div>
-                    @error('contact_info')
-                        <div class="text-danger"> {{ $message }} </div>
-                    @enderror
                 </div>
             </div>
 
             <div class="row mt-6">
-
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <input autocomplete="off" wire:model="date" type="date"
-                            class="form-control @error('date')is-invalid @enderror" id="floatingInput"
-                            aria-describedby="floatingInputHelp" />
-                        <label for="floatingInput">Date</label>
+                {{-- Date Created --}}
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="date_input" class="col-md-4 col-form-label">Date Created</label>
+                        <div class="col-md-8">
+                            <input autocomplete="off" wire:model="date" type="date"
+                                class="form-control @error('date')is-invalid @enderror" id="date_input"
+                                aria-describedby="date_input_help" />
+                            @error('date')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
                     </div>
-                    @error('date')
-                        <div class="text-danger"> {{ $message }} </div>
-                    @enderror
                 </div>
 
-                <div class="col">
-                </div>
-            </div>
-
-            <div class="row mt-6">
-
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <input autocomplete="off" wire:model="justification" type="file"
-                            class="form-control @error('justification')is-invalid @enderror" id="floatingInput"
-                            aria-describedby="floatingInputHelp" />
-                        <label for="floatingInput">Justification for Request <span class="text-danger">*</span></label>
-                    </div>
-                    @error('justification')
-                        <div class="text-danger"> {{ $message }} </div>
-                    @enderror
-                </div>
-
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <input autocomplete="off" wire:model="location_of_delivery" type="text"
-                            class="form-control @error('location_of_delivery')is-invalid @enderror" id="floatingInput"
-                            placeholder="Location of Delivery" aria-describedby="floatingInputHelp" />
-                        <label for="floatingInput">Location of Delivery</label>
-                    </div>
-                    @error('location_of_delivery')
-                        <div class="text-danger"> {{ $message }} </div>
-                    @enderror
+                <div class="col-md-6">
+                    {{-- Empty column to maintain layout symmetry --}}
                 </div>
             </div>
 
-            <div class="row mt-6">
+            {{-- - Procurement Section Divider and Introduction - --}}
+            <div class="divider mt-6">
+                <div class="divider-text fw-bold fs-5"><i class="ri-file-text-line me-2"></i>Procurement Request
+                </div>
+            </div>
 
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <input autocomplete="off" wire:model="date_required_by" type="date"
-                            class="form-control @error('date_required_by')is-invalid @enderror" id="floatingInput"
-                            aria-describedby="floatingInputHelp" />
-                        <label for="floatingInput">Date Required By</label>
+            <p class="mt-6 fw-medium text-center">Please ensure this form is submitted with a covering memo
+                explaining the
+                request</p>
+
+            {{-- Justification (Textarea - Full Width) --}}
+            <div class="row mt-6">
+                <div class="col-md-12">
+                    <div class="mb-3 row">
+                        <label for="justification_textarea" class="col-md-2 col-form-label">Justification for
+                            Request <span class="text-danger">*</span></label>
+                        <div class="col-md-10">
+                            <textarea wire:model="justification" class="form-control @error('justification')is-invalid @enderror"
+                                id="justification_textarea" rows="4"></textarea>
+                            @error('justification')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
                     </div>
-                    @error('date_required_by')
-                        <div class="text-danger"> {{ $message }} </div>
-                    @enderror
+                </div>
+            </div>
+
+            {{-- Location and Date Required By --}}
+            <div class="row mt-6">
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="location_of_delivery_input" class="col-md-4 col-form-label">Location of
+                            Delivery</label>
+                        <div class="col-md-8">
+                            <input autocomplete="off" wire:model="location_of_delivery" type="text"
+                                class="form-control @error('location_of_delivery')is-invalid @enderror"
+                                id="location_of_delivery_input" placeholder="Location of Delivery"
+                                aria-describedby="location_of_delivery_help" />
+                            @error('location_of_delivery')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <input autocomplete="off" wire:model="estimated_value" type="number"
-                            class="form-control @error('estimated_value')is-invalid @enderror" id="floatingInput"
-                            placeholder="Estimated Value" aria-describedby="floatingInputHelp" />
-                        <label for="floatingInput">Estimated Value</label>
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="date_required_by_input" class="col-md-4 col-form-label">Date Required By</label>
+                        <div class="col-md-8">
+                            <input autocomplete="off" wire:model="date_required_by" type="date"
+                                class="form-control @error('date_required_by')is-invalid @enderror"
+                                id="date_required_by_input" aria-describedby="date_required_by_help" />
+                            @error('date_required_by')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
                     </div>
-                    @error('estimated_value')
-                        <div class="text-danger"> {{ $message }} </div>
-                    @enderror
+                </div>
+            </div>
+
+            {{-- Estimated Value --}}
+            <div class="row mt-6">
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="estimated_value_input" class="col-md-4 col-form-label">Estimated Value</label>
+                        <div class="col-md-8">
+                            <input autocomplete="off" wire:model="estimated_value" type="number" step="0.01"
+                                class="form-control @error('estimated_value')is-invalid @enderror"
+                                id="estimated_value_input" placeholder="Estimated Value"
+                                aria-describedby="estimated_value_help" />
+                            @error('estimated_value')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                </div>
+            </div>
+
+            {{-- - Finance Section and Checkboxes - --}}
+            <p class="text-center mt-6 fw-medium">Please contact the Finance & Accounts department to obtain the
+                following information <span class="text-danger">*</span></p>
+
+            <div class="row mt-6">
+                <div class="col-md-6">
+                    <div class="form-check mt-4">
+                        <label class="form-check-label" for="defaultCheck1"> Availability of Funds </label>
+                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
+                            wire:model="availability_of_funds">
+                    </div>
+                    <div class="form-check mt-4">
+                        <label class="form-check-label" for="defaultCheck2"> Verified by Accounts </label>
+                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck2"
+                            wire:model="verified_by_accounts">
+                    </div>
+                </div>
+
+                <div wire:ignore class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="vote_no_input" class="col-md-4 col-form-label">Vote Number(s)</label>
+                        <div class="col mt-3">
+                            <select style="width: 100%;" id="voteSelect" class="js-example-basic-multiple"
+                                multiple="multiple">
+
+                                @foreach ($votes as $vote)
+                                    <option value="{{ $vote->id }}">{{ $vote->number }} | {{ $vote->name }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="divider mt-6">
-                <div class="divider-text fw-bold fs-5"><i class="ri-file-text-line me-2"></i>Items</div>
+                <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
             </div>
 
             <div class="row">
@@ -301,6 +377,13 @@
             })
         });
 
+
+        $('#voteSelect').select2();
+
+        $('#voteSelect').on('change', function() {
+            var selectedValues = $(this).val();
+            $wire.set('selected_votes', selectedValues);
+        });
 
         $wire.on('scrollToError', () => {
             // Wait for Livewire to finish rendering the error fields

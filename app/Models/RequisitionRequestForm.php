@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\DB;
 
 class RequisitionRequestForm extends Model
@@ -16,7 +17,7 @@ class RequisitionRequestForm extends Model
         'requisition_id',
         'date',
         'contact_info',
-        'justification_path',
+        'justification',
         'location_of_delivery',
         'date_required_by',
         'estimated_value',
@@ -108,6 +109,12 @@ class RequisitionRequestForm extends Model
     public function logs()
     {
         return $this->hasMany(FormLog::class, 'requisition_request_form_id');
+    }
+
+    public function votes(): BelongsToMany
+    {
+        return $this->belongsToMany(Vote::class, 'requisition_form_votes')
+            ->withTimestamps();
     }
 
     public function uploads()
