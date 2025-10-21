@@ -10,9 +10,11 @@
                     <i class="ri-arrow-left-circle-line me-1"></i> Back
                 </a>
                 <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
-                    <strong style="margin-right: 90px"><i class="fa-solid fa-file-pen"></i> Procurement
-                        Requisition Form</strong>
+                    <strong><i class="fa-solid fa-file-pen"></i> Procurement Requisition Form</strong>
                 </h1>
+                <a href="{{ asset('form_instructions.pdf') }}" target="_blank" class="btn btn-dark">
+                    <i class="fa-solid fa-circle-info me-2"></i> Instructions
+                </a>
             </div>
 
             <div class="row mt-6">
@@ -77,24 +79,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Contact Person Info (Input) --}}
-                <div class="col-md-6">
-                    <div class="mb-3 row">
-                        <label for="contact_info_input" class="col-md-4 col-form-label">Contact Person Info</label>
-                        <div class="col-md-8">
-                            <input autocomplete="off" wire:model="contact_info" type="text"
-                                class="form-control @error('contact_info')is-invalid @enderror" id="contact_info_input"
-                                placeholder="Contact Person Info" aria-describedby="contact_info_help" />
-                            @error('contact_info')
-                                <div class="text-danger"> {{ $message }} </div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row mt-6">
                 {{-- Date Created --}}
                 <div class="col-md-6">
                     <div class="mb-3 row">
@@ -110,10 +94,40 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    {{-- Empty column to maintain layout symmetry --}}
-                </div>
+                {{-- Contact Person Info (Input) --}}
+                {{-- <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="contact_info_input" class="col-md-4 col-form-label">Contact Person Info</label>
+                        <div class="col-md-8">
+                            <input autocomplete="off" wire:model="contact_info" type="text"
+                                class="form-control @error('contact_info')is-invalid @enderror" id="contact_info_input"
+                                placeholder="Contact Person Info" aria-describedby="contact_info_help" />
+                            @error('contact_info')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
+                    </div>
+                </div> --}}
             </div>
+
+            {{-- <div class="row mt-6">
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="date_input" class="col-md-4 col-form-label">Date Created</label>
+                        <div class="col-md-8">
+                            <input disabled autocomplete="off" wire:model="date" type="date"
+                                class="form-control @error('date')is-invalid @enderror" id="date_input"
+                                aria-describedby="date_input_help" />
+                            @error('date')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                </div>
+            </div> --}}
 
             {{-- - Procurement Section Divider and Introduction - --}}
             <div class="divider mt-6">
@@ -236,90 +250,146 @@
                 <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
             </div>
 
-            <div class="row">
-                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addItemModal"
-                    class="btn btn-primary waves-effect waves-light w-25 m-auto">
-                    <span class="fa-solid fa-file-circle-plus me-1_5"></span>Add Item
-                </a>
-            </div>
-
             <p class="mt-6 fw-medium">For items with multiple specifications, please attach additional
-                documentation
-                as necessary <span class="text-danger">*</span></p>
+                documentation as necessary <span class="text-danger">*</span></p>
 
-            <div class="row mt-6">
-                <table class="table table-hover table-bordered w-100">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Qty. In Stock</th>
-                            <th>Qty. Requesting</th>
-                            <th>Unit of Measure</th>
-                            <th>Size</th>
-                            <th>Colour</th>
-                            <th>Brand/Model</th>
-                            <th>Other</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0">
-                        @forelse($items as $key => $item)
+            <div class="row mt-6" x-data="{
+                items: $wire.entangle('items'),
+                errors: $wire.entangle('validationErrors')
+            }">
+                <div class="table-responsive">
+                    <table class="table table-bordered w-100">
+                        <thead>
                             <tr>
-                                <td>{{ $item['name'] }}</td>
-                                <td>{{ $item['qty_in_stock'] }}</td>
-                                <td>{{ $item['qty_requesting'] }}</td>
-                                <td>{{ $item['unit_of_measure'] }}</td>
-                                <td>{{ $item['size'] }}</td>
-                                <td>{{ $item['colour'] }}</td>
-                                <td>{{ $item['brand_model'] }}</td>
-                                <td>{{ $item['other'] }}</td>
-                                <td>
-                                    <button class="btn btn-danger mx-auto"
-                                        wire:click="removeItem({{ $key }})"><i
-                                            class="fa-solid fa-trash-can"></i></button>
-                                </td>
+                                <th>Item</th>
+                                <th>Qty. In Stock</th>
+                                <th>Qty. Requesting</th>
+                                <th>Unit of Measure</th>
+                                <th>Size</th>
+                                <th>Colour</th>
+                                <th>Brand/Model</th>
+                                <th>Other</th>
+                                <th style="width: 80px;">Actions</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="9" class="text-center">No items added.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <p class="text-center mt-6 fw-medium">Please contact the Finance & Accounts department to
-                obtain the
-                following information <span class="text-danger">*</span></p>
-
-            <div class="row mt-6">
-
-                <div class="col">
-                    <div class="form-check mt-4">
-                        <label class="form-check-label" for="defaultCheck1"> Availability of Funds </label>
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
-                            wire:model="availability_of_funds">
-                    </div>
-                    <div class="form-check mt-4">
-                        <label class="form-check-label" for="defaultCheck2"> Verified by Accounts </label>
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck2"
-                            wire:model="verified_by_accounts">
-                    </div>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            <template x-for="(item, index) in items" :key="index">
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                            :class="errors['items.' + index + '.name'] ? 'is-invalid' : ''"
+                                            x-model="items[index].name" placeholder="Item Name" required>
+                                        <template x-if="errors['items.' + index + '.name']">
+                                            <div class="text-danger small"
+                                                x-text="errors['items.' + index + '.name'][0]"></div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm"
+                                            :class="errors['items.' + index + '.qty_in_stock'] ? 'is-invalid' : ''"
+                                            x-model="items[index].qty_in_stock" placeholder="0" min="0"
+                                            required>
+                                        <template x-if="errors['items.' + index + '.qty_in_stock']">
+                                            <div class="text-danger small"
+                                                x-text="errors['items.' + index + '.qty_in_stock'][0]">
+                                            </div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm"
+                                            :class="errors['items.' + index + '.qty_requesting'] ? 'is-invalid' : ''"
+                                            x-model="items[index].qty_requesting" placeholder="0" min="1"
+                                            required>
+                                        <template x-if="errors['items.' + index + '.qty_requesting']">
+                                            <div class="text-danger small"
+                                                x-text="errors['items.' + index + '.qty_requesting'][0]">
+                                            </div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                            :class="errors['items.' + index + '.unit_of_measure'] ? 'is-invalid' : ''"
+                                            x-model="items[index].unit_of_measure" placeholder="Unit">
+                                        <template x-if="errors['items.' + index + '.unit_of_measure']">
+                                            <div class="text-danger small"
+                                                x-text="errors['items.' + index + '.unit_of_measure'][0]">
+                                            </div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                            :class="errors['items.' + index + '.size'] ? 'is-invalid' : ''"
+                                            x-model="items[index].size" placeholder="Size">
+                                        <template x-if="errors['items.' + index + '.size']">
+                                            <div class="text-danger small"
+                                                x-text="errors['items.' + index + '.size'][0]"></div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                            :class="errors['items.' + index + '.colour'] ? 'is-invalid' : ''"
+                                            x-model="items[index].colour" placeholder="Colour">
+                                        <template x-if="errors['items.' + index + '.colour']">
+                                            <div class="text-danger small"
+                                                x-text="errors['items.' + index + '.colour'][0]"></div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                            :class="errors['items.' + index + '.brand_model'] ? 'is-invalid' : ''"
+                                            x-model="items[index].brand_model" placeholder="Brand/Model">
+                                        <template x-if="errors['items.' + index + '.brand_model']">
+                                            <div class="text-danger small"
+                                                x-text="errors['items.' + index + '.brand_model'][0]">
+                                            </div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                            :class="errors['items.' + index + '.other'] ? 'is-invalid' : ''"
+                                            x-model="items[index].other" placeholder="Other">
+                                        <template x-if="errors['items.' + index + '.other']">
+                                            <div class="text-danger small"
+                                                x-text="errors['items.' + index + '.other'][0]"></div>
+                                        </template>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                            @click="items.splice(index, 1)" :disabled="items.length <= 1"
+                                            title="Cannot delete the last item">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template x-if="items.length === 0">
+                                <tr>
+                                    <td colspan="9" class="text-center">No items added. Click the button below to
+                                        add an item.</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="col">
-                    <div class="form-floating form-floating-outline">
-                        <input autocomplete="off" wire:model="vote_no" type="text"
-                            class="form-control @error('vote_no')is-invalid @enderror" id="floatingInput"
-                            placeholder="Vote Number" aria-describedby="floatingInputHelp" />
-                        <label for="floatingInput">Vote Number</label>
+                <div class="row mt-3">
+                    <div class="col d-flex justify-content-center">
+                        <button type="button" class="btn btn-primary waves-effect waves-light"
+                            @click="items.push({ 
+                                name: '', 
+                                qty_in_stock: 0, 
+                                qty_requesting: 1, 
+                                unit_of_measure: '', 
+                                size: '', 
+                                colour: '', 
+                                brand_model: '', 
+                                other: '' 
+                            })">
+                            <span class="fa-solid fa-circle-plus me-1_5"></span>Add Item
+                        </button>
                     </div>
-                    @error('vote_no')
-                        <div class="text-danger"> {{ $message }} </div>
-                    @enderror
                 </div>
             </div>
-
 
             <div class="divider">
                 <div class="divider-text fw-bold fs-5 mt-4"><i class="fa-solid fa-file-arrow-up me-2"></i>File

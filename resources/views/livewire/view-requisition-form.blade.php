@@ -22,7 +22,7 @@
                     {{-- Center Column: Heading --}}
                     <div class="col-6 col-sm-8 text-center">
                         <h1 class="h3 mb-0 text-gray-800">
-                            <strong><i class="fa-solid fa-file-invoice"></i>
+                            <strong>#
                                 {{ $requisitionForm->form_code }}</strong>
                         </h1>
                     </div>
@@ -199,7 +199,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-6">
                         <div class="mb-3 row">
                             <label for="contact_info_input" class="col-md-4 col-form-label">Contact Person
                                 Info</label>
@@ -214,10 +214,23 @@
                                 @enderror
                             </div>
                         </div>
+                    </div> --}}
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="date_input" class="col-md-4 col-form-label">Date Created</label>
+                            <div class="col-md-8">
+                                <input autocomplete="off" wire:model="date" type="date" disabled
+                                    class="form-control @error('date')is-invalid @enderror" id="date_input"
+                                    aria-describedby="date_input_help" />
+                                @error('date')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row mt-6">
+                {{-- <div class="row mt-6">
                     <div class="col-md-6">
                         <div class="mb-3 row">
                             <label for="date_input" class="col-md-4 col-form-label">Date Created</label>
@@ -234,7 +247,7 @@
 
                     <div class="col-md-6">
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="divider mt-6">
                     <div class="divider-text fw-bold fs-5"><i class="ri-file-text-line me-2"></i>Procurement Request
@@ -243,7 +256,7 @@
 
                 <p class="mt-6 fw-medium text-center">Please ensure this form is submitted with a covering memo
                     explaining the
-                    request</p>
+                    request <span class="text-danger">*</span></p>
 
                 <div class="row mt-6">
                     <div class="col-md-12">

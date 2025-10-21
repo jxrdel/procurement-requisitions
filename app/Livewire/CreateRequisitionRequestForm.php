@@ -41,6 +41,7 @@ class CreateRequisitionRequestForm extends Component
     public $users;
 
     public $items = [];
+    public $validationErrors = [];
     public $votes;
     public $item_name;
     public $qty_in_stock = 0;
@@ -69,32 +70,53 @@ class CreateRequisitionRequestForm extends Component
         $this->requesting_unit = Auth::user()->department_id;
         $this->head_of_department = Auth::user()->department->head_of_department_id ?? null;
         $this->votes = Vote::orderBy('number')->get();
+        $this->items = [
+            [
+                'name' => '',
+                'qty_in_stock' => 0,
+                'qty_requesting' => 1,
+                'unit_of_measure' => '',
+                'size' => '',
+                'colour' => '',
+                'brand_model' => '',
+                'other' => '',
+            ]
+        ];
     }
 
     public function save()
     {
-        dd($this->selected_votes);
-        // Validate the main form fields
-        try {
-            $this->validate([
-                'requesting_unit' => 'required|exists:departments,id',
-                'head_of_department' => 'required|exists:users,id',
-                'contact_person_id' => 'required|exists:users,id',
-                'date' => 'required|date|date_format:Y-m-d',
-                'contact_info' => 'nullable|string|max:255',
-                'justification' => 'required|string',
-                'location_of_delivery' => 'nullable|string|max:255',
-                'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
-                'estimated_value' => 'nullable|numeric|min:0',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->dispatch('scrollToError');
-            throw $e;
+        // Build validation rules for items dynamically
+        $rules = [
+            'requesting_unit' => 'required|exists:departments,id',
+            'head_of_department' => 'required|exists:users,id',
+            'contact_person_id' => 'required|exists:users,id',
+            'date' => 'required|date|date_format:Y-m-d',
+            'contact_info' => 'nullable|string|max:255',
+            'justification' => 'required|string',
+            'location_of_delivery' => 'nullable|string|max:255',
+            'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
+            'estimated_value' => 'nullable|numeric|min:0',
+            'items' => 'required|array|min:1',
+        ];
+
+        foreach ($this->items as $index => $item) {
+            $rules["items.{$index}.name"] = 'required|string|max:255';
+            $rules["items.{$index}.qty_in_stock"] = 'required|integer|min:0';
+            $rules["items.{$index}.qty_requesting"] = 'required|integer|min:1';
+            $rules["items.{$index}.unit_of_measure"] = 'nullable|string|max:50';
+            $rules["items.{$index}.size"] = 'nullable|string|max:50';
+            $rules["items.{$index}.colour"] = 'nullable|string|max:50';
+            $rules["items.{$index}.brand_model"] = 'nullable|string|max:255';
+            $rules["items.{$index}.other"] = 'nullable|string|max:255';
         }
 
-        if (empty($this->items)) {
-            $this->dispatch('show-error', message: 'Please add at least one item to the requisition form.');
-            return;
+        try {
+            $this->validate($rules);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->validationErrors = $e->validator->errors()->toArray();
+            $this->dispatch('scrollToError');
+            throw $e;
         }
 
         $form = RequisitionRequestForm::create([
@@ -112,6 +134,7 @@ class CreateRequisitionRequestForm extends Component
             'status' => RequestFormStatus::CREATED,
             'created_by' => Auth::user()->username ?? null,
         ]);
+
         foreach ($this->items as $item) {
             $form->items()->create($item);
         }
@@ -194,6 +217,14 @@ class CreateRequisitionRequestForm extends Component
             $this->skipRender();
         } else {
             $this->dispatch('preserveScroll');
+        }
+    }
+
+    public function updated($propertyName)
+    {
+        // Clear validation errors when user types
+        if (str_starts_with($propertyName, 'items.')) {
+            $this->validationErrors = [];
         }
     }
 }
