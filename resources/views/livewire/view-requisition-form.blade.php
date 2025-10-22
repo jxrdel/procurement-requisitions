@@ -3,6 +3,7 @@
     @include('livewire.approve-form-hod-modal')
     @include('livewire.decline-form-modal')
     @include('livewire.add-form-log')
+    @include('livewire.send-to-hod-modal')
     <div class="card">
         <div class="card-body" x-data="{ isEditing: $wire.entangle('isEditing') }">
 
@@ -48,16 +49,10 @@
                                 <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
                             </button>
                         @elseif($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD)
-                            <button type="button" style="width: 8.5rem"
-                                wire:confirm="Are you sure you want to approve this requisition form?"
-                                wire:loading.attr="disabled" wire:target="approveRequisitionHOD"
-                                wire:click="approveRequisitionHOD" class="btn btn-sm btn-success">
-                                <span wire:loading.remove>
-                                    <i class="ri-checkbox-circle-line me-1"></i> Approve
-                                </span>
-                                <span wire:loading>
-                                    <i class="ri-loader-2-line ri-spin me-1"></i>
-                                </span>
+                            <button wire:loading.attr="disabled" style="width: 8.5rem" data-bs-toggle="modal"
+                                data-bs-target="#approveRequisitionFormHOD" type="button"
+                                class="btn btn-sm btn-success">
+                                <i class="ri-checkbox-circle-line me-1"></i> Approve
                             </button>
                             <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
                                 class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
@@ -258,6 +253,31 @@
                     explaining the
                     request <span class="text-danger">*</span></p>
 
+                {{-- Category --}}
+                <div class="row mt-6">
+                    <div class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="category_input" class="col-md-4 col-form-label">Category</label>
+                            <div class="col-md-8">
+                                <select x-bind:disabled="!isEditing" required wire:model="category"
+                                    class="form-select @error('category')is-invalid @enderror" id="category_label"
+                                    aria-label="Category Select">
+                                    <option value="">Select a Category</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category }}">{{ $category }}</option>
+                                    @endforeach
+                                </select>
+                                @error('category')
+                                    <div class="text-danger"> {{ $message }} </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                    </div>
+                </div>
+
                 <div class="row mt-6">
                     <div class="col-md-12">
                         <div class="mb-3 row">
@@ -440,17 +460,18 @@
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO)
                     <div class="row mt-8" x-show="!isEditing">
                         <div class="text-center m-auto">
-                            <button type="button" class="btn btn-sm btn-info" wire:loading.attr="disabled"
-                                wire:target="sendToHOD"
-                                wire:confirm="Are you sure you want to send this form to the Head of Department for approval?"
-                                wire:click="sendToHOD">
+                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
+                                data-bs-target="#sendToHodModal">
                                 <i class="tf-icons ri-mail-send-line me-1_5"></i>
                                 <span>Send to Head of Department</span>
-                                <div wire:loading wire:target="sendToHOD"
-                                    class="spinner-border spinner-border-sm text-secondary mx-1" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
                             </button>
+                        </div>
+                    </div>
+                @elseif($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD)
+                    <div class="row mt-4">
+                        <div class="alert alert-warning text-center" role="alert">
+                            <strong>This requisition form is pending approval from
+                                {{ $requisitionForm->headOfDepartment->name ?? 'the Head of Department' }}.</strong>
                         </div>
                     </div>
                 @elseif ($requisitionForm->hod_approval)
@@ -753,26 +774,25 @@
         $(document).ready(function() {
             window.addEventListener('close-add-item-modal', event => {
                 $('#addItemModal').modal('hide');
-            })
-        });
+            });
 
-        $(document).ready(function() {
             window.addEventListener('close-log-modal', event => {
                 $('#addLogModal').modal('hide');
-            })
-        });
+            });
 
-        $(document).ready(function() {
             window.addEventListener('close-hod-approval-modal', event => {
                 $('#approveRequisitionFormHOD').modal('hide');
-            })
-        });
+            });
 
-        $(document).ready(function() {
             window.addEventListener('close-decline-modal', event => {
                 $('#declineRequisitionForm').modal('hide');
-            })
+            });
+
+            window.addEventListener('close-sent-to-hod-modal', event => {
+                $('#sendToHodModal').modal('hide');
+            });
         });
+
 
         $('#voteSelect').select2();
         $('#voteSelect').val(@json($this->selected_votes)).trigger('change');

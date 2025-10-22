@@ -139,6 +139,31 @@
                 explaining the
                 request</p>
 
+            {{-- Category --}}
+            <div class="row mt-6">
+                <div class="col-md-6">
+                    <div class="mb-3 row">
+                        <label for="category_input" class="col-md-4 col-form-label">Category</label>
+                        <div class="col-md-8">
+                            <select required wire:model="category"
+                                class="form-select @error('category')is-invalid @enderror" id="category_label"
+                                aria-label="Category Select">
+                                <option value="">Select a Category</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category }}">{{ $category }}</option>
+                                @endforeach
+                            </select>
+                            @error('category')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                </div>
+            </div>
+
             {{-- Justification (Textarea - Full Width) --}}
             <div class="row mt-6">
                 <div class="col-md-12">

@@ -36,7 +36,7 @@ class RequestForReportingOfficerApproval extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Requisition Form Sent for Approval | PRA')
+            ->subject('Requisition Form Sent for Non-Objection | PRA')
             ->markdown('emails.request-for-reporting-officer-approval', [
                 "recipient" => $notifiable->name,
                 "form" => $this->form,

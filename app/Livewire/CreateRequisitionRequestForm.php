@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\FormCategory;
 use App\Models\Department;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
@@ -22,6 +23,7 @@ class CreateRequisitionRequestForm extends Component
     public $head_of_department;
     public $contact_person_id;
     public $date;
+    public $category;
     public $contact_info;
 
     public $justification;
@@ -54,6 +56,7 @@ class CreateRequisitionRequestForm extends Component
 
     public $uploads;
     public $selected_votes = [];
+    public $categories;
 
 
     public function render()
@@ -70,6 +73,7 @@ class CreateRequisitionRequestForm extends Component
         $this->requesting_unit = Auth::user()->department_id;
         $this->head_of_department = Auth::user()->department->head_of_department_id ?? null;
         $this->votes = Vote::orderBy('number')->get();
+        $this->categories = FormCategory::options();
         $this->items = [
             [
                 'name' => '',
@@ -98,10 +102,12 @@ class CreateRequisitionRequestForm extends Component
             'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
             'estimated_value' => 'nullable|numeric|min:0',
             'items' => 'required|array|min:1',
+            'uploads' => 'required|array|min:1',
+            'uploads.*' => 'file|max:10240',
         ];
 
         foreach ($this->items as $index => $item) {
-            $rules["items.{$index}.name"] = 'required|string|max:255';
+            $rules["items.{$index}.name"] = 'required|string';
             $rules["items.{$index}.qty_in_stock"] = 'required|integer|min:0';
             $rules["items.{$index}.qty_requesting"] = 'required|integer|min:1';
             $rules["items.{$index}.unit_of_measure"] = 'nullable|string|max:50';
@@ -112,7 +118,10 @@ class CreateRequisitionRequestForm extends Component
         }
 
         try {
-            $this->validate($rules);
+            $this->validate($rules, [
+                'uploads.required' => 'Please upload at least 1 document.',
+                'items.*.name.required' => 'This field is required.',
+            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->validationErrors = $e->validator->errors()->toArray();
             $this->dispatch('scrollToError');
@@ -124,6 +133,7 @@ class CreateRequisitionRequestForm extends Component
             'head_of_department_id' => $this->head_of_department,
             'contact_person_id' => $this->contact_person_id,
             'date' => $this->date,
+            'category' => $this->category,
             'contact_info' => $this->contact_info,
             'location_of_delivery' => $this->location_of_delivery,
             'justification' => $this->justification,

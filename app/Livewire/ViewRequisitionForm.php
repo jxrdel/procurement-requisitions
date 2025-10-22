@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\FormCategory;
 use App\Models\Department;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
@@ -34,6 +35,7 @@ class ViewRequisitionForm extends Component
     public $head_of_department;
     public $contact_person_id;
     public $date;
+    public $category;
     public $contact_info;
 
     public $justification;
@@ -48,6 +50,9 @@ class ViewRequisitionForm extends Component
     public $procurement_officer_assigned;
     public $date_received;
     public $expected_date_of_completion;
+    public $contact_person_note;
+    public $hod_note;
+    public $reporting_officer_note;
 
     public $units;
     public $users;
@@ -65,6 +70,7 @@ class ViewRequisitionForm extends Component
 
     public $uploads;
     public $votes;
+    public $categories;
 
     public $isEditing = false;
 
@@ -82,11 +88,13 @@ class ViewRequisitionForm extends Component
         $this->units = Department::orderBy('name')->get();
         $this->users = User::orderBy('name')->get();
         $this->votes = Vote::orderBy('number')->get();
+        $this->categories = FormCategory::options();
 
         $this->requesting_unit = $this->requisitionForm->requesting_unit;
         $this->head_of_department = $this->requisitionForm->head_of_department_id;
         $this->contact_person_id = $this->requisitionForm->contact_person_id;
         $this->date = $this->requisitionForm->date ? $this->requisitionForm->date->format('Y-m-d') : null;
+        $this->category = $this->requisitionForm->category;
         $this->contact_info = $this->requisitionForm->contact_info;
         $this->justification = $this->requisitionForm->justification;
         $this->location_of_delivery = $this->requisitionForm->location_of_delivery;
@@ -131,6 +139,7 @@ class ViewRequisitionForm extends Component
             'head_of_department_id' => $this->head_of_department,
             'contact_person_id' => $this->contact_person_id,
             'date' => $this->date,
+            'category' => $this->category,
             'contact_info' => $this->contact_info,
             'justification' => $this->justification,
             'location_of_delivery' => $this->location_of_delivery,
@@ -151,7 +160,7 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        $this->dispatch('show-message', message: 'Requisition form updated successfully.');
+        $this->dispatch('show-message', message: 'Form updated successfully.');
         $this->isEditing = false;
     }
 
@@ -210,7 +219,12 @@ class ViewRequisitionForm extends Component
 
     public function sendToHOD()
     {
+        $this->validate([
+            'contact_person_note' => 'required|string',
+        ]);
+
         $this->requisitionForm->status = RequestFormStatus::SENT_TO_HOD;
+        $this->requisitionForm->contact_person_note = $this->contact_person_note;
         $this->requisitionForm->date_sent_to_hod = now();
         $this->requisitionForm->save();
 
@@ -224,6 +238,7 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
+        $this->dispatch('close-sent-to-hod-modal');
         $this->dispatch('show-message', message: 'Requisition form sent to Head of Department for approval.');
     }
 
@@ -248,9 +263,11 @@ class ViewRequisitionForm extends Component
     {
         $this->validate([
             'selectedOfficer' => 'required|exists:users,id',
+            'hod_note' => 'required|string',
         ], [
             'selectedOfficer.required' => 'Please select a Reporting Officer to send the form to.',
             'selectedOfficer.exists' => 'The selected Reporting Officer is invalid.',
+            'hod_note.required' => 'Please enter a note',
         ]);
 
         $reportingOfficer = User::find($this->selectedOfficer);
@@ -263,16 +280,17 @@ class ViewRequisitionForm extends Component
         }
 
         $this->requisitionForm->hod_approval = true;
+        $this->requisitionForm->hod_note = $this->hod_note;
         $this->requisitionForm->hod_approval_date = now();
         $this->requisitionForm->reporting_officer_id = $this->selectedOfficer;
         $this->requisitionForm->save();
 
         if ($reportingOfficer) {
-            // Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
+            Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
-            'details' => 'Requisition form approved by ' . Auth::user()->name . ' and sent to ' . $reportingOfficer->reporting_officer_role . ' ' . $reportingOfficer->name . ' for approval.',
+            'details' => 'Requisition form approved by ' . Auth::user()->name . ' and sent to ' . $reportingOfficer->reporting_officer_role . ' ' . $reportingOfficer->name . ' for non-objection.',
             'created_by' => Auth::user()->username,
         ]);
 

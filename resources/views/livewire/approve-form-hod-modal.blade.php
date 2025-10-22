@@ -34,6 +34,15 @@
                             @error('selectedOfficer')
                                 <div class="text-danger mt-1"> {{ $message }} </div>
                             @enderror
+                            <div class="form-floating form-floating-outline mt-4">
+                                <textarea wire:model="hod_note" class="form-control @error('hod_note')is-invalid @enderror"
+                                    placeholder="Enter note here" id="hodNoteInput" style="height: 100px"></textarea>
+                                <label for="hodNoteInput">Note</label>
+                            </div>
+
+                            @error('hod_note')
+                                <div class="text-danger mt-1"> {{ $message }} </div>
+                            @enderror
                         </div>
                     </div>
                 </form>
@@ -42,8 +51,12 @@
 
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-success" wire:click="approveRequisitionHOD"
-                    wire:loading.attr="disabled">
-                    Approve
+                    wire:loading.attr="disabled" wire:target="approveRequisitionHOD">
+                    <span>Approve</span>
+                    <div wire:loading wire:target="approveRequisitionHOD"
+                        class="spinner-border spinner-border-sm text-white mx-1" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </button>
 
                 <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>

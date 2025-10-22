@@ -4,6 +4,10 @@
 
 <p>Please be advised that a new requisition form has been sent for your non-objection.</p>
 
+<p><strong>Note:</strong></p>
+
+<p>{{ $form->hod_note }}</p>
+
 <p><strong>Form Details:</strong></p>
 
 <ul>
