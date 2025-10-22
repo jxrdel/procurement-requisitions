@@ -34,37 +34,53 @@ class User extends Authenticatable
 
     public function scopeProcurement($query)
     {
-        return $query->where('department', 'Procurement')->where('is_active', true);
+        return $query->whereHas('department', function ($q) {
+            $q->where('name', 'Procurement Unit');
+        })->where('is_active', true);
     }
 
     public function scopeCostBudgeting($query)
     {
-        return $query->where('department', 'Cost & Budgeting')->where('is_active', true);
+        return $query->whereHas('department', function ($q) {
+            $q->where('name', 'Cost & Budgeting');
+        })->where('is_active', true);
     }
 
     public function scopeAccountsPayable($query)
     {
-        return $query->where('department', 'Accounts Payable')->where('is_active', true);
+        // Assuming 'Accounts Payable' is the correct department name used in the database.
+        // If the department name is 'Accounts', you should change 'Accounts Payable' below.
+        return $query->whereHas('department', function ($q) {
+            $q->where('name', 'Accounts Payable');
+        })->where('is_active', true);
     }
 
     public function scopeVoteControl($query)
     {
-        return $query->where('department', 'Vote Control')->where('is_active', true);
+        return $query->whereHas('department', function ($q) {
+            $q->where('name', 'Vote Control');
+        })->where('is_active', true);
     }
 
     public function scopeAdmin($query)
     {
-        return $query->where('department', 'Admin')->where('is_active', true);
+        return $query->whereHas('department', function ($q) {
+            $q->where('name', 'General Administration'); // Assumes 'Admin' maps to a full department name
+        })->where('is_active', true);
     }
 
     public function scopeCheckStaff($query)
     {
-        return $query->where('department', 'Check Staff')->where('is_active', true);
+        return $query->whereHas('department', function ($q) {
+            $q->where('name', 'Check Dispatch'); // Assumes 'Check Staff' maps to 'Check Dispatch'
+        })->where('is_active', true);
     }
 
     public function scopeChequeProcessing($query)
     {
-        return $query->where('department', 'Cheque Processing')->where('is_active', true);
+        return $query->whereHas('department', function ($q) {
+            $q->where('name', 'Cheque Processing');
+        })->where('is_active', true);
     }
 
     public function scopeReportingOfficers($query)

@@ -82,7 +82,7 @@
                 {{-- Date Created --}}
                 <div class="col-md-6">
                     <div class="mb-3 row">
-                        <label for="date_input" class="col-md-4 col-form-label">Date Created</label>
+                        <label for="date_input" class="col-md-4 col-form-label">Date</label>
                         <div class="col-md-8">
                             <input disabled autocomplete="off" wire:model="date" type="date"
                                 class="form-control @error('date')is-invalid @enderror" id="date_input"
@@ -143,7 +143,8 @@
             <div class="row mt-6">
                 <div class="col-md-6">
                     <div class="mb-3 row">
-                        <label for="category_input" class="col-md-4 col-form-label">Category</label>
+                        <label for="category_input" class="col-md-4 col-form-label">Category <span
+                                class="text-danger">*</span></label>
                         <div class="col-md-8">
                             <select required wire:model="category"
                                 class="form-select @error('category')is-invalid @enderror" id="category_label"
@@ -186,7 +187,7 @@
                 <div class="col-md-6">
                     <div class="mb-3 row">
                         <label for="location_of_delivery_input" class="col-md-4 col-form-label">Location of
-                            Delivery</label>
+                            Delivery/ Installation/ Works</label>
                         <div class="col-md-8">
                             <input autocomplete="off" wire:model="location_of_delivery" type="text"
                                 class="form-control @error('location_of_delivery')is-invalid @enderror"
@@ -275,8 +276,15 @@
                 <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
             </div>
 
-            <p class="mt-6 fw-medium">For items with multiple specifications, please attach additional
+            <p class="mt-6 fw-medium text-center">For items with multiple specifications, please attach additional
                 documentation as necessary <span class="text-danger">*</span></p>
+
+            {{-- <div class="row">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#addItemModal"
+                    class="btn btn-primary waves-effect waves-light w-25 m-auto">
+                    <span class="fa-solid fa-file-circle-plus me-1_5"></span>Add Item
+                </button>
+            </div> --}}
 
             <div class="row mt-6" x-data="{
                 items: $wire.entangle('items'),

@@ -58,6 +58,7 @@ class ViewRequisitionForm extends Component
     public $users;
 
     public $items = [];
+    public $validationErrors = [];
     public $selected_votes = [];
     public $item_name;
     public $qty_in_stock = 0;
@@ -112,26 +113,43 @@ class ViewRequisitionForm extends Component
 
     public function save()
     {
-        try {
-            $this->validate([
-                'requesting_unit' => 'required|exists:departments,id',
-                'head_of_department' => 'required|exists:users,id',
-                'contact_person_id' => 'required|exists:users,id',
-                'date' => 'required|date|date_format:Y-m-d',
-                'contact_info' => 'nullable|string|max:255',
-                'justification' => 'required|string',
-                'location_of_delivery' => 'nullable|string|max:255',
-                'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
-                'estimated_value' => 'nullable|numeric|min:0',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->dispatch('scrollToError');
-            throw $e;
+
+        // Build validation rules for items dynamically
+        $rules = [
+            'requesting_unit' => 'required|exists:departments,id',
+            'head_of_department' => 'required|exists:users,id',
+            'contact_person_id' => 'required|exists:users,id',
+            'date' => 'required|date|date_format:Y-m-d',
+            'contact_info' => 'nullable|string|max:255',
+            'justification' => 'required|string',
+            'location_of_delivery' => 'nullable|string|max:255',
+            'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
+            'estimated_value' => 'nullable|numeric|min:0',
+            'items' => 'required|array|min:1',
+            // 'uploads' => 'array|min:1',
+            // 'uploads.*' => 'file|max:10240',
+        ];
+
+        foreach ($this->items as $index => $item) {
+            $rules["items.{$index}.name"] = 'required|string';
+            $rules["items.{$index}.qty_in_stock"] = 'required|integer|min:0';
+            $rules["items.{$index}.qty_requesting"] = 'required|integer|min:1';
+            $rules["items.{$index}.unit_of_measure"] = 'nullable|string|max:50';
+            $rules["items.{$index}.size"] = 'nullable|string|max:50';
+            $rules["items.{$index}.colour"] = 'nullable|string|max:50';
+            $rules["items.{$index}.brand_model"] = 'nullable|string|max:255';
+            $rules["items.{$index}.other"] = 'nullable|string|max:255';
         }
 
-        if (empty($this->items)) {
-            $this->dispatch('show-error', message: 'Please add at least one item to the requisition form.');
-            return;
+        try {
+            $this->validate($rules, [
+                'uploads.required' => 'Please upload at least 1 document.',
+                'items.*.name.required' => 'This field is required.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->validationErrors = $e->validator->errors()->toArray();
+            $this->dispatch('scrollToError');
+            throw $e;
         }
 
         $data = [
@@ -286,7 +304,7 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->save();
 
         if ($reportingOfficer) {
-            Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
+            // Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
@@ -333,7 +351,7 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        Notification::send($this->requisitionForm->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
+        // Notification::send($this->requisitionForm->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
 
 
         $this->dispatch('show-message', message: 'Requisition form approved successfully.');

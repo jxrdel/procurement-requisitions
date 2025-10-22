@@ -35,7 +35,8 @@
                         <div wire:ignore>
                             <label style="width:100%" for="unitSelect">Requesting Unit:</label>
 
-                            <select class="js-example-basic-single form-control" id="unitSelect" style="width: 100%">
+                            <select wire:model="requesting_unit" class="js-example-basic-single form-control"
+                                id="unitSelect" style="width: 100%">
                                 <option value="" selected>Select a Unit</option>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department->id }}">{{ $department->name }}</option>
@@ -82,7 +83,8 @@
                         <div wire:ignore>
                             <label style="width:100%" for="sofSelect">Source of Funds:</label>
 
-                            <select class="js-example-basic-single form-control" id="sofSelect" style="width: 100%">
+                            <select wire:model="source_of_funds" class="js-example-basic-single form-control"
+                                id="sofSelect" style="width: 100%">
                                 <option value="" selected>Select a Vote</option>
                                 @foreach ($votes as $vote)
                                     <option value="{{ $vote->number }}">{{ $vote->number }}</option>
@@ -103,6 +105,81 @@
                             <label for="floatingInput">Date Received by Procurement</label>
                         </div>
                         @error('date_received_procurement')
+                            <div class="text-danger"> {{ $message }} </div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mt-6" x-data="{ siteVisit: $wire.entangle('site_visit') }">
+                    <div class="col">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" id="siteVisitCheck" x-model="siteVisit">
+                            <label class="form-check-label" for="siteVisitCheck">
+                                Site Visit Required
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col" x-show="siteVisit" x-transition>
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="site_visit_date" type="date"
+                                class="form-control @error('site_visit_date')is-invalid @enderror"
+                                id="siteVisitDateInput" placeholder="Site Visit Date" />
+                            <label for="siteVisitDateInput">Site Visit Date</label>
+                        </div>
+                        @error('site_visit_date')
+                            <div class="text-danger"> {{ $message }} </div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mt-6">
+                    <div class="col">
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="tender_issue_date" type="date"
+                                class="form-control @error('tender_issue_date')is-invalid @enderror"
+                                id="tenderIssueDateInput" placeholder="Tender Issue Date" />
+                            <label for="tenderIssueDateInput">Tender Issue Date</label>
+                        </div>
+                        @error('tender_issue_date')
+                            <div class="text-danger"> {{ $message }} </div>
+                        @enderror
+                    </div>
+
+                    <div class="col">
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="tender_deadline_date" type="date"
+                                class="form-control @error('tender_deadline_date')is-invalid @enderror"
+                                id="tenderDeadlineDateInput" placeholder="Tender Deadline Date" />
+                            <label for="tenderDeadlineDateInput">Tender Deadline Date</label>
+                        </div>
+                        @error('tender_deadline_date')
+                            <div class="text-danger"> {{ $message }} </div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mt-6">
+                    <div class="col">
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="evaluation_start_date" type="date"
+                                class="form-control @error('evaluation_start_date')is-invalid @enderror"
+                                id="evaluationStartDateInput" placeholder="Evaluation Start Date" />
+                            <label for="evaluationStartDateInput">Evaluation Start Date</label>
+                        </div>
+                        @error('evaluation_start_date')
+                            <div class="text-danger"> {{ $message }} </div>
+                        @enderror
+                    </div>
+
+                    <div class="col">
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="evaluation_end_date" type="date"
+                                class="form-control @error('evaluation_end_date')is-invalid @enderror"
+                                id="evaluationEndDateInput" placeholder="Evaluation End Date" />
+                            <label for="evaluationEndDateInput">Evaluation End Date</label>
+                        </div>
+                        @error('evaluation_end_date')
                             <div class="text-danger"> {{ $message }} </div>
                         @enderror
                     </div>

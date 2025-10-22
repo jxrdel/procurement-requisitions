@@ -33,7 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [Controller::class, 'index'])->name('/');
 
     Route::get('/requisitions', [RequisitionController::class, 'index'])->name('requisitions.index');
-    Route::get('/requisitions/create', CreateRequisition::class)->name('requisitions.create');
+    Route::get('/requisitions/create/{form}', CreateRequisition::class)->name('requisitions.create');
     Route::get('/requisitions/view/{id}', ViewRequisition::class)->name('requisitions.view');
     Route::get('/getrequisitions', [RequisitionController::class, 'getRequisitions'])->name('getrequisitions');
     Route::get('/getinprogressrequisitions', [RequisitionController::class, 'getInProgressRequisitions'])->name('getinprogressrequisitions');

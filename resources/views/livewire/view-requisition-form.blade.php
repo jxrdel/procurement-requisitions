@@ -94,7 +94,8 @@
                                 Decline
                             </button>
                         @elseif ($requisitionForm->status === \App\RequestFormStatus::APPROVED_BY_PROCUREMENT)
-                            <a href="{{ route('requisitions.create') }}" class="btn btn-sm btn-success">
+                            <a href="{{ route('requisitions.create', ['form' => $requisitionForm]) }}"
+                                class="btn btn-sm btn-success">
                                 <i class="fa-solid fa-plus-circle me-1"></i> Create Requisition
                             </a>
                         @endif
@@ -298,7 +299,7 @@
                     <div class="col-md-6">
                         <div class="mb-3 row">
                             <label for="location_of_delivery_input" class="col-md-4 col-form-label">Location of
-                                Delivery</label>
+                                Delivery/ Installation/ Works</label>
                             <div class="col-md-8">
                                 <input autocomplete="off" wire:model="location_of_delivery" type="text"
                                     x-bind:disabled="!isEditing"
@@ -390,7 +391,7 @@
                     <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
                 </div>
 
-                @if (!$requisitionForm->hod_approval)
+                {{-- @if (!$requisitionForm->hod_approval)
                     <div class="row">
                         <button type="button" data-bs-toggle="modal" data-bs-target="#addItemModal"
                             x-bind:class="{ 'pointer-events-none opacity-50': !isEditing }"
@@ -398,57 +399,162 @@
                             <span class="fa-solid fa-file-circle-plus me-1_5"></span>Add Item
                         </button>
                     </div>
-                @endif
+                @endif --}}
 
                 <p class="mt-6 fw-medium text-center">For items with multiple specifications, please attach additional
                     documentation
                     as necessary <span class="text-danger">*</span></p>
 
-                <div class="row mt-6">
-                    <table class="table table-hover table-bordered w-100">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Qty. In Stock</th>
-                                <th>Qty. Requesting</th>
-                                <th>Unit of Measure</th>
-                                <th>Size</th>
-                                <th>Colour</th>
-                                <th>Brand/Model</th>
-                                <th>Other</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="table-border-bottom-0">
-                            @forelse($items as $key => $item)
+                <div class="row mt-6" x-data="{
+                    items: $wire.entangle('items'),
+                    errors: $wire.entangle('validationErrors'),
+                    isEditing: $wire.entangle('isEditing')
+                }">
+                    <div class="table-responsive">
+                        <table class="table table-bordered w-100">
+                            <thead>
                                 <tr>
-                                    <td>{{ $item['name'] }}</td>
-                                    <td>{{ $item['qty_in_stock'] }}</td>
-                                    <td>{{ $item['qty_requesting'] }}</td>
-                                    <td>{{ $item['unit_of_measure'] }}</td>
-                                    <td>{{ $item['size'] }}</td>
-                                    <td>{{ $item['colour'] }}</td>
-                                    <td>{{ $item['brand_model'] }}</td>
-                                    <td>{{ $item['other'] }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger mx-auto"
-                                            x-bind:disabled="!isEditing"
-                                            wire:click="removeItem({{ $key }})">
-                                            <i class="fa-solid fa-trash-can"></i>
-                                        </button>
-                                    </td>
+                                    <th>Item</th>
+                                    <th>Qty. In Stock</th>
+                                    <th>Qty. Requesting</th>
+                                    <th>Unit of Measure</th>
+                                    <th>Size</th>
+                                    <th>Colour</th>
+                                    <th>Brand/Model</th>
+                                    <th>Other</th>
+                                    <th style="width: 80px;">Actions</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="9" class="text-center">No items added.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="table-border-bottom-0">
+                                <template x-for="(item, index) in items" :key="index">
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                :class="errors['items.' + index + '.name'] ? 'is-invalid' : ''"
+                                                x-model="items[index].name" placeholder="Item Name" required
+                                                x-bind:disabled="!isEditing">
+                                            <template x-if="errors['items.' + index + '.name']">
+                                                <div class="text-danger small"
+                                                    x-text="errors['items.' + index + '.name'][0]"></div>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm"
+                                                :class="errors['items.' + index + '.qty_in_stock'] ? 'is-invalid' : ''"
+                                                x-model="items[index].qty_in_stock" placeholder="0" min="0"
+                                                required x-bind:disabled="!isEditing">
+                                            <template x-if="errors['items.' + index + '.qty_in_stock']">
+                                                <div class="text-danger small"
+                                                    x-text="errors['items.' + index + '.qty_in_stock'][0]">
+                                                </div>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm"
+                                                :class="errors['items.' + index + '.qty_requesting'] ? 'is-invalid' : ''"
+                                                x-model="items[index].qty_requesting" placeholder="0" min="1"
+                                                required x-bind:disabled="!isEditing">
+                                            <template x-if="errors['items.' + index + '.qty_requesting']">
+                                                <div class="text-danger small"
+                                                    x-text="errors['items.' + index + '.qty_requesting'][0]">
+                                                </div>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                :class="errors['items.' + index + '.unit_of_measure'] ? 'is-invalid' : ''"
+                                                x-model="items[index].unit_of_measure" placeholder="Unit"
+                                                x-bind:disabled="!isEditing">
+                                            <template x-if="errors['items.' + index + '.unit_of_measure']">
+                                                <div class="text-danger small"
+                                                    x-text="errors['items.' + index + '.unit_of_measure'][0]">
+                                                </div>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                :class="errors['items.' + index + '.size'] ? 'is-invalid' : ''"
+                                                x-model="items[index].size" placeholder="Size"
+                                                x-bind:disabled="!isEditing">
+                                            <template x-if="errors['items.' + index + '.size']">
+                                                <div class="text-danger small"
+                                                    x-text="errors['items.' + index + '.size'][0]"></div>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                :class="errors['items.' + index + '.colour'] ? 'is-invalid' : ''"
+                                                x-model="items[index].colour" placeholder="Colour"
+                                                x-bind:disabled="!isEditing">
+                                            <template x-if="errors['items.' + index + '.colour']">
+                                                <div class="text-danger small"
+                                                    x-text="errors['items.' + index + '.colour'][0]"></div>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                :class="errors['items.' + index + '.brand_model'] ? 'is-invalid' : ''"
+                                                x-model="items[index].brand_model" placeholder="Brand/Model"
+                                                x-bind:disabled="!isEditing">
+                                            <template x-if="errors['items.' + index + '.brand_model']">
+                                                <div class="text-danger small"
+                                                    x-text="errors['items.' + index + '.brand_model'][0]">
+                                                </div>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                :class="errors['items.' + index + '.other'] ? 'is-invalid' : ''"
+                                                x-model="items[index].other" placeholder="Other"
+                                                x-bind:disabled="!isEditing">
+                                            <template x-if="errors['items.' + index + '.other']">
+                                                <div class="text-danger small"
+                                                    x-text="errors['items.' + index + '.other'][0]"></div>
+                                            </template>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                @click="items.splice(index, 1)"
+                                                :disabled="items.length <= 1 || !isEditing"
+                                                title="Cannot delete the last item">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <template x-if="items.length === 0">
+                                    <tr>
+                                        <td colspan="9" class="text-center">No items added. Click the button below
+                                            to add an item.</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col d-flex justify-content-center">
+                            <button x-bind:disabled="!isEditing" type="button"
+                                class="btn btn-primary waves-effect waves-light"
+                                @click="items.push({ 
+                                    name: '', 
+                                    qty_in_stock: 0, 
+                                    qty_requesting: 1, 
+                                    unit_of_measure: '', 
+                                    size: '', 
+                                    colour: '', 
+                                    brand_model: '', 
+                                    other: '' 
+                                })">
+                                <span class="fa-solid fa-circle-plus me-1_5"></span>Add Item
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="divider mt-6">
-                    <div class="divider-text fw-bold fs-5"><i class="fa-solid fa-user-tie me-2"></i>Requesting Head of
+                    <div class="divider-text fw-bold fs-5"><i class="fa-solid fa-user-tie me-2"></i>Requesting
+                        Head of
                         Department/Unit/Division</div>
                 </div>
 
@@ -534,10 +640,10 @@
                             <table class="table table-bordered text-center">
                                 <thead>
                                     <tr>
-                                        <th style="width: 25%;">Position</th>
-                                        <th style="width: 25%;">Name</th>
-                                        <th style="width: 25%;">Signature</th>
-                                        <th style="width: 25%;">Date</th>
+                                        <th>Position</th>
+                                        <th>Name</th>
+                                        <th>Signature</th>
+                                        <th>Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>

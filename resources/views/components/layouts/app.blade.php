@@ -299,6 +299,85 @@
                                     aria-label="Star themeselection/materio-bootstrap-html-admin-template-free on GitHub">{{ Auth::user()->name }}</a>
                             </li>
 
+                            <!-- Notifications -->
+                            <li class="nav-item navbar-dropdown dropdown me-5">
+                                <a class="nav-link dropdown-toggle hide-arrow p-0 position-relative"
+                                    href="javascript:void(0);" data-bs-toggle="dropdown">
+                                    <i class="ri-notification-3-line ri-24px"></i>
+                                    @php
+                                        $unreadCount = Auth::user()->unreadNotifications->count();
+                                    @endphp
+                                    @if ($unreadCount > 0)
+                                        <span
+                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                                            <span class="visually-hidden">unread notifications</span>
+                                        </span>
+                                    @endif
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end mt-3 py-2"
+                                    style="max-height: 400px; overflow-y: auto; min-width: 300px;">
+                                    <li
+                                        class="dropdown-header d-flex align-items-center justify-content-between py-2 px-4">
+                                        <h6 class="mb-0">Notifications</h6>
+                                        @if ($unreadCount > 0)
+                                            <a href="#" class="text-primary small">
+                                                Mark all read
+                                            </a>
+                                        @endif
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+
+                                    @forelse(Auth::user()->notifications()->take(10)->get() as $notification)
+                                        <li>
+                                            <a class="dropdown-item {{ $notification->read_at ? '' : 'bg-light' }} py-2 px-4"
+                                                href="#">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="flex-shrink-0 me-3">
+                                                        <i class="ri-mail-line ri-20px text-primary"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-1 small fw-semibold">
+                                                            {{ $notification->data['title'] ?? 'Notification' }}
+                                                        </p>
+                                                        <p class="mb-1 small text-muted">
+                                                            {{ Str::limit($notification->data['message'] ?? 'You have a new notification', 50) }}
+                                                        </p>
+                                                        <small class="text-muted">
+                                                            {{ $notification->created_at->diffForHumans() }}
+                                                        </small>
+                                                    </div>
+                                                    @if (!$notification->read_at)
+                                                        <span class="badge bg-primary rounded-pill ms-2">New</span>
+                                                    @endif
+                                                </div>
+                                            </a>
+                                        </li>
+                                    @empty
+                                        <li>
+                                            <div class="dropdown-item text-center py-4">
+                                                <i class="ri-notification-off-line ri-48px text-muted mb-2"></i>
+                                                <p class="mb-0 text-muted">No notifications</p>
+                                            </div>
+                                        </li>
+                                    @endforelse
+
+                                    @if (Auth::user()->notifications->count() > 10)
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-center text-primary py-2" href="#">
+                                                View all notifications
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </li>
+                            <!--/ Notifications -->
+
                             <!-- User -->
                             <li class="nav-item navbar-dropdown dropdown-user dropdown">
                                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);"

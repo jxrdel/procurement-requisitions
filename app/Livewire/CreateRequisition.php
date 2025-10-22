@@ -6,8 +6,10 @@ use App\Mail\ErrorNotification;
 use App\Models\CurrentFinancialYear;
 use App\Models\Department;
 use App\Models\Requisition;
+use App\Models\RequisitionRequestForm;
 use App\Models\User;
 use App\Models\Vote;
+use App\RequestFormStatus;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +25,7 @@ class CreateRequisition extends Component
 
     #[Title('Create Requsition')]
 
+    public $form;
     public $requisition_status;
     public $requisition_no;
     public $requesting_unit;
@@ -32,6 +35,12 @@ class CreateRequisition extends Component
     public $assigned_to;
     public $date_assigned;
     public $date_received_procurement;
+    public $site_visit = false;
+    public $site_visit_date;
+    public $tender_issue_date;
+    public $tender_deadline_date;
+    public $evaluation_start_date;
+    public $evaluation_end_date;
     public $date_sent_dps;
     public $ps_approval = 'Not Sent';
     public $ps_approval_date;
@@ -50,13 +59,17 @@ class CreateRequisition extends Component
     public $votes;
     public $vendors = [];
 
-    public function mount()
+    public function mount(RequisitionRequestForm $form)
     {
+        $this->form = $form;
         $this->requisition_no = CurrentFinancialYear::generateRequisitionNo();
         $this->departments = Department::all();
         $this->staff = User::procurement()->get();
         $this->votes = Vote::active()->get();
-        // $this->vendors[] = ['name' => '', 'amount' => ''];
+        $this->requesting_unit = $form->requesting_unit;
+        $this->item = $form->items->pluck('name')->implode(', ');
+        $this->date_received_procurement = $form->reporting_officer_approval_date->format('Y-m-d');
+        $this->source_of_funds = $form->votes->first()->number;
     }
 
 
@@ -69,12 +82,36 @@ class CreateRequisition extends Component
     {
         try {
 
+            if ($this->site_visit_date === '') {
+                $this->site_visit_date = null;
+            }
+
+            if ($this->tender_issue_date === '') {
+                $this->tender_issue_date = null;
+            }
+
+            if ($this->tender_deadline_date === '') {
+                $this->tender_deadline_date = null;
+            }
+
+            if ($this->evaluation_start_date === '') {
+                $this->evaluation_start_date = null;
+            }
+
+            if ($this->evaluation_end_date === '') {
+                $this->evaluation_end_date = null;
+            }
+
             if ($this->date_assigned === '') {
                 $this->date_assigned = null;
             }
 
             if ($this->date_sent_dps === '') {
                 $this->date_sent_dps = null;
+            }
+
+            if ($this->ps_approval_date === '') {
+                $this->ps_approval_date = null;
             }
 
             if ($this->date_received_procurement === '') {
@@ -115,6 +152,12 @@ class CreateRequisition extends Component
                 'assigned_to' => $this->assigned_to,
                 'date_assigned' => $this->date_assigned,
                 'date_received_procurement' => $this->date_received_procurement,
+                'site_visit' => $this->site_visit,
+                'site_visit_date' => $this->site_visit_date,
+                'tender_issue_date' => $this->tender_issue_date,
+                'tender_deadline_date' => $this->tender_deadline_date,
+                'evaluation_start_date' => $this->evaluation_start_date,
+                'evaluation_end_date' => $this->evaluation_end_date,
                 'date_sent_dps' => $this->date_sent_dps,
                 'ps_approval' => $this->ps_approval,
                 'ps_approval_date' => $this->ps_approval_date,
@@ -152,6 +195,10 @@ class CreateRequisition extends Component
                     ]);
                 }
             }
+            $this->form->update([
+                'requisition_id' => $newrequisition->id,
+                'status' => RequestFormStatus::COMPLETED,
+            ]);
 
             Log::info('Requisition #' . $this->requisition_no . ' was created by ' . Auth::user()->name);
             return redirect()->route('requisitions.index')->with('success', 'Requisition created successfully');
@@ -176,6 +223,12 @@ class CreateRequisition extends Component
                 'date_sent_dps' => $this->date_sent_dps,
                 'ps_approval' => $this->ps_approval,
                 'date_received_procurement' => $this->date_received_procurement,
+                'site_visit' => $this->site_visit,
+                'site_visit_date' => $this->site_visit_date,
+                'tender_issue_date' => $this->tender_issue_date,
+                'tender_deadline_date' => $this->tender_deadline_date,
+                'evaluation_start_date' => $this->evaluation_start_date,
+                'evaluation_end_date' => $this->evaluation_end_date,
                 // 'sent_to_cb' => $this->sent_to_cb,
                 // 'date_sent_cb' => $this->date_sent_cb,
                 'vendors' => $this->vendors,
@@ -185,10 +238,17 @@ class CreateRequisition extends Component
                 'requesting_unit' => 'required',
                 'file_no' => 'nullable',
                 'item' => 'required',
+                'site_visit' => 'boolean',
+                //Site visit date is required if site visit is true
+                'site_visit_date' => 'nullable|date|date_format:Y-m-d|required_if:site_visit,true',
+                'tender_issue_date' => 'nullable|date|date_format:Y-m-d',
+                'tender_deadline_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:tender_issue_date',
+                'evaluation_start_date' => 'nullable|date|date_format:Y-m-d',
+                'evaluation_end_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:evaluation_start_date',
                 'assigned_to' => 'nullable',
-                'date_assigned' => 'nullable|date|before_or_equal:today',
-                'date_received_procurement' => 'required|date|before_or_equal:today',
-                'date_sent_dps' => 'nullable|date|before_or_equal:today',
+                'date_assigned' => 'nullable|date|before_or_equal:today|date_format:Y-m-d',
+                'date_received_procurement' => 'required|date|before_or_equal:today|date_format:Y-m-d',
+                'date_sent_dps' => 'nullable|date|before_or_equal:today|date_format:Y-m-d',
                 'vendors.*.vendor_name' => 'required',
                 'vendors.*.amount' => 'required|numeric',
                 // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',

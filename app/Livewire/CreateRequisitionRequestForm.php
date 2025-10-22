@@ -92,6 +92,7 @@ class CreateRequisitionRequestForm extends Component
     {
         // Build validation rules for items dynamically
         $rules = [
+            'category' => 'required',
             'requesting_unit' => 'required|exists:departments,id',
             'head_of_department' => 'required|exists:users,id',
             'contact_person_id' => 'required|exists:users,id',

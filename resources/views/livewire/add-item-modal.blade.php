@@ -13,9 +13,8 @@
                 {{-- Form for adding item details --}}
                 <form wire:submit.prevent="addItem" action="">
 
-                    {{-- Row 1: Item, Stock, Requested Qty --}}
+                    {{-- Row 1: Item Name (Full Width) --}}
                     <div class="row mb-3">
-
                         <div class="col">
                             <div class="form-floating form-floating-outline">
                                 <input required wire:model="item_name" type="text"
@@ -27,7 +26,10 @@
                                 <div class="text-danger"> {{ $message }} </div>
                             @enderror
                         </div>
+                    </div>
 
+                    {{-- Row 2: Quantities and Unit --}}
+                    <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating form-floating-outline">
                                 <input required wire:model="qty_in_stock" type="number"
@@ -52,11 +54,6 @@
                             @enderror
                         </div>
 
-                    </div>
-
-                    {{-- Row 2: Unit of Measure, Size, Colour --}}
-                    <div class="row mb-3">
-
                         <div class="col">
                             <div class="form-floating form-floating-outline">
                                 <input wire:model="unit_of_measure" type="text"
@@ -68,7 +65,10 @@
                                 <div class="text-danger"> {{ $message }} </div>
                             @enderror
                         </div>
+                    </div>
 
+                    {{-- Row 3: Size, Colour, Brand/Model --}}
+                    <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating form-floating-outline">
                                 <input wire:model="size" type="text"
@@ -93,11 +93,6 @@
                             @enderror
                         </div>
 
-                    </div>
-
-                    {{-- Row 3: Brand/Model, Other --}}
-                    <div class="row mb-4">
-
                         <div class="col">
                             <div class="form-floating form-floating-outline">
                                 <input wire:model="brand_model" type="text"
@@ -109,7 +104,10 @@
                                 <div class="text-danger"> {{ $message }} </div>
                             @enderror
                         </div>
+                    </div>
 
+                    {{-- Row 4: Other Details (Full Width) --}}
+                    <div class="row mb-4">
                         <div class="col">
                             <div class="form-floating form-floating-outline">
                                 <input wire:model="other" type="text"
@@ -121,7 +119,6 @@
                                 <div class="text-danger"> {{ $message }} </div>
                             @enderror
                         </div>
-
                     </div>
 
 
