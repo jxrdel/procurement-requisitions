@@ -263,6 +263,16 @@
                         </li>
                     @endcan
 
+                    <li @class([
+                        'menu-item mb-3',
+                        'active' => request()->routeIs('notifications.*'),
+                    ])>
+                        <a href="{{ route('notifications.index') }}" class="menu-link">
+                            <i class="menu-icon ri-notification-3-line"></i>
+                            <div data-i18n="Basic">Notifications</div>
+                        </a>
+                    </li>
+
                     <li class="menu-header mt-7">
                         <span class="menu-header-text">Help</span>
                     </li>
@@ -320,11 +330,9 @@
                                     <li
                                         class="dropdown-header d-flex align-items-center justify-content-between py-2 px-4">
                                         <h6 class="mb-0">Notifications</h6>
-                                        @if ($unreadCount > 0)
-                                            <a href="#" class="text-primary small">
-                                                Mark all read
-                                            </a>
-                                        @endif
+                                        <a href="{{ route('notifications.index') }}" class="text-primary small">
+                                            View All
+                                        </a>
                                     </li>
                                     <li>
                                         <hr class="dropdown-divider">
@@ -333,7 +341,7 @@
                                     @forelse(Auth::user()->notifications()->take(10)->get() as $notification)
                                         <li>
                                             <a class="dropdown-item {{ $notification->read_at ? '' : 'bg-light' }} py-2 px-4"
-                                                href="#">
+                                                href="{{ route('notifications.view', $notification->id) }}">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-shrink-0 me-3">
                                                         <i class="ri-mail-line ri-20px text-primary"></i>

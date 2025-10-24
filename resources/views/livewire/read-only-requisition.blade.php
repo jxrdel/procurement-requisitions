@@ -90,6 +90,44 @@
                 </div>
 
                 <div class="row mt-7">
+                    <div class="col mx-5">
+                        <label><strong>Site Visit Required:</strong>
+                            @if ($this->requisition->site_visit)
+                                <i class="fa-solid fa-check text-success"></i>
+                            @else
+                                <i class="fa-solid fa-xmark text-danger"></i>
+                            @endif
+                        </label>
+                    </div>
+                    <div class="col mx-5">
+                        <label><strong>Site Visit Date:</strong>
+                            {{ $this->getFormattedDate($this->requisition->site_visit_date) }}</label>
+                    </div>
+                </div>
+
+                <div class="row mt-7">
+                    <div class="col mx-5">
+                        <label><strong>Tender Issue Date:</strong>
+                            {{ $this->getFormattedDate($this->requisition->tender_issue_date) }}</label>
+                    </div>
+                    <div class="col mx-5">
+                        <label><strong>Tender Deadline Date:</strong>
+                            {{ $this->getFormattedDate($this->requisition->tender_deadline_date) }}</label>
+                    </div>
+                </div>
+
+                <div class="row mt-7">
+                    <div class="col mx-5">
+                        <label><strong>Evaluation Start Date:</strong>
+                            {{ $this->getFormattedDate($this->requisition->evaluation_start_date) }}</label>
+                    </div>
+                    <div class="col mx-5">
+                        <label><strong>Evaluation End Date:</strong>
+                            {{ $this->getFormattedDate($this->requisition->evaluation_end_date) }}</label>
+                    </div>
+                </div>
+
+                <div class="row mt-7">
 
                     <div class="col mx-5">
                         <label><strong>Source of Funds:</strong>

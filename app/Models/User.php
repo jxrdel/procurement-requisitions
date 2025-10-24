@@ -109,4 +109,11 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function getDigitalSignatureAttribute(): string
+    {
+        $salt = config('app.key');
+
+        return hash('sha256', $this->username . $salt);
+    }
 }

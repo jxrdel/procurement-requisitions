@@ -6,6 +6,7 @@ use App\Models\Requisition;
 use App\Models\User;
 use App\Models\Vote;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\DataTables;
@@ -123,9 +124,21 @@ class Controller
 
     public function getUsers()
     {
-        $users = User::all();
+        // Eager load the department relationship
+        $users = User::with('department')->select('users.*'); // Select base table columns
 
-        return DataTables::of($users)->make(true);
+        return DataTables::of($users)
+            ->addColumn('department_name', function ($user) {
+                // Access the name via the relationship, provide 'N/A' if null
+                return $user->department->name ?? 'N/A';
+            })
+            // Add filterColumn for searching the department name
+            ->filterColumn('department_name', function (Builder $query, $keyword) {
+                $query->whereHas('department', function (Builder $q) use ($keyword) {
+                    $q->where('name', 'like', "%{$keyword}%");
+                });
+            })
+            ->make(true);
     }
 
     public function help()

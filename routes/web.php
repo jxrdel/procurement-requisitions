@@ -6,6 +6,7 @@ use App\Http\Controllers\CBRequisitionController;
 use App\Http\Controllers\CheckRoomController;
 use App\Http\Controllers\ChequeProcessingController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\RequisitionFormController;
 use App\Livewire\CostBudgetingRequisition;
@@ -43,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/requisitions/forms/create', CreateRequisitionRequestForm::class)->name('requisition_forms.create');
     Route::get('/requisitions/forms/view/{id}', ViewRequisitionForm::class)->name('requisition_forms.view');
     Route::get('/requisitions/forms/getforms', [RequisitionFormController::class, 'getForms'])->name('getrequisition_forms');
+    Route::get('/requisitions/forms/preview/{id}', [RequisitionFormController::class, 'preview'])->name('requisition_forms.preview');
 
     Route::get('/cost_and_budgeting', [CBRequisitionController::class, 'index'])->name('cost_and_budgeting.index');
     Route::get('/cost_and_budgeting/view/{id}', CostBudgetingRequisition::class)->name('cost_and_budgeting.view')->middleware('can:view-cost-budgeting-requisitions');
@@ -73,6 +75,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getchequeprocessing_vendors', [ChequeProcessingController::class, 'getChequeProcessingVendors'])->name('getchequeprocessing_vendors');
     Route::get('/getcompletedchequeprocessing_vendors', [ChequeProcessingController::class, 'getCompletedChequeProcessingVendors'])->name('getcompletedchequeprocessing_vendors');
     Route::get('/getinprogresschequeprocessing_vendors', [ChequeProcessingController::class, 'getInProgressChequeProcessingVendors'])->name('getinprogresschequeprocessing_vendors');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/getnotifications', [NotificationController::class, 'getNotifications'])->name('notifications.get');
+    Route::get('/notifications/view/{id}', [NotificationController::class, 'view'])->name('notifications.view');
 
     Route::get('/users', [Controller::class, 'users'])->name('users');
     Route::get('/getusers', [Controller::class, 'getUsers'])->name('getusers');

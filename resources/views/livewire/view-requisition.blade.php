@@ -138,6 +138,44 @@
                                     </div>
 
                                     <div class="row mt-7">
+                                        <div class="col mx-5">
+                                            <label><strong>Site Visit Required:</strong>
+                                                @if ($this->requisition->site_visit)
+                                                    <i class="fa-solid fa-check text-success"></i>
+                                                @else
+                                                    <i class="fa-solid fa-xmark text-danger"></i>
+                                                @endif
+                                            </label>
+                                        </div>
+                                        <div class="col mx-5">
+                                            <label><strong>Site Visit Date:</strong>
+                                                {{ $this->getFormattedDate($this->requisition->site_visit_date) }}</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-7">
+                                        <div class="col mx-5">
+                                            <label><strong>Tender Issue Date:</strong>
+                                                {{ $this->getFormattedDate($this->requisition->tender_issue_date) }}</label>
+                                        </div>
+                                        <div class="col mx-5">
+                                            <label><strong>Tender Deadline Date:</strong>
+                                                {{ $this->getFormattedDate($this->requisition->tender_deadline_date) }}</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-7">
+                                        <div class="col mx-5">
+                                            <label><strong>Evaluation Start Date:</strong>
+                                                {{ $this->getFormattedDate($this->requisition->evaluation_start_date) }}</label>
+                                        </div>
+                                        <div class="col mx-5">
+                                            <label><strong>Evaluation End Date:</strong>
+                                                {{ $this->getFormattedDate($this->requisition->evaluation_end_date) }}</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-7">
 
                                         <div class="col mx-5">
                                             <label><strong>Source of Funds:</strong>
@@ -304,6 +342,87 @@
                                                 <label for="floatingInput">Item</label>
                                             </div>
                                             @error('item')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-6" x-data="{ siteVisit: $wire.entangle('site_visit') }">
+                                        <div class="col">
+                                            <div class="form-check mt-4">
+                                                <input class="form-check-input" type="checkbox" id="siteVisitCheck"
+                                                    x-model="siteVisit">
+                                                <label class="form-check-label" for="siteVisitCheck">
+                                                    Site Visit Required
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col" x-show="siteVisit" x-transition>
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="site_visit_date" type="date"
+                                                    class="form-control @error('site_visit_date')is-invalid @enderror"
+                                                    id="siteVisitDateInput" placeholder="Site Visit Date" />
+                                                <label for="siteVisitDateInput">Site Visit Date</label>
+                                            </div>
+                                            @error('site_visit_date')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-6">
+                                        <div class="col">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="tender_issue_date"
+                                                    type="date"
+                                                    class="form-control @error('tender_issue_date')is-invalid @enderror"
+                                                    id="tenderIssueDateInput" placeholder="Tender Issue Date" />
+                                                <label for="tenderIssueDateInput">Tender Issue Date</label>
+                                            </div>
+                                            @error('tender_issue_date')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="tender_deadline_date"
+                                                    type="date"
+                                                    class="form-control @error('tender_deadline_date')is-invalid @enderror"
+                                                    id="tenderDeadlineDateInput" placeholder="Tender Deadline Date" />
+                                                <label for="tenderDeadlineDateInput">Tender Deadline Date</label>
+                                            </div>
+                                            @error('tender_deadline_date')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-6">
+                                        <div class="col">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="evaluation_start_date"
+                                                    type="date"
+                                                    class="form-control @error('evaluation_start_date')is-invalid @enderror"
+                                                    id="evaluationStartDateInput"
+                                                    placeholder="Evaluation Start Date" />
+                                                <label for="evaluationStartDateInput">Evaluation Start Date</label>
+                                            </div>
+                                            @error('evaluation_start_date')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="evaluation_end_date"
+                                                    type="date"
+                                                    class="form-control @error('evaluation_end_date')is-invalid @enderror"
+                                                    id="evaluationEndDateInput" placeholder="Evaluation End Date" />
+                                                <label for="evaluationEndDateInput">Evaluation End Date</label>
+                                            </div>
+                                            @error('evaluation_end_date')
                                                 <div class="text-danger"> {{ $message }} </div>
                                             @enderror
                                         </div>

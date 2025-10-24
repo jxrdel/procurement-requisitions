@@ -24,7 +24,11 @@
                     <div class="col-6 col-sm-8 text-center">
                         <h1 class="h3 mb-0 text-gray-800">
                             <strong>#
-                                {{ $requisitionForm->form_code }}</strong>
+                                {{ $requisitionForm->form_code }}
+                                <a href="{{ route('requisition_forms.preview', ['id' => $requisitionForm->id]) }}"
+                                    target="_blank">
+                                    <i class="fa-solid fa-print me-1"></i>
+                                </a></strong>
                         </h1>
                     </div>
 
@@ -97,6 +101,11 @@
                             <a href="{{ route('requisitions.create', ['form' => $requisitionForm]) }}"
                                 class="btn btn-sm btn-success">
                                 <i class="fa-solid fa-plus-circle me-1"></i> Create Requisition
+                            </a>
+                        @elseif ($requisitionForm->status === \App\RequestFormStatus::COMPLETED)
+                            <a href="{{ route('requisitions.view', ['id' => $requisitionForm->requisition->id]) }}"
+                                target="_blank" class="btn btn-sm btn-success">
+                                <i class="fa-solid fa-eye me-1"></i> View Requisition
                             </a>
                         @endif
                     </div>
@@ -531,12 +540,12 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="row mt-3">
-                        <div class="col d-flex justify-content-center">
-                            <button x-bind:disabled="!isEditing" type="button"
-                                class="btn btn-primary waves-effect waves-light"
-                                @click="items.push({ 
+                    @if (!$requisitionForm->hod_approval)
+                        <div class="row mt-3">
+                            <div class="col d-flex justify-content-center">
+                                <button x-bind:disabled="!isEditing" type="button"
+                                    class="btn btn-primary waves-effect waves-light"
+                                    @click="items.push({ 
                                     name: '', 
                                     qty_in_stock: 0, 
                                     qty_requesting: 1, 
@@ -546,10 +555,11 @@
                                     brand_model: '', 
                                     other: '' 
                                 })">
-                                <span class="fa-solid fa-circle-plus me-1_5"></span>Add Item
-                            </button>
+                                    <span class="fa-solid fa-circle-plus me-1_5"></span>Add Item
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
 
                 <div class="divider mt-6">
@@ -631,6 +641,26 @@
                     </div>
                 @endif
 
+                @if ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS)
+                    <div class="row mt-4">
+                        <div class="alert alert-warning text-center" role="alert">
+                            <strong>This requisition form is pending approval from the Permanent Secretary.</strong>
+                        </div>
+                    </div>
+                @elseif($requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS)
+                    <div class="row mt-4">
+                        <div class="alert alert-warning text-center" role="alert">
+                            <strong>This requisition form is pending approval from the Deputy Permanent
+                                Secretary.</strong>
+                        </div>
+                    </div>
+                @elseif($requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO)
+                    <div class="row mt-4">
+                        <div class="alert alert-warning text-center" role="alert">
+                            <strong>This requisition form is pending approval from the Chief Medical Officer.</strong>
+                        </div>
+                    </div>
+                @endif
 
                 @if ($requisitionForm->reporting_officer_approval)
                     <div class="divider mt-6">
@@ -725,6 +755,42 @@
                     </div>
                 @endif
 
+                @if ($requisitionForm->reporting_officer_approval)
+                    <div class="divider mt-6">
+                        <div class="divider-text fw-bold fs-5"><i class="fa-solid fa-dollar-sign me-2"></i>Procurement
+                        </div>
+                    </div>
+
+                    <div class="row mt-6">
+                        <div class="col">
+                            <label for="requesting_unit_label" class="col col-form-label"><span class="fw-bold">Date
+                                    Received:
+                                </span>{{ $requisitionForm->reporting_officer_approval_date ? \Carbon\Carbon::parse($requisitionForm->reporting_officer_approval_date)->format('d/m/Y') : '' }}</label>
+                        </div>
+
+                        <div class="col">
+                            <label for="requesting_unit_label" class="col col-form-label"><span class="fw-bold">Seen
+                                    By:
+                                </span>{{ Str::of($requisitionForm->requisition?->created_by ?? '')->replace('.', ' ')->title() }}</label>
+                        </div>
+                    </div>
+
+                    <div class="row mt-6">
+                        <div class="col">
+                            <label for="requesting_unit_label" class="col col-form-label"><span
+                                    class="fw-bold">Procurement Officer Assigned:
+                                </span>{{ $requisitionForm->requisition?->procurement_officer?->name ?? '' }}</label>
+                        </div>
+
+                        <div class="col">
+                            <label for="requesting_unit_label" class="col col-form-label"><span
+                                    class="fw-bold">Expected Date of Completion
+                                    By:
+                                </span></label>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="divider">
                     <div class="divider-text fw-bold fs-5 mt-4"><i class="fa-solid fa-file-arrow-up me-2"></i>File
                         Uploads
@@ -740,51 +806,59 @@
                         <input wire:model="uploads" type="file" multiple class="form-control"
                             style="display: inline;width: 400px;height:45px">
                         <button wire:click.prevent="uploadFiles()" class="btn btn-primary"
-                            wire:loading.attr="disabled" wire:target="uploads" style="width: 8rem"><i
+                            wire:loading.attr="disabled" wire:target="uploads,uploadFiles" style="width: 8rem"><i
                                 class="fas fa-plus me-2"></i> Upload</button>
-                        <div wire:loading wire:target="uploads"
+                        <div wire:loading wire:target="uploads,uploadFiles"
                             class="spinner-border spinner-border-sm text-secondary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="row ">
-
-                    <div class="demo-inline-spacing d-flex justify-content-center align-items-center">
-                        <div class="list-group list-group-flush" style="width: 500px">
-
-                            @forelse ($requisitionForm->uploads as $upload)
-                                <div class="list-group list-group-flush list-group-item-action"
-                                    style="width: 100%;cursor: default;">
-                                    <div class="list-group-item d-flex justify-content-between align-items-center"
-                                        style="border: none;">
-                                        <a class="text-dark text-decoration-underline"
-                                            href="{{ Storage::url($upload->file_path) }}"
-                                            target="_blank">{{ $upload->file_name }}</a>
-                                        {{-- <button type="button" class="btn btn-danger">
-                                                <i class="ri-delete-bin-2-line me-1"></i> Delete
-                                            </button> --}}
-                                        @can('edit-records')
-                                            <a href="javascript:void(0)" x-bind:class="isEditing ? '' : 'd-none'"
-                                                wire:confirm="Are you sure you want to delete this file?"
-                                                wire:click="deleteFile({{ $upload->id }})">
-                                                <i class="ri-close-large-line text-danger fw-bold"></i>
-                                            </a>
-                                        @endcan
-
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="list-group list-group-flush list-group-item-action"
-                                    style="width: 100%;cursor: default;">
-                                    <div class="list-group-item" style="border: none;">
-                                        <p class="text-center">No files uploaded</p>
-
-                                    </div>
-                                </div>
-                            @endforelse
-
+                <div class="row mt-6">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered w-100">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50%;">File Name</th>
+                                        <th style="width: 30%;">Uploaded By</th>
+                                        <th style="width: 10%; text-align: center;">Date</th>
+                                        {{-- HIDE HEADER IF NOT EDITING --}}
+                                        <th x-show="isEditing" style="width: 10%; text-align: center;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-border-bottom-0">
+                                    @forelse($requisitionForm->uploads as $upload)
+                                        <tr>
+                                            <td>
+                                                <a href="{{ Storage::url($upload->file_path) }}" target="_blank">
+                                                    {{ $upload->file_name }} <i
+                                                        class="fa-solid fa-arrow-up-right-from-square"></i>
+                                                </a>
+                                            </td>
+                                            <td>{{ $upload->uploaded_by ?? 'N/A' }}</td>
+                                            <td class="text-center">{{ $upload->created_at->format('d/m/Y') }}</td>
+                                            {{-- HIDE DATA CELL IF NOT EDITING --}}
+                                            <td x-show="isEditing" class="text-center">
+                                                @can('edit-records')
+                                                    <a href="javascript:void(0)"
+                                                        wire:confirm="Are you sure you want to delete this file?"
+                                                        wire:click="deleteFile({{ $upload->id }})" class="text-danger">
+                                                        <i class="ri-delete-bin-2-line"></i>
+                                                    </a>
+                                                @endcan
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" class="text-center">No files uploaded.</td>
+                                            {{-- Add a hidden column cell for layout when no files exist --}}
+                                            <td x-show="isEditing" class="text-center"></td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -847,28 +921,31 @@
                 </div> --}}
 
                 {{-- Only show Save button when editing is enabled --}}
-                <div class="row mt-8" x-show="isEditing">
-                    <div class="text-center m-auto">
-                        <button type="submit" wire:loading.attr="disabled" wire:target="save,uploads,justification"
-                            class="btn btn-primary waves-effect waves-light" style="width: 100px">
-                            <span class="tf-icons ri-save-3-line me-1_5"></span>Save
-                        </button>
-                        &nbsp;
-                        <button type="button" @click="isEditing = false"
-                            class="btn btn-dark waves-effect waves-light" style="width: 100px">
-                            <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
-                        </button>
+                @if (!$requisitionForm->hod_approval)
+                    <div class="row mt-8" x-show="isEditing">
+                        <div class="text-center m-auto">
+                            <button type="submit" wire:loading.attr="disabled"
+                                wire:target="save,uploads,justification"
+                                class="btn btn-primary waves-effect waves-light" style="width: 100px">
+                                <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                            </button>
+                            &nbsp;
+                            <button type="button" @click="isEditing = false"
+                                class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="row mt-8" x-show="!isEditing">
-                    <div class="text-center m-auto">
-                        <button type="button" @click="isEditing = !isEditing"
-                            x-bind:class="isEditing ? 'btn-danger' : 'btn-success'" class="btn btn-sm">
-                            <i class="fa-solid fa-pen-to-square me-1_5"></i>
-                            <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
-                        </button>
+                    <div class="row mt-8" x-show="!isEditing">
+                        <div class="text-center m-auto">
+                            <button type="button" @click="isEditing = !isEditing"
+                                x-bind:class="isEditing ? 'btn-danger' : 'btn-success'" class="btn btn-sm">
+                                <i class="fa-solid fa-pen-to-square me-1_5"></i>
+                                <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                @endif
             </form>
 
         </div>

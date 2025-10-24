@@ -45,10 +45,6 @@
 
 
 @section('scripts')
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'></script>
-
     <script>
         $(document).ready(function() {
             $('#myTable').DataTable({
@@ -66,8 +62,9 @@
                         name: 'name'
                     },
                     {
-                        data: 'department',
-                        name: 'department'
+                        data: 'department_name',
+                        name: 'department.name',
+                        title: 'Department'
                     },
                     {
                         data: null,

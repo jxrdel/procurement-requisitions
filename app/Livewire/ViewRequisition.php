@@ -47,6 +47,12 @@ class ViewRequisition extends Component
     public $assigned_to;
     public $date_assigned;
     public $date_received_procurement;
+    public $site_visit = false;
+    public $site_visit_date;
+    public $tender_issue_date;
+    public $tender_deadline_date;
+    public $evaluation_start_date;
+    public $evaluation_end_date;
     public $date_sent_dps;
     public $ps_approval;
     public $amount;
@@ -141,6 +147,12 @@ class ViewRequisition extends Component
         $this->assigned_to = $this->requisition->assigned_to;
         $this->date_assigned = $this->requisition->date_assigned;
         $this->date_received_procurement = $this->requisition->date_received_procurement;
+        $this->site_visit = $this->requisition->site_visit;
+        $this->site_visit_date = $this->requisition->site_visit_date;
+        $this->tender_issue_date = $this->requisition->tender_issue_date;
+        $this->tender_deadline_date = $this->requisition->tender_deadline_date;
+        $this->evaluation_start_date = $this->requisition->evaluation_start_date;
+        $this->evaluation_end_date = $this->requisition->evaluation_end_date;
         $this->date_sent_dps = $this->requisition->date_sent_dps;
         $this->ps_approval = $this->requisition->ps_approval;
         $this->amount = $this->requisition->amount;
@@ -301,6 +313,12 @@ class ViewRequisition extends Component
                 'requesting_unit' => $this->requesting_unit,
                 'file_no' => $this->file_no,
                 'item' => $this->item,
+                'site_visit' => $this->site_visit,
+                'site_visit_date' => $this->site_visit_date,
+                'tender_issue_date' => $this->tender_issue_date,
+                'tender_deadline_date' => $this->tender_deadline_date,
+                'evaluation_start_date' => $this->evaluation_start_date,
+                'evaluation_end_date' => $this->evaluation_end_date,
                 'source_of_funds' => $this->source_of_funds,
                 'date_received_procurement' => $this->date_received_procurement,
                 'assigned_to' => $this->assigned_to,
@@ -415,36 +433,33 @@ class ViewRequisition extends Component
     {
         $status = $this->requisition_status;
 
-        if ($this->ps_approval === 'Not Sent') {
-            $status = 'To be Sent to DPS';
+        if ($this->tender_issue_date === null && $this->tender_deadline_date === null) {
+            $this->requisition_status = 'Tender To Be Issued';
+        }
+
+        if ($this->tender_issue_date !== null && $this->tender_deadline_date !== null && $this->tender_deadline_date >= date('Y-m-d')) {
+            $this->requisition_status = 'Tender In Progress';
+        }
+
+        // If evaluation dates are set and evaluation end date is in the future
+        if ($this->evaluation_start_date !== null && $this->evaluation_end_date !== null && $this->evaluation_end_date >= date('Y-m-d')) {
+            $this->requisition_status = 'Evaluation In Progress';
+        }
+
+        if ($this->evaluation_end_date !== null && $this->evaluation_end_date < date('Y-m-d') && $this->ps_approval === 'Not Sent') {
+            $this->requisition_status = 'To be Sent to DPS';
         }
 
         if ($this->ps_approval === 'Pending') {
-            $status = 'Pending PS Approval';
+            $this->requisition_status = 'Pending PS Approval';
         }
 
         if ($this->ps_approval === 'Approval Denied') {
-            $status = 'Denied by PS';
+            $this->requisition_status = 'Denied by PS';
         }
 
         if ($this->ps_approval === 'Approved') {
-            $status = 'Approved by PS';
-        }
-
-        if ($this->requisition->cost_budgeting_requisition) {
-            $status = 'To Be Sent to MoF';
-        }
-
-        if ($this->requisition->cost_budgeting_requisition && $this->requisition->cost_budgeting_requisition->is_completed) {
-            $status = 'Sent to Procurement';
-        }
-
-        if ($this->requisition->vote_control_requisition) {
-            $status = 'Sent to Vote Control';
-        }
-
-        if ($this->requisition->vote_control_requisition && $this->requisition->vote_control_requisition->is_completed) {
-            $status = 'Completed';
+            $this->requisition_status = 'Approved by PS';
         }
 
         $this->requisition->update([

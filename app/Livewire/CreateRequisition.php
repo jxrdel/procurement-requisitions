@@ -62,6 +62,10 @@ class CreateRequisition extends Component
     public function mount(RequisitionRequestForm $form)
     {
         $this->form = $form;
+        // If form already has a requisition, redirect to edit page
+        if (!is_null($form->requisition_id)) {
+            return redirect()->route('requisitions.view', $form->requisition_id);
+        }
         $this->requisition_no = CurrentFinancialYear::generateRequisitionNo();
         $this->departments = Department::all();
         $this->staff = User::procurement()->get();
@@ -122,7 +126,20 @@ class CreateRequisition extends Component
                 return;  // Stop execution if form validation fails
             }
 
-            if ($this->ps_approval === 'Not Sent') {
+            if ($this->tender_issue_date === null && $this->tender_deadline_date === null) {
+                $this->requisition_status = 'Tender To Be Issued';
+            }
+
+            if ($this->tender_issue_date !== null && $this->tender_deadline_date !== null && $this->tender_deadline_date >= date('Y-m-d')) {
+                $this->requisition_status = 'Tender In Progress';
+            }
+
+            // If evaluation dates are set and evaluation end date is in the future
+            if ($this->evaluation_start_date !== null && $this->evaluation_end_date !== null && $this->evaluation_end_date >= date('Y-m-d')) {
+                $this->requisition_status = 'Evaluation In Progress';
+            }
+
+            if ($this->evaluation_end_date !== null && $this->evaluation_end_date < date('Y-m-d') && $this->ps_approval === 'Not Sent') {
                 $this->requisition_status = 'To be Sent to DPS';
             }
 
@@ -198,6 +215,11 @@ class CreateRequisition extends Component
             $this->form->update([
                 'requisition_id' => $newrequisition->id,
                 'status' => RequestFormStatus::COMPLETED,
+            ]);
+
+            $this->form->logs()->create([
+                'details' => 'Requisition created with Requisition No: ' . $this->requisition_no . ' by ' . Auth::user()->name,
+                'created_by' => Auth::user()->username,
             ]);
 
             Log::info('Requisition #' . $this->requisition_no . ' was created by ' . Auth::user()->name);

@@ -23,10 +23,10 @@ class LoginForm extends Component
 
     public function login()
     {
-        // $user = User::find(12);
+        $user = User::find(5);
 
-        // Auth::login($user);
-        // return redirect()->intended('/'); // Fallback to dashboard if no intended page
+        Auth::login($user);
+        return redirect()->intended('/'); // Fallback to dashboard if no intended page
 
         try {
 

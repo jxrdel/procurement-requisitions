@@ -162,7 +162,7 @@ class CreateRequisitionRequestForm extends Component
                 $form->uploads()->create([
                     'file_name' => $filename,
                     'file_path' => $uploadPath,
-                    'uploaded_by' => Auth::user()->username ?? null,
+                    'uploaded_by' => Auth::user()->name ?? null,
                 ]);
             }
         }

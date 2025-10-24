@@ -48,13 +48,15 @@
                 <thead>
                     <tr>
                         <th style="width: 15%; text-align: center;">Form Code</th>
-                        <th style="width: 30%; text-align: center;">Contact Person</th>
-                        <th style="width: 25%; text-align: center;">Date Created</th>
-                        <th style="width: 25%; text-align: center;">Status</th>
-                        <th style="width: 15%; text-align: center;">Actions</th>
+                        <th style="width: 25%; text-align: center;">Items</th>
+                        <th style="width: 20%; text-align: center;">Date Created</th>
+                        <th style="width: 15%; text-align: center;">Form Status</th>
+                        <th style="width: 15%; text-align: center;">Requisition Status</th>
+                        <th style="width: 10%; text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
+                    {{-- DataTables will populate this --}}
                 </tbody>
             </table>
 
@@ -81,9 +83,9 @@
                         "title": "Form Code"
                     },
                     {
-                        "data": "contact_person_name",
-                        "name": "contact_person_id",
-                        "title": "Contact Person"
+                        "data": "items_list",
+                        "name": "items_list",
+                        "title": "Items"
                     },
                     {
                         "data": "date_created_formatted",
@@ -96,16 +98,24 @@
                         "title": "Status"
                     },
                     {
+                        "data": "requisition_status_badge",
+                        "name": "requisition.status",
+                        "title": "Requisition Status",
+                        "orderable": false,
+                        "searchable": false,
+                        "className": "text-center"
+                    },
+                    {
                         "data": "actions",
                         "name": "actions",
                         "title": "Actions",
                         "orderable": false,
                         "searchable": false
-                    }
+                    },
                 ],
                 "order": [
                     [2, "desc"]
-                ] // Default sort by Date Created (index 2) descending
+                ]
             });
         });
 

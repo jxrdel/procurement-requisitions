@@ -66,6 +66,9 @@ class Requisition extends Model
         'updated_by',
     ];
 
+    protected $casts = [
+        'site_visit' => 'boolean',
+    ];
 
     public function statuslogs()
     {

@@ -300,6 +300,7 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->hod_approval = true;
         $this->requisitionForm->hod_note = $this->hod_note;
         $this->requisitionForm->hod_approval_date = now();
+        $this->requisitionForm->hod_digital_signature = Auth::user()->digital_signature;
         $this->requisitionForm->reporting_officer_id = $this->selectedOfficer;
         $this->requisitionForm->save();
 
@@ -322,10 +323,11 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
         $this->requisitionForm->reporting_officer_approval = true;
         $this->requisitionForm->reporting_officer_approval_date = now();
+        $this->requisitionForm->reporting_officer_digital_signature = Auth::user()->digital_signature;
         $this->requisitionForm->save();
 
         $this->requisitionForm->logs()->create([
-            'details' => 'Requisition form approved by ' . Auth::user()->reporting_officer_role . ' ' . Auth::user()->name,
+            'details' => 'Requisition form approved by ' . Auth::user()->reporting_officer_role . ' ' . Auth::user()->name . ' and sent to Procurement.',
             'created_by' => Auth::user()->username,
         ]);
 
@@ -344,6 +346,7 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->status = RequestFormStatus::APPROVED_BY_PROCUREMENT;
         $this->requisitionForm->procurement_approval = true;
         $this->requisitionForm->procurement_approval_date = now();
+        $this->requisitionForm->procurement_digital_signature = Auth::user()->digital_signature;
         $this->requisitionForm->save();
 
         $this->requisitionForm->logs()->create([
@@ -443,7 +446,7 @@ class ViewRequisitionForm extends Component
                 $this->requisitionForm->uploads()->create([
                     'file_name' => $filename,
                     'file_path' => $uploadPath,
-                    'uploaded_by' => Auth::user()->username ?? null,
+                    'uploaded_by' => Auth::user()->name ?? null,
                 ]);
             }
         }
