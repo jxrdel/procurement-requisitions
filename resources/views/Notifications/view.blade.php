@@ -56,7 +56,7 @@
                         @if (!empty($notification->data['url']))
                             <div class="d-grid gap-2 d-md-flex justify-content-md-start">
                                 <a href="{{ $notification->data['url'] }}" class="btn btn-primary px-4">
-                                    <i class="ri-eye-line me-2"></i> View Details
+                                    <i class="ri-eye-line me-2"></i> View
                                 </a>
                             </div>
                         @endif

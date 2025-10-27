@@ -338,7 +338,7 @@
                                         <hr class="dropdown-divider">
                                     </li>
 
-                                    @forelse(Auth::user()->notifications()->take(10)->get() as $notification)
+                                    @forelse(Auth::user()->notifications()->take(5)->get() as $notification)
                                         <li>
                                             <a class="dropdown-item {{ $notification->read_at ? '' : 'bg-light' }} py-2 px-4"
                                                 href="{{ route('notifications.view', $notification->id) }}">
@@ -372,12 +372,13 @@
                                         </li>
                                     @endforelse
 
-                                    @if (Auth::user()->notifications->count() > 10)
+                                    @if (Auth::user()->notifications->count() > 5)
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li>
-                                            <a class="dropdown-item text-center text-primary py-2" href="#">
+                                            <a class="dropdown-item text-center text-primary py-2"
+                                                href="{{ route('notifications.index') }}">
                                                 View all notifications
                                             </a>
                                         </li>

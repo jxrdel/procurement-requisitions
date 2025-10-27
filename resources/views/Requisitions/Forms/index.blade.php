@@ -95,7 +95,7 @@
                     {
                         "data": "status_badge",
                         "name": "status",
-                        "title": "Status"
+                        "title": "Form Status"
                     },
                     {
                         "data": "requisition_status_badge",

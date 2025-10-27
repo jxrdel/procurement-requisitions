@@ -276,15 +276,15 @@
                 <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
             </div>
 
-            <p class="mt-6 fw-medium text-center">For items with multiple specifications, please attach additional
-                documentation as necessary <span class="text-danger">*</span></p>
+            {{-- <p class="mt-6 fw-medium text-center">For items with multiple specifications, please attach additional
+                documentation as necessary <span class="text-danger">*</span></p> --}}
 
-            {{-- <div class="row">
+            <div class="row">
                 <button type="button" data-bs-toggle="modal" data-bs-target="#addItemModal"
                     class="btn btn-primary waves-effect waves-light w-25 m-auto">
                     <span class="fa-solid fa-file-circle-plus me-1_5"></span>Add Item
                 </button>
-            </div> --}}
+            </div>
 
             <div class="row mt-6" x-data="{
                 items: $wire.entangle('items'),
@@ -438,7 +438,25 @@
 
                     <input wire:model="uploads" type="file" multiple class="form-control"
                         style="display: inline;width: 400px;height:45px">
-                    <span wire:loading wire:target="uploads">Uploading...</span>
+                    <button wire:click.prevent="uploadFiles()" class="btn btn-primary" wire:loading.attr="disabled"
+                        wire:target="uploads" style="width: 8rem"><i class="fas fa-plus me-2"></i> Upload</button>
+                    <div wire:loading wire:target="uploads" class="spinner-border spinner-border-sm text-secondary"
+                        role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                    {{-- Upload Instructions List --}}
+                    <div class="text-start m-auto mt-5" style="max-width: 400px;">
+                        <ul class="list-unstyled small">
+                            <li><i class="fa-solid fa-circle-dot me-2"></i><strong>At least 1</strong> upload is
+                                required.</li>
+                            <li><i class="fa-solid fa-circle-dot me-2"></i>File must be <strong>less than
+                                    10MB</strong>.
+                            </li>
+                            <li><i class="fa-solid fa-circle-dot me-2"></i>For items with multiple specifications,
+                                please upload additional documentation as necessary.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
