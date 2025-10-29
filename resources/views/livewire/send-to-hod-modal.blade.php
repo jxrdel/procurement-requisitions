@@ -23,7 +23,7 @@
                                 <textarea required wire:model="contact_person_note"
                                     class="form-control @error('contact_person_note')is-invalid @enderror" placeholder="Please enter a note"
                                     id="contactPersonNoteInput" style="height: 150px"></textarea>
-                                <label for="contactPersonNoteInput">Note for HOD</label>
+                                <label for="contactPersonNoteInput">Minute to HOD</label>
                             </div>
 
                             @error('contact_person_note')

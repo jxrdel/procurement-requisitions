@@ -1,5 +1,6 @@
 <div>
     @include('livewire.add-item-modal')
+    @include('livewire.edit-item-modal')
     @include('livewire.approve-form-hod-modal')
     @include('livewire.decline-form-modal')
     @include('livewire.add-form-log')
@@ -14,26 +15,21 @@
                 <div class="d-sm-flex align-items-center justify-content-between mb-5">
 
                     {{-- Left Column: Back Button --}}
-                    <div class="col-3 col-sm-2 text-start">
+                    <div class="col text-start">
                         <a href="{{ route('requisition_forms.index') }}" class="btn btn-primary">
                             <i class="ri-arrow-left-circle-line me-1"></i> Back
                         </a>
                     </div>
 
                     {{-- Center Column: Heading --}}
-                    <div class="col-6 col-sm-8 text-center">
+                    <div class="col text-center">
                         <h1 class="h3 mb-0 text-gray-800">
-                            <strong>#
-                                {{ $requisitionForm->form_code }}
-                                <a href="{{ route('requisition_forms.preview', ['id' => $requisitionForm->id]) }}"
-                                    target="_blank">
-                                    <i class="fa-solid fa-print me-1"></i>
-                                </a></strong>
+                            <strong>#{{ $requisitionForm->form_code }}</strong>
                         </h1>
                     </div>
 
                     {{-- Right Column: Save + Edit Buttons --}}
-                    <div class="col-3 col-sm-2 text-end d-flex justify-content-end gap-2">
+                    <div class="col text-end d-flex justify-content-end gap-2">
 
                         @if (
                             !$requisitionForm->date_sent_to_hod ||
@@ -42,47 +38,66 @@
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT)
-                            <button type="submit" x-show="isEditing" class="btn btn-sm btn-primary"
-                                x-bind:class="isEditing ? '' : 'd-none'"> <i class="fa-solid fa-save me-1"></i> Save
-                            </button>
+                            @can('edit-requisition-form', $requisitionForm)
+                                <button type="submit" x-show="isEditing" class="btn btn-sm btn-primary"
+                                    x-bind:class="isEditing ? '' : 'd-none'"> <i class="fa-solid fa-save me-1"></i> Save
+                                </button>
 
-                            <button type="button" @click="isEditing = !isEditing"
-                                x-bind:class="isEditing ? 'btn-danger' : 'btn-success'" class="btn btn-sm">
-                                <i x-bind:class="isEditing ? 'fa-solid fa-xmark' : 'fa-solid fa-pen-to-square'"
-                                    class="me-1_5"></i>
-                                <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
-                            </button>
+                                <button type="button" @click="isEditing = !isEditing"
+                                    x-bind:class="isEditing ? 'btn-danger' : 'btn-success'" class="btn btn-sm">
+                                    <i x-bind:class="isEditing ? 'fa-solid fa-xmark' : 'fa-solid fa-pen-to-square'"
+                                        class="me-1_5"></i>
+                                    <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
+                                </button>
+                            @endcan
                         @elseif($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD)
-                            <button wire:loading.attr="disabled" style="width: 8.5rem" data-bs-toggle="modal"
-                                data-bs-target="#approveRequisitionFormHOD" type="button"
-                                class="btn btn-sm btn-success">
-                                <i class="ri-checkbox-circle-line me-1"></i> Approve
-                            </button>
-                            <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
-                                class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
-                                Decline
-                            </button>
+                            @if (Auth::user()->id == $requisitionForm->head_of_department_id)
+                                {{-- Approve and Decline Buttons for HOD --}}
+                                <button wire:loading.attr="disabled" data-bs-toggle="modal"
+                                    data-bs-target="#approveRequisitionFormHOD" type="button"
+                                    class="btn btn-sm btn-success">
+                                    <i class="ri-checkbox-circle-line me-1"></i> Approve
+                                </button>
+                                <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
+                                    class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
+                                    Decline
+                                </button>
+                            @endif
                         @elseif (
                             $requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_DPS ||
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO)
-                            <button type="button" style="width: 8.5rem"
-                                wire:confirm="Are you sure you want to approve this requisition form?"
-                                wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
-                                wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-success">
-                                <span wire:loading.remove>
-                                    <i class="ri-checkbox-circle-line me-1"></i> Approve
-                                </span>
-                                <span wire:loading>
-                                    <i class="ri-loader-2-line ri-spin me-1"></i>
-                                </span>
-                            </button>
-                            <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
-                                class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
-                                Decline
-                            </button>
+                            @if (Auth::user()->id == $requisitionForm->reporting_officer_id)
+                                {{-- Approve and Decline Buttons for Reporting Officer --}}
+                                <button type="button"
+                                    wire:confirm="Are you sure you want to approve this requisition form?"
+                                    wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
+                                    wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-dark">
+                                    <span wire:loading.remove>
+                                        <i class="ri-mail-send-line me-1"></i> Forward
+                                    </span>
+                                    <span wire:loading>
+                                        <i class="ri-loader-2-line ri-spin me-1"></i>
+                                    </span>
+                                </button>
+                                <button type="button"
+                                    wire:confirm="Are you sure you want to approve this requisition form?"
+                                    wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
+                                    wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-success">
+                                    <span wire:loading.remove>
+                                        <i class="ri-checkbox-circle-line me-1"></i> Approve
+                                    </span>
+                                    <span wire:loading>
+                                        <i class="ri-loader-2-line ri-spin me-1"></i>
+                                    </span>
+                                </button>
+                                <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
+                                    class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
+                                    Decline
+                                </button>
+                            @endif
                         @elseif ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_PROCUREMENT)
-                            <button type="button" style="width: 8.5rem"
+                            <button type="button"
                                 wire:confirm="Are you sure you want to approve this requisition form?"
                                 wire:loading.attr="disabled" wire:target="approveRequisitionProcurement"
                                 wire:click="approveRequisitionProcurement" class="btn btn-sm btn-success">
@@ -97,7 +112,9 @@
                                 class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
                                 Decline
                             </button>
-                        @elseif ($requisitionForm->status === \App\RequestFormStatus::APPROVED_BY_PROCUREMENT)
+                        @elseif (
+                            $requisitionForm->status === \App\RequestFormStatus::APPROVED_BY_PROCUREMENT &&
+                                Auth::user()->department->name == 'Procurement Unit')
                             <a href="{{ route('requisitions.create', ['form' => $requisitionForm]) }}"
                                 class="btn btn-sm btn-success">
                                 <i class="fa-solid fa-plus-circle me-1"></i> Create Requisition
@@ -400,7 +417,7 @@
                     <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
                 </div>
 
-                {{-- @if (!$requisitionForm->hod_approval)
+                @if (!$requisitionForm->hod_approval)
                     <div class="row">
                         <button type="button" data-bs-toggle="modal" data-bs-target="#addItemModal"
                             x-bind:class="{ 'pointer-events-none opacity-50': !isEditing }"
@@ -408,7 +425,7 @@
                             <span class="fa-solid fa-file-circle-plus me-1_5"></span>Add Item
                         </button>
                     </div>
-                @endif --}}
+                @endif
 
                 <p class="mt-6 fw-medium text-center">For items with multiple specifications, please attach additional
                     documentation
@@ -416,11 +433,9 @@
 
                 <div class="row mt-6" x-data="{
                     items: $wire.entangle('items'),
-                    errors: $wire.entangle('validationErrors'),
-                    isEditing: $wire.entangle('isEditing')
                 }">
                     <div class="table-responsive">
-                        <table class="table table-bordered w-100">
+                        <table class="table table-hover table-bordered w-100">
                             <thead>
                                 <tr>
                                     <th>Item</th>
@@ -431,135 +446,42 @@
                                     <th>Colour</th>
                                     <th>Brand/Model</th>
                                     <th>Other</th>
-                                    <th style="width: 80px;">Actions</th>
+                                    <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="table-border-bottom-0">
-                                <template x-for="(item, index) in items" :key="index">
+                                @forelse($items as $key => $item)
                                     <tr>
+                                        <td>{{ $item['name'] }}</td>
+                                        <td>{{ $item['qty_in_stock'] }}</td>
+                                        <td>{{ $item['qty_requesting'] }}</td>
+                                        <td>{{ $item['unit_of_measure'] }}</td>
+                                        <td>{{ $item['size'] }}</td>
+                                        <td>{{ $item['colour'] }}</td>
+                                        <td>{{ $item['brand_model'] }}</td>
+                                        <td>{{ $item['other'] }}</td>
                                         <td>
-                                            <input type="text" class="form-control form-control-sm"
-                                                :class="errors['items.' + index + '.name'] ? 'is-invalid' : ''"
-                                                x-model="items[index].name" placeholder="Item Name" required
-                                                x-bind:disabled="!isEditing">
-                                            <template x-if="errors['items.' + index + '.name']">
-                                                <div class="text-danger small"
-                                                    x-text="errors['items.' + index + '.name'][0]"></div>
-                                            </template>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm"
-                                                :class="errors['items.' + index + '.qty_in_stock'] ? 'is-invalid' : ''"
-                                                x-model="items[index].qty_in_stock" placeholder="0" min="0"
-                                                required x-bind:disabled="!isEditing">
-                                            <template x-if="errors['items.' + index + '.qty_in_stock']">
-                                                <div class="text-danger small"
-                                                    x-text="errors['items.' + index + '.qty_in_stock'][0]">
-                                                </div>
-                                            </template>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm"
-                                                :class="errors['items.' + index + '.qty_requesting'] ? 'is-invalid' : ''"
-                                                x-model="items[index].qty_requesting" placeholder="0" min="1"
-                                                required x-bind:disabled="!isEditing">
-                                            <template x-if="errors['items.' + index + '.qty_requesting']">
-                                                <div class="text-danger small"
-                                                    x-text="errors['items.' + index + '.qty_requesting'][0]">
-                                                </div>
-                                            </template>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm"
-                                                :class="errors['items.' + index + '.unit_of_measure'] ? 'is-invalid' : ''"
-                                                x-model="items[index].unit_of_measure" placeholder="Unit"
-                                                x-bind:disabled="!isEditing">
-                                            <template x-if="errors['items.' + index + '.unit_of_measure']">
-                                                <div class="text-danger small"
-                                                    x-text="errors['items.' + index + '.unit_of_measure'][0]">
-                                                </div>
-                                            </template>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm"
-                                                :class="errors['items.' + index + '.size'] ? 'is-invalid' : ''"
-                                                x-model="items[index].size" placeholder="Size"
-                                                x-bind:disabled="!isEditing">
-                                            <template x-if="errors['items.' + index + '.size']">
-                                                <div class="text-danger small"
-                                                    x-text="errors['items.' + index + '.size'][0]"></div>
-                                            </template>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm"
-                                                :class="errors['items.' + index + '.colour'] ? 'is-invalid' : ''"
-                                                x-model="items[index].colour" placeholder="Colour"
-                                                x-bind:disabled="!isEditing">
-                                            <template x-if="errors['items.' + index + '.colour']">
-                                                <div class="text-danger small"
-                                                    x-text="errors['items.' + index + '.colour'][0]"></div>
-                                            </template>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm"
-                                                :class="errors['items.' + index + '.brand_model'] ? 'is-invalid' : ''"
-                                                x-model="items[index].brand_model" placeholder="Brand/Model"
-                                                x-bind:disabled="!isEditing">
-                                            <template x-if="errors['items.' + index + '.brand_model']">
-                                                <div class="text-danger small"
-                                                    x-text="errors['items.' + index + '.brand_model'][0]">
-                                                </div>
-                                            </template>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm"
-                                                :class="errors['items.' + index + '.other'] ? 'is-invalid' : ''"
-                                                x-model="items[index].other" placeholder="Other"
-                                                x-bind:disabled="!isEditing">
-                                            <template x-if="errors['items.' + index + '.other']">
-                                                <div class="text-danger small"
-                                                    x-text="errors['items.' + index + '.other'][0]"></div>
-                                            </template>
-                                        </td>
-                                        <td class="text-center">
+                                            <button type="button" x-bind:disabled="!isEditing"
+                                                class="btn btn-dark mx-auto me-1"
+                                                wire:click="displayEditModal({{ $key }})"><i
+                                                    class="fa-solid fa-pen-to-square"></i></button>
+
                                             <button type="button" class="btn btn-sm btn-danger"
-                                                @click="items.splice(index, 1)"
+                                                wire:click="removeItem({{ $key }})"
                                                 :disabled="items.length <= 1 || !isEditing"
                                                 title="Cannot delete the last item">
                                                 <i class="fa-solid fa-trash-can"></i>
                                             </button>
                                         </td>
                                     </tr>
-                                </template>
-                                <template x-if="items.length === 0">
+                                @empty
                                     <tr>
-                                        <td colspan="9" class="text-center">No items added. Click the button below
-                                            to add an item.</td>
+                                        <td colspan="9" class="text-center">No items added.</td>
                                     </tr>
-                                </template>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
-                    @if (!$requisitionForm->hod_approval)
-                        <div class="row mt-3">
-                            <div class="col d-flex justify-content-center">
-                                <button x-bind:disabled="!isEditing" type="button"
-                                    class="btn btn-primary waves-effect waves-light"
-                                    @click="items.push({ 
-                                    name: '', 
-                                    qty_in_stock: 0, 
-                                    qty_requesting: 1, 
-                                    unit_of_measure: '', 
-                                    size: '', 
-                                    colour: '', 
-                                    brand_model: '', 
-                                    other: '' 
-                                })">
-                                    <span class="fa-solid fa-circle-plus me-1_5"></span>Add Item
-                                </button>
-                            </div>
-                        </div>
-                    @endif
                 </div>
 
                 <div class="divider mt-6">
@@ -921,28 +843,67 @@
                 </div> --}}
 
                 {{-- Only show Save button when editing is enabled --}}
-                @if (!$requisitionForm->hod_approval)
+                @if (
+                    !$requisitionForm->date_sent_to_hod ||
+                        $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_HOD ||
+                        $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
+                        $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
+                        $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO ||
+                        $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT)
                     <div class="row mt-8" x-show="isEditing">
-                        <div class="text-center m-auto">
-                            <button type="submit" wire:loading.attr="disabled"
-                                wire:target="save,uploads,justification"
-                                class="btn btn-primary waves-effect waves-light" style="width: 100px">
-                                <span class="tf-icons ri-save-3-line me-1_5"></span>Save
-                            </button>
-                            &nbsp;
-                            <button type="button" @click="isEditing = false"
-                                class="btn btn-dark waves-effect waves-light" style="width: 100px">
-                                <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
-                            </button>
+                        <div class="col"></div>
+                        <div class="col text-center m-auto">
+                            @can('edit-requisition-form', $requisitionForm)
+                                <button type="submit" wire:loading.attr="disabled"
+                                    wire:target="save,uploads,justification"
+                                    class="btn btn-primary waves-effect waves-light" style="width: 100px">
+                                    <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                                </button>
+                                &nbsp;
+                                <button type="button" @click="isEditing = false"
+                                    class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                    <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
+                                </button>
+                            @endcan
+                        </div>
+                        <div class="col">
+                            <a class="btn btn-dark text-end" style="float: right;"
+                                href="{{ route('requisition_forms.preview', ['id' => $requisitionForm->id]) }}"
+                                target="_blank">
+                                <i class="fa-solid fa-file-lines me-2"></i>View Form
+                            </a>
                         </div>
                     </div>
                     <div class="row mt-8" x-show="!isEditing">
-                        <div class="text-center m-auto">
-                            <button type="button" @click="isEditing = !isEditing"
-                                x-bind:class="isEditing ? 'btn-danger' : 'btn-success'" class="btn btn-sm">
-                                <i class="fa-solid fa-pen-to-square me-1_5"></i>
-                                <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
-                            </button>
+                        <div class="col"></div>
+                        <div class="col">
+                            <div class="text-center m-auto">
+                                @can('edit-requisition-form', $requisitionForm)
+                                    <button type="button" @click="isEditing = !isEditing"
+                                        x-bind:class="isEditing ? 'btn-danger' : 'btn-success'" class="btn btn-sm">
+                                        <i class="fa-solid fa-pen-to-square me-1_5"></i>
+                                        <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
+                                    </button>
+                                @endcan
+                            </div>
+                        </div>
+                        <div class="col">
+                            <a class="btn btn-dark text-end" style="float: right;"
+                                href="{{ route('requisition_forms.preview', ['id' => $requisitionForm->id]) }}"
+                                target="_blank">
+                                <i class="fa-solid fa-file-lines me-2"></i>View Form
+                            </a>
+                        </div>
+                    </div>
+                @else
+                    {{-- Display View form button on far right --}}
+                    <div class="row mt-8">
+                        <div class="col">
+                            <a class="btn btn-dark text-end" style="float: right;"
+                                href="{{ route('requisition_forms.preview', ['id' => $requisitionForm->id]) }}"
+                                target="_blank">
+                                <i class="fa-solid fa-file-lines me-2"></i>View Form
+                            </a>
                         </div>
                     </div>
                 @endif
@@ -958,6 +919,14 @@
             window.addEventListener('close-add-item-modal', event => {
                 $('#addItemModal').modal('hide');
             });
+
+            window.addEventListener('display-edit-item-modal', event => {
+                $('#editItemModal').modal('show');
+            })
+
+            window.addEventListener('close-edit-item-modal', event => {
+                $('#editItemModal').modal('hide');
+            })
 
             window.addEventListener('close-log-modal', event => {
                 $('#addLogModal').modal('hide');

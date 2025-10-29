@@ -36,8 +36,8 @@
                             @enderror
                             <div class="form-floating form-floating-outline mt-4">
                                 <textarea wire:model="hod_note" class="form-control @error('hod_note')is-invalid @enderror"
-                                    placeholder="Enter note here" id="hodNoteInput" style="height: 100px"></textarea>
-                                <label for="hodNoteInput">Note</label>
+                                    placeholder="Enter minute here" id="hodNoteInput" style="height: 100px"></textarea>
+                                <label for="hodNoteInput">Minute</label>
                             </div>
 
                             @error('hod_note')

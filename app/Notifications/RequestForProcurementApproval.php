@@ -53,7 +53,7 @@ class RequestForProcurementApproval extends Notification
     {
         return [
             "title" => "Requisition Form Sent for Approval",
-            "message" => "A requisition form ({$this->form->form_code}) has been updated as requested and has been resubmitted for your review and approval",
+            "message" => "A Requisition Form #{$this->form->form_code} has been updated as requested and has been resubmitted for your review and approval",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

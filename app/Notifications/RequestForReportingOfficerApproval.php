@@ -53,7 +53,7 @@ class RequestForReportingOfficerApproval extends Notification
     {
         return [
             "title" => "Requisition Form Sent for Approval",
-            "message" => "A new requisition form ({$this->form->form_code}) has been sent to you for approval from {$this->form->requestingUnit->name}.",
+            "message" => "A new Requisition Form #{$this->form->form_code} has been sent to you for approval from {$this->form->requestingUnit->name}.",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

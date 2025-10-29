@@ -53,7 +53,7 @@ class RequestForHODApproval extends Notification
     {
         return [
             "title" => "Requisition Form Sent for Approval",
-            "message" => "A new requisition form ({$this->form->form_code}) has been sent to you for approval.",
+            "message" => "A new Requisition Form #{$this->form->form_code} has been sent to you for approval.",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

@@ -53,7 +53,7 @@ class DeclinedByHOD extends Notification
     {
         return [
             "title" => "Requisition Form Denied by HOD",
-            "message" => "A requisition form ({$this->form->form_code}) has been denied by the Head of Department.",
+            "message" => "A Requisition Form #{$this->form->form_code} has been denied by the Head of Department.",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

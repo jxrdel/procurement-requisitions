@@ -53,7 +53,7 @@ class LoginForm extends Component
                     }
                 } else {
                     $this->resetValidation();
-                    $this->addError('username', 'User does not have a Windows Login. Please contact Administrator');
+                    $this->addError('username', 'User does not have a Windows Login. Please contact ICT Helpdesk at etx. 11000');
                 }
             } else { //Display error if no user is found
                 $this->resetValidation();

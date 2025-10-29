@@ -53,6 +53,7 @@ class CreateRequisitionRequestForm extends Component
     public $colour;
     public $brand_model;
     public $other;
+    public $editItemKey;
 
     public $uploads;
     public $selected_votes = [];
@@ -74,18 +75,6 @@ class CreateRequisitionRequestForm extends Component
         $this->head_of_department = Auth::user()->department->head_of_department_id ?? null;
         $this->votes = Vote::orderBy('number')->get();
         $this->categories = FormCategory::options();
-        $this->items = [
-            [
-                'name' => '',
-                'qty_in_stock' => 0,
-                'qty_requesting' => 1,
-                'unit_of_measure' => '',
-                'size' => '',
-                'colour' => '',
-                'brand_model' => '',
-                'other' => '',
-            ]
-        ];
     }
 
     public function save()
@@ -204,6 +193,62 @@ class CreateRequisitionRequestForm extends Component
         $this->items[] = $newItem;
         $this->dispatch('show-message', message: 'Item added successfully');
         $this->dispatch('close-add-item-modal');
+
+        $this->reset([
+            'item_name',
+            'qty_in_stock',
+            'qty_requesting',
+            'unit_of_measure',
+            'size',
+            'colour',
+            'brand_model',
+            'other'
+        ]);
+    }
+
+    public function displayEditModal($key)
+    {
+        $this->editItemKey = $key;
+        $item = $this->items[$key];
+
+        $this->item_name = $item['name'];
+        $this->qty_in_stock = $item['qty_in_stock'];
+        $this->qty_requesting = $item['qty_requesting'];
+        $this->unit_of_measure = $item['unit_of_measure'];
+        $this->size = $item['size'];
+        $this->colour = $item['colour'];
+        $this->brand_model = $item['brand_model'];
+        $this->other = $item['other'];
+
+        $this->dispatch('display-edit-item-modal');
+    }
+
+    public function editItem()
+    {
+        $this->validate([
+            'item_name' => 'required|string|max:255',
+            'qty_in_stock' => 'required|integer|min:0',
+            'qty_requesting' => 'required|integer|min:1',
+            'unit_of_measure' => 'nullable|string|max:50',
+            'size' => 'nullable|string|max:50',
+            'colour' => 'nullable|string|max:50',
+            'brand_model' => 'nullable|string|max:255',
+            'other' => 'nullable|string|max:255',
+        ]);
+
+        $this->items[$this->editItemKey] = [
+            'name' => $this->item_name,
+            'qty_in_stock' => $this->qty_in_stock,
+            'qty_requesting' => $this->qty_requesting,
+            'unit_of_measure' => $this->unit_of_measure,
+            'size' => $this->size,
+            'colour' => $this->colour,
+            'brand_model' => $this->brand_model,
+            'other' => $this->other,
+        ];
+
+        $this->dispatch('show-message', message: 'Item updated successfully');
+        $this->dispatch('close-edit-item-modal');
 
         $this->reset([
             'item_name',

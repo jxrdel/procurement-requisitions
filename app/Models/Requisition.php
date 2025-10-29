@@ -147,4 +147,10 @@ class Requisition extends Model
 
         return true;
     }
+
+    //Get requisition form
+    public function requisitionForm()
+    {
+        return $this->hasOne(RequisitionRequestForm::class, 'requisition_id');
+    }
 }

@@ -66,7 +66,7 @@ class DeclinedByProcurement extends Notification
     {
         return [
             "title" => "Requisition Form Denied by Procurement",
-            "message" => "A requisition form ({$this->form->form_code}) has been denied by Procurement')",
+            "message" => "A Requisition Form #{$this->form->form_code} has been denied by Procurement')",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

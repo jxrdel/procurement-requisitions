@@ -66,7 +66,7 @@ class ApprovedByReportingOfficer extends Notification
     {
         return [
             "title" => "Requisition Form Approved by " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer'),
-            "message" => "Requisition form ({$this->form->form_code}) has been approved by the " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ".",
+            "message" => "Requisition Form #{$this->form->form_code} has been approved by the " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ".",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

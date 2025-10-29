@@ -78,5 +78,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('view-log', function ($user, $log) {
             return $user->department->name === $log->user->department->name;
         });
+
+        Gate::define('view-requisition-form', function ($user, $form) {
+            return $user->id == $form->contact_person_id || $user->id == $form->head_of_department_id || $user->is_reporting_officer || $user->department->name === 'Procurement Unit';
+        });
+
+        Gate::define('edit-requisition-form', function ($user, $form) {
+            return $user->id == $form->contact_person_id || $user->id == $form->head_of_department_id;
+        });
     }
 }

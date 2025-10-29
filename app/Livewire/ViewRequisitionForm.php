@@ -17,6 +17,7 @@ use App\Notifications\RequestForProcurementApproval;
 use App\Notifications\RequestForReportingOfficerApproval;
 use App\RequestFormStatus;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
@@ -68,6 +69,7 @@ class ViewRequisitionForm extends Component
     public $colour;
     public $brand_model;
     public $other;
+    public $editItemKey;
 
     public $uploads;
     public $votes;
@@ -84,7 +86,12 @@ class ViewRequisitionForm extends Component
 
     public function mount($id)
     {
+
         $this->requisitionForm = RequisitionRequestForm::with('items')->findOrFail($id);
+        if (Gate::denies('view-requisition-form', $this->requisitionForm)) {
+            abort(403, 'You do not have permission to view this requisition form.');
+        }
+
 
         $this->units = Department::orderBy('name')->get();
         $this->users = User::orderBy('name')->get();
@@ -180,6 +187,62 @@ class ViewRequisitionForm extends Component
 
         $this->dispatch('show-message', message: 'Form updated successfully.');
         $this->isEditing = false;
+    }
+
+    public function displayEditModal($key)
+    {
+        $this->editItemKey = $key;
+        $item = $this->items[$key];
+
+        $this->item_name = $item['name'];
+        $this->qty_in_stock = $item['qty_in_stock'];
+        $this->qty_requesting = $item['qty_requesting'];
+        $this->unit_of_measure = $item['unit_of_measure'];
+        $this->size = $item['size'];
+        $this->colour = $item['colour'];
+        $this->brand_model = $item['brand_model'];
+        $this->other = $item['other'];
+
+        $this->dispatch('display-edit-item-modal');
+    }
+
+    public function editItem()
+    {
+        $this->validate([
+            'item_name' => 'required|string|max:255',
+            'qty_in_stock' => 'required|integer|min:0',
+            'qty_requesting' => 'required|integer|min:1',
+            'unit_of_measure' => 'nullable|string|max:50',
+            'size' => 'nullable|string|max:50',
+            'colour' => 'nullable|string|max:50',
+            'brand_model' => 'nullable|string|max:255',
+            'other' => 'nullable|string|max:255',
+        ]);
+
+        $this->items[$this->editItemKey] = [
+            'name' => $this->item_name,
+            'qty_in_stock' => $this->qty_in_stock,
+            'qty_requesting' => $this->qty_requesting,
+            'unit_of_measure' => $this->unit_of_measure,
+            'size' => $this->size,
+            'colour' => $this->colour,
+            'brand_model' => $this->brand_model,
+            'other' => $this->other,
+        ];
+
+        $this->dispatch('show-message', message: 'Item updated successfully');
+        $this->dispatch('close-edit-item-modal');
+
+        $this->reset([
+            'item_name',
+            'qty_in_stock',
+            'qty_requesting',
+            'unit_of_measure',
+            'size',
+            'colour',
+            'brand_model',
+            'other'
+        ]);
     }
 
     public function addItem()

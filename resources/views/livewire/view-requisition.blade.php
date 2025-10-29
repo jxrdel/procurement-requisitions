@@ -9,22 +9,34 @@
     }" x-cloak>
         <div class="card-body">
 
-            <div class="d-sm-flex align-items-center justify-content-between mb-5">
+            <div class="d-flex align-items-center justify-content-between mb-5 position-relative">
+                {{-- Back button --}}
                 <a href="{{ route('requisitions.index') }}" class="btn btn-dark">
                     <i class="ri-arrow-left-circle-line me-1"></i> Back
                 </a>
 
-                <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
-                    <strong>{{ $this->requisition_no }}</strong>
-                    @if ($this->requisition->is_completed)
-                        <span style="background-color: #47a102 !important;"
-                            class="badge rounded-pill bg-success fs-5">Completed</span>
-                        {{-- @else
-                        <span style="background-color: #c6850c !important;"
-                            class="badge rounded-pill bg-danger fs-5">{{ $this->requisition->requisition_status }}</span> --}}
-                    @endif
-                </h1>
+                {{-- Centered requisition number --}}
+                <div class="position-absolute start-50 translate-middle-x text-center">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <strong>{{ $this->requisition_no }}</strong>
+                        @if ($this->requisition->is_completed)
+                            <span class="badge rounded-pill bg-success fs-5"
+                                style="background-color: #47a102 !important;">
+                                Completed
+                            </span>
+                        @endif
+                    </h1>
+                </div>
+                @if ($this->requisition->requisitionForm)
+                    {{-- View Requisition Form button --}}
+                    <a href="{{ route('requisition_forms.view', ['id' => $this->requisition->requisitionForm->id]) }}"
+                        target="_blank" class="btn btn-success">
+                        <i class="fa-solid fa-eye me-1"></i> View Requisition Form
+                    </a>
+                @endif
             </div>
+
+
             <div class="nav-align-top mb-6" style="min-height: 380px">
                 <ul wire:ignore class="nav nav-tabs mb-4 nav-fill" role="tablist">
                     <li x-on:click="$wire.active_pane = 'procurement1'" wire:ignore class="nav-item mb-1 mb-sm-0">

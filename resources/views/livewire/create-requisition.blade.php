@@ -7,15 +7,30 @@
         }" x-cloak>
             <div class="card-body">
 
-                <div class="d-sm-flex align-items-center justify-content-between mb-5">
-                    <a href="{{ route('requisitions.index') }}" class="btn btn-primary">
-                        <i class="ri-arrow-left-circle-line me-1"></i> Back
-                    </a>
-                    <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
-                        <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i> Create
-                            Requisition</strong>
-                    </h1>
+                <div class="d-flex align-items-center justify-content-between mb-5 position-relative">
+                    {{-- Left Button --}}
+                    <div>
+                        <a href="{{ route('requisitions.index') }}" class="btn btn-primary">
+                            <i class="ri-arrow-left-circle-line me-1"></i> Back
+                        </a>
+                    </div>
+
+                    {{-- Center Title --}}
+                    <div class="position-absolute start-50 translate-middle-x text-center">
+                        <h1 class="h3 mb-0 text-gray-800">
+                            <strong><i class="fa-solid fa-file-circle-plus me-2"></i>Create Requisition</strong>
+                        </h1>
+                    </div>
+
+                    {{-- Right Button --}}
+                    <div>
+                        <a href="{{ route('requisitions.view', ['id' => $form->id]) }}" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-plus-circle me-1"></i> View Requisition Form
+                        </a>
+                    </div>
                 </div>
+
+
 
 
                 <div class="row mt-8">

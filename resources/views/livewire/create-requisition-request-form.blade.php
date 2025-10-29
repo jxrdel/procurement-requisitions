@@ -1,7 +1,6 @@
 <div>
     @include('livewire.add-item-modal')
-    {{-- @include('livewire.accept-form-modal')
-    @include('livewire.decline-form-modal') --}}
+    @include('livewire.edit-item-modal')
     <div class="card">
         <div class="card-body">
 
@@ -286,12 +285,9 @@
                 </button>
             </div>
 
-            <div class="row mt-6" x-data="{
-                items: $wire.entangle('items'),
-                errors: $wire.entangle('validationErrors')
-            }">
+            <div class="row mt-6">
                 <div class="table-responsive">
-                    <table class="table table-bordered w-100">
+                    <table class="table table-hover table-bordered w-100">
                         <thead>
                             <tr>
                                 <th>Item</th>
@@ -302,125 +298,36 @@
                                 <th>Colour</th>
                                 <th>Brand/Model</th>
                                 <th>Other</th>
-                                <th style="width: 80px;">Actions</th>
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
-                            <template x-for="(item, index) in items" :key="index">
+                            @forelse($items as $key => $item)
                                 <tr>
+                                    <td>{{ $item['name'] }}</td>
+                                    <td>{{ $item['qty_in_stock'] }}</td>
+                                    <td>{{ $item['qty_requesting'] }}</td>
+                                    <td>{{ $item['unit_of_measure'] }}</td>
+                                    <td>{{ $item['size'] }}</td>
+                                    <td>{{ $item['colour'] }}</td>
+                                    <td>{{ $item['brand_model'] }}</td>
+                                    <td>{{ $item['other'] }}</td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm"
-                                            :class="errors['items.' + index + '.name'] ? 'is-invalid' : ''"
-                                            x-model="items[index].name" placeholder="Item Name" required>
-                                        <template x-if="errors['items.' + index + '.name']">
-                                            <div class="text-danger small"
-                                                x-text="errors['items.' + index + '.name'][0]"></div>
-                                        </template>
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm"
-                                            :class="errors['items.' + index + '.qty_in_stock'] ? 'is-invalid' : ''"
-                                            x-model="items[index].qty_in_stock" placeholder="0" min="0"
-                                            required>
-                                        <template x-if="errors['items.' + index + '.qty_in_stock']">
-                                            <div class="text-danger small"
-                                                x-text="errors['items.' + index + '.qty_in_stock'][0]">
-                                            </div>
-                                        </template>
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm"
-                                            :class="errors['items.' + index + '.qty_requesting'] ? 'is-invalid' : ''"
-                                            x-model="items[index].qty_requesting" placeholder="0" min="1"
-                                            required>
-                                        <template x-if="errors['items.' + index + '.qty_requesting']">
-                                            <div class="text-danger small"
-                                                x-text="errors['items.' + index + '.qty_requesting'][0]">
-                                            </div>
-                                        </template>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm"
-                                            :class="errors['items.' + index + '.unit_of_measure'] ? 'is-invalid' : ''"
-                                            x-model="items[index].unit_of_measure" placeholder="Unit">
-                                        <template x-if="errors['items.' + index + '.unit_of_measure']">
-                                            <div class="text-danger small"
-                                                x-text="errors['items.' + index + '.unit_of_measure'][0]">
-                                            </div>
-                                        </template>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm"
-                                            :class="errors['items.' + index + '.size'] ? 'is-invalid' : ''"
-                                            x-model="items[index].size" placeholder="Size">
-                                        <template x-if="errors['items.' + index + '.size']">
-                                            <div class="text-danger small"
-                                                x-text="errors['items.' + index + '.size'][0]"></div>
-                                        </template>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm"
-                                            :class="errors['items.' + index + '.colour'] ? 'is-invalid' : ''"
-                                            x-model="items[index].colour" placeholder="Colour">
-                                        <template x-if="errors['items.' + index + '.colour']">
-                                            <div class="text-danger small"
-                                                x-text="errors['items.' + index + '.colour'][0]"></div>
-                                        </template>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm"
-                                            :class="errors['items.' + index + '.brand_model'] ? 'is-invalid' : ''"
-                                            x-model="items[index].brand_model" placeholder="Brand/Model">
-                                        <template x-if="errors['items.' + index + '.brand_model']">
-                                            <div class="text-danger small"
-                                                x-text="errors['items.' + index + '.brand_model'][0]">
-                                            </div>
-                                        </template>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm"
-                                            :class="errors['items.' + index + '.other'] ? 'is-invalid' : ''"
-                                            x-model="items[index].other" placeholder="Other">
-                                        <template x-if="errors['items.' + index + '.other']">
-                                            <div class="text-danger small"
-                                                x-text="errors['items.' + index + '.other'][0]"></div>
-                                        </template>
-                                    </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-danger"
-                                            @click="items.splice(index, 1)" :disabled="items.length <= 1"
-                                            title="Cannot delete the last item">
-                                            <i class="fa-solid fa-trash-can"></i>
-                                        </button>
+                                        <button class="btn btn-dark mx-auto me-1"
+                                            wire:click="displayEditModal({{ $key }})"><i
+                                                class="fa-solid fa-pen-to-square"></i></button>
+                                        <button class="btn btn-danger mx-auto"
+                                            wire:click="removeItem({{ $key }})"><i
+                                                class="fa-solid fa-trash-can"></i></button>
                                     </td>
                                 </tr>
-                            </template>
-                            <template x-if="items.length === 0">
+                            @empty
                                 <tr>
-                                    <td colspan="9" class="text-center">No items added. Click the button below to
-                                        add an item.</td>
+                                    <td colspan="9" class="text-center">No items added.</td>
                                 </tr>
-                            </template>
+                            @endforelse
                         </tbody>
                     </table>
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col d-flex justify-content-center">
-                        <button type="button" class="btn btn-primary waves-effect waves-light"
-                            @click="items.push({ 
-                                name: '', 
-                                qty_in_stock: 0, 
-                                qty_requesting: 1, 
-                                unit_of_measure: '', 
-                                size: '', 
-                                colour: '', 
-                                brand_model: '', 
-                                other: '' 
-                            })">
-                            <span class="fa-solid fa-circle-plus me-1_5"></span>Add Item
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -438,8 +345,6 @@
 
                     <input wire:model="uploads" type="file" multiple class="form-control"
                         style="display: inline;width: 400px;height:45px">
-                    <button wire:click.prevent="uploadFiles()" class="btn btn-primary" wire:loading.attr="disabled"
-                        wire:target="uploads" style="width: 8rem"><i class="fas fa-plus me-2"></i> Upload</button>
                     <div wire:loading wire:target="uploads" class="spinner-border spinner-border-sm text-secondary"
                         role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -447,7 +352,7 @@
 
                     {{-- Upload Instructions List --}}
                     <div class="text-start m-auto mt-5" style="max-width: 400px;">
-                        <ul class="list-unstyled small">
+                        <ul class="list-unstyled small text-danger">
                             <li><i class="fa-solid fa-circle-dot me-2"></i><strong>At least 1</strong> upload is
                                 required.</li>
                             <li><i class="fa-solid fa-circle-dot me-2"></i>File must be <strong>less than
@@ -495,6 +400,14 @@
         $(document).ready(function() {
             window.addEventListener('close-add-item-modal', event => {
                 $('#addItemModal').modal('hide');
+            })
+
+            window.addEventListener('display-edit-item-modal', event => {
+                $('#editItemModal').modal('show');
+            })
+
+            window.addEventListener('close-edit-item-modal', event => {
+                $('#editItemModal').modal('hide');
             })
         });
 

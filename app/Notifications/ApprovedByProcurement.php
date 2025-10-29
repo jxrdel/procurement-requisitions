@@ -61,7 +61,7 @@ class ApprovedByProcurement extends Notification
     {
         return [
             "title" => "Requisition Form Approved by Procurement",
-            "message" => "Requisition form ({$this->form->form_code}) has been approved by the Procurement Department.",
+            "message" => "Requisition Form #{$this->form->form_code} has been approved by the Procurement Department.",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }
