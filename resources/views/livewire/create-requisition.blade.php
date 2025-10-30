@@ -24,7 +24,8 @@
 
                     {{-- Right Button --}}
                     <div>
-                        <a href="{{ route('requisitions.view', ['id' => $form->id]) }}" class="btn btn-success btn-sm">
+                        <a href="{{ route('requisition_forms.view', ['id' => $form->id]) }}" target="_blank"
+                            class="btn btn-success btn-sm">
                             <i class="fa-solid fa-plus-circle me-1"></i> View Requisition Form
                         </a>
                     </div>
@@ -125,7 +126,39 @@
                     </div>
                 </div>
 
-                <div class="row mt-6" x-data="{ siteVisit: $wire.entangle('site_visit') }">
+                <div class="row mt-6">
+
+                    <div class="col">
+                        <div class="form-floating form-floating-outline mb-6">
+                            <select wire:model="assigned_to"
+                                class="form-select @error('assigned_to')is-invalid @enderror"
+                                id="exampleFormControlSelect1" aria-label="Default select example">
+                                <option value="" selected>Select Employee</option>
+                                @foreach ($staff as $staff)
+                                    <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                @endforeach
+                            </select>
+                            <label for="exampleFormControlSelect1">Assigned To</label>
+                            @error('assigned_to')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="date_assigned" type="date"
+                                class="form-control @error('date_assigned')is-invalid @enderror" id="floatingInput"
+                                aria-describedby="floatingInputHelp" />
+                            <label for="floatingInput">Date Assigned to Officer</label>
+                        </div>
+                        @error('date_assigned')
+                            <div class="text-danger"> {{ $message }} </div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row" x-data="{ siteVisit: $wire.entangle('site_visit') }">
                     <div class="col">
                         <div class="form-check mt-4">
                             <input class="form-check-input" type="checkbox" id="siteVisitCheck" x-model="siteVisit">
@@ -201,38 +234,6 @@
                 </div>
 
                 <div class="row mt-6">
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline mb-6">
-                            <select wire:model="assigned_to"
-                                class="form-select @error('assigned_to')is-invalid @enderror"
-                                id="exampleFormControlSelect1" aria-label="Default select example">
-                                <option value="" selected>Select Employee</option>
-                                @foreach ($staff as $staff)
-                                    <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="exampleFormControlSelect1">Assigned To</label>
-                            @error('assigned_to')
-                                <div class="text-danger"> {{ $message }} </div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="date_assigned" type="date"
-                                class="form-control @error('date_assigned')is-invalid @enderror" id="floatingInput"
-                                aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Date Assigned to Officer</label>
-                        </div>
-                        @error('date_assigned')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row">
 
                     <div class="col">
                         <div class="form-floating form-floating-outline">

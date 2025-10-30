@@ -352,8 +352,8 @@
 
                     {{-- Upload Instructions List --}}
                     <div class="text-start m-auto mt-5" style="max-width: 400px;">
-                        <ul class="list-unstyled small text-danger">
-                            <li><i class="fa-solid fa-circle-dot me-2"></i><strong>At least 1</strong> upload is
+                        <ul class="list-unstyled text-danger">
+                            <li><i class="fa-solid fa-circle-dot me-2"></i><strong>At least 2</strong> uploads are
                                 required.</li>
                             <li><i class="fa-solid fa-circle-dot me-2"></i>File must be <strong>less than
                                     10MB</strong>.

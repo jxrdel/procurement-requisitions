@@ -12,6 +12,7 @@ use App\Models\Vote;
 use App\RequestFormStatus;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -66,6 +67,11 @@ class CreateRequisition extends Component
         if (!is_null($form->requisition_id)) {
             return redirect()->route('requisitions.view', $form->requisition_id);
         }
+
+        if (Gate::denies('create-requisitions', $this->form)) {
+            abort(403, 'You do not have permission to create a requisition.');
+        }
+
         $this->requisition_no = CurrentFinancialYear::generateRequisitionNo();
         $this->departments = Department::all();
         $this->staff = User::procurement()->get();

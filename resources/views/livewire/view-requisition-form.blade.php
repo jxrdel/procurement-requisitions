@@ -677,7 +677,7 @@
                     </div>
                 @endif
 
-                @if ($requisitionForm->reporting_officer_approval)
+                @if ($requisitionForm->requisition)
                     <div class="divider mt-6">
                         <div class="divider-text fw-bold fs-5"><i class="fa-solid fa-dollar-sign me-2"></i>Procurement
                         </div>

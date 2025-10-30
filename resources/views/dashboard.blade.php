@@ -270,7 +270,7 @@
                     [5, 'desc']
                 ], // Sorting by the hidden `created_at` column (index 5)
                 "processing": true,
-                "serverSide": true,
+                "serverSide": false,
                 "ajax": {
                     "url": "{{ route('getinprogressrequisitions') }}",
                     "type": "GET"
@@ -295,7 +295,7 @@
                         data: 'vendor_status',
                         name: 'vendor_status',
                         orderable: false,
-                        searchable: false,
+                        searchable: true,
                         render: function(data, type, row) {
                             var statusHtml = '';
 

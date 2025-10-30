@@ -98,7 +98,7 @@
                                 <input wire:model="brand_model" type="text"
                                     class="form-control @error('brand_model')is-invalid @enderror" autocomplete="off"
                                     id="brandModelInput" placeholder="Brand/Model (Optional)" />
-                                <label for="brandModelInput">Brand / Model</label>
+                                <label for="brandModelInput">Brand / Model (If Applicable)</label>
                             </div>
                             @error('brand_model')
                                 <div class="text-danger"> {{ $message }} </div>

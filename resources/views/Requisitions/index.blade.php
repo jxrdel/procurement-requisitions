@@ -16,7 +16,7 @@
                         Requisitions</strong></h1>
             </div>
 
-            @can('create-requisitions')
+            @can('change-financial-year')
                 <div class="row mb-4 align-items-center">
                     <!-- Empty Column for Spacing -->
                     <div class="col"></div>

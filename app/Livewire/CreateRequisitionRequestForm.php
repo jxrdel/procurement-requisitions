@@ -92,7 +92,7 @@ class CreateRequisitionRequestForm extends Component
             'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
             'estimated_value' => 'nullable|numeric|min:0',
             'items' => 'required|array|min:1',
-            'uploads' => 'required|array|min:1',
+            'uploads' => 'required|array|min:2',
             'uploads.*' => 'file|max:10240',
         ];
 
@@ -118,6 +118,7 @@ class CreateRequisitionRequestForm extends Component
             throw $e;
         }
 
+        dd($this->items);
         $form = RequisitionRequestForm::create([
             'requesting_unit' => $this->requesting_unit,
             'head_of_department_id' => $this->head_of_department,
