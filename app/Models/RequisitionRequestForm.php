@@ -47,6 +47,8 @@ class RequisitionRequestForm extends Model
         'second_reporting_officer_id',
         'third_reporting_officer_approval',
         'third_reporting_officer_id',
+        'second_reporting_officer_approval_date',
+        'third_reporting_officer_approval_date',
     ];
 
     protected $casts = [
@@ -61,6 +63,8 @@ class RequisitionRequestForm extends Model
         'hod_approval_date' => 'datetime',
         'date_sent_to_hod' => 'datetime',
         'reporting_officer_approval_date' => 'datetime',
+        'second_reporting_officer_approval_date' => 'datetime',
+        'third_reporting_officer_approval_date' => 'datetime',
         'estimated_value' => 'decimal:2',
     ];
 

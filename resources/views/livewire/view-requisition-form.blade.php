@@ -622,7 +622,7 @@
                                             <td>{{ $requisitionForm->secondReportingOfficer->reporting_officer_role ?? 'Reporting Officer' }}</td>
                                             <td>{{ $requisitionForm->secondReportingOfficer->name }}</td>
                                             <td>{{ $requisitionForm->secondReportingOfficer->initials }}</td>
-                                            <td></td>
+                                            <td>{{ $requisitionForm->second_reporting_officer_approval_date ? $requisitionForm->second_reporting_officer_approval_date->format('d/m/Y H:i:s') : '' }}</td>
                                         </tr>
                                     @endif
                                     @if ($requisitionForm->third_reporting_officer_approval && $requisitionForm->thirdReportingOfficer)
@@ -630,7 +630,7 @@
                                             <td>{{ $requisitionForm->thirdReportingOfficer->reporting_officer_role ?? 'Reporting Officer' }}</td>
                                             <td>{{ $requisitionForm->thirdReportingOfficer->name }}</td>
                                             <td>{{ $requisitionForm->thirdReportingOfficer->initials }}</td>
-                                            <td></td>
+                                            <td>{{ $requisitionForm->third_reporting_officer_approval_date ? $requisitionForm->third_reporting_officer_approval_date->format('d/m/Y H:i:s') : '' }}</td>
                                         </tr>
                                     @endif
                                 </tbody>

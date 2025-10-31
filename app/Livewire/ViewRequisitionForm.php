@@ -416,9 +416,11 @@ class ViewRequisitionForm extends Component
         } elseif ($this->requisitionForm->second_reporting_officer_approval !== true) {
             if ($currentUser->id != $this->requisitionForm->second_reporting_officer_id) abort(403, 'You are not authorized to approve this requisition at this stage.');
             $this->requisitionForm->second_reporting_officer_approval = true;
+            $this->requisitionForm->second_reporting_officer_approval_date = now();
         } elseif ($this->requisitionForm->third_reporting_officer_approval !== true) {
             if ($currentUser->id != $this->requisitionForm->third_reporting_officer_id) abort(403, 'You are not authorized to approve this requisition at this stage.');
             $this->requisitionForm->third_reporting_officer_approval = true;
+            $this->requisitionForm->third_reporting_officer_approval_date = now();
         }
 
         // Handle forwarding
