@@ -43,6 +43,10 @@ class RequisitionRequestForm extends Model
         'status',
         'created_by',
         'updated_by',
+        'second_reporting_officer_approval',
+        'second_reporting_officer_id',
+        'third_reporting_officer_approval',
+        'third_reporting_officer_id',
     ];
 
     protected $casts = [
@@ -106,6 +110,16 @@ class RequisitionRequestForm extends Model
     public function reportingOfficer()
     {
         return $this->belongsTo(User::class, 'reporting_officer_id');
+    }
+
+    public function secondReportingOfficer()
+    {
+        return $this->belongsTo(User::class, 'second_reporting_officer_id');
+    }
+
+    public function thirdReportingOfficer()
+    {
+        return $this->belongsTo(User::class, 'third_reporting_officer_id');
     }
 
     public function requisition()
