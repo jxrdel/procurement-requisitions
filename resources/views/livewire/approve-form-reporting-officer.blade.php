@@ -1,10 +1,10 @@
-<div wire:ignore.self class="modal fade" id="approveRequisitionFormHOD" tabindex="-1"
-    aria-labelledby="approveRequisitionFormHODLabel" aria-hidden="true">
+<div wire:ignore.self class="modal fade" id="approveRequisitionFormReportingOfficer" tabindex="-1"
+    aria-labelledby="approveRequisitionFormReportingOfficerLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 {{-- Centered and smaller title --}}
-                <h1 class="modal-title fs-5 w-100 text-center fw-bold" id="approveRequisitionFormHODLabel"
+                <h1 class="modal-title fs-5 w-100 text-center fw-bold" id="approveRequisitionFormReportingOfficerLabel"
                     style="color: black;">
                     Accept Requisition Form
                 </h1>
@@ -13,11 +13,11 @@
 
             <div class="modal-body text-center" style="color: black">
 
-                <form wire:submit.prevent="acceptRequisition" action="">
+                <form wire:submit.prevent="acceptRequisitionReportingOfficer" action="">
 
                     <div class="row">
                         <div class="col-12">
-                            <p class="mb-3">Select the recipient of the requisition.</p>
+                            <p class="mb-3">Select the recipient of the approved requisition.</p>
 
                             <div wire:ignore class="mx-auto" style="width: 100%;">
                                 <select required wire:model="selectedOfficer"
@@ -50,10 +50,10 @@
             </div>
 
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-success" wire:click="approveRequisitionHOD"
-                    wire:loading.attr="disabled" wire:target="approveRequisitionHOD">
+                <button type="button" class="btn btn-success" wire:click="approveRequisitionReportingOfficer"
+                    wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer">
                     <span>Accept</span>
-                    <div wire:loading wire:target="approveRequisitionHOD"
+                    <div wire:loading wire:target="approveRequisitionReportingOfficer"
                         class="spinner-border spinner-border-sm text-white mx-1" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>

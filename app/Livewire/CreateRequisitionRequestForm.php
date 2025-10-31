@@ -118,7 +118,6 @@ class CreateRequisitionRequestForm extends Component
             throw $e;
         }
 
-        dd($this->items);
         $form = RequisitionRequestForm::create([
             'requesting_unit' => $this->requesting_unit,
             'head_of_department_id' => $this->head_of_department,

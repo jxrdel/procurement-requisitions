@@ -2,6 +2,7 @@
     @include('livewire.add-item-modal')
     @include('livewire.edit-item-modal')
     @include('livewire.approve-form-hod-modal')
+    @include('livewire.approve-form-reporting-officer')
     @include('livewire.decline-form-modal')
     @include('livewire.add-form-log')
     @include('livewire.send-to-hod-modal')
@@ -56,7 +57,7 @@
                                 <button wire:loading.attr="disabled" data-bs-toggle="modal"
                                     data-bs-target="#approveRequisitionFormHOD" type="button"
                                     class="btn btn-sm btn-success">
-                                    <i class="ri-checkbox-circle-line me-1"></i> Approve
+                                    <i class="ri-checkbox-circle-line me-1"></i> Accept
                                 </button>
                                 <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
                                     class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
@@ -80,12 +81,11 @@
                                         <i class="ri-loader-2-line ri-spin me-1"></i>
                                     </span>
                                 </button>
-                                <button type="button"
-                                    wire:confirm="Are you sure you want to approve this requisition form?"
-                                    wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
-                                    wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-success">
+                                <button type="button" wire:loading.attr="disabled" data-bs-toggle="modal"
+                                    data-bs-target="#approveRequisitionFormReportingOfficer" type="button"
+                                    class="btn btn-sm btn-success">
                                     <span wire:loading.remove>
-                                        <i class="ri-checkbox-circle-line me-1"></i> Approve
+                                        <i class="ri-checkbox-circle-line me-1"></i> Accept
                                     </span>
                                     <span wire:loading>
                                         <i class="ri-loader-2-line ri-spin me-1"></i>
