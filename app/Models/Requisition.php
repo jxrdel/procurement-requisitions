@@ -15,6 +15,11 @@ class Requisition extends Model
         'assigned_to',
         'date_assigned',
         'date_received_procurement',
+        'actual_cost',
+        'funding_availability',
+        'date_sent_aov_procurement',
+        'note_to_ps',
+        'note_to_ps_date',
         'site_visit',
         'site_visit_date',
         'tender_issue_date',
@@ -68,6 +73,7 @@ class Requisition extends Model
 
     protected $casts = [
         'site_visit' => 'boolean',
+        'note_to_ps' => 'boolean',
     ];
 
     public function statuslogs()

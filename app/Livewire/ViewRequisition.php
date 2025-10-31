@@ -47,6 +47,11 @@ class ViewRequisition extends Component
     public $assigned_to;
     public $date_assigned;
     public $date_received_procurement;
+    public $actual_cost;
+    public $funding_availability;
+    public $date_sent_aov_procurement;
+    public $note_to_ps = false;
+    public $note_to_ps_date;
     public $site_visit = false;
     public $site_visit_date;
     public $tender_issue_date;
@@ -147,6 +152,11 @@ class ViewRequisition extends Component
         $this->assigned_to = $this->requisition->assigned_to;
         $this->date_assigned = $this->requisition->date_assigned;
         $this->date_received_procurement = $this->requisition->date_received_procurement;
+        $this->actual_cost = $this->requisition->actual_cost;
+        $this->funding_availability = $this->requisition->funding_availability;
+        $this->date_sent_aov_procurement = $this->requisition->date_sent_aov_procurement;
+        $this->note_to_ps = $this->requisition->note_to_ps;
+        $this->note_to_ps_date = $this->requisition->note_to_ps_date;
         $this->site_visit = $this->requisition->site_visit;
         $this->site_visit_date = $this->requisition->site_visit_date;
         $this->tender_issue_date = $this->requisition->tender_issue_date;
@@ -313,8 +323,13 @@ class ViewRequisition extends Component
                 'requesting_unit' => $this->requesting_unit,
                 'file_no' => $this->file_no,
                 'item' => $this->item,
+                'actual_cost' => $this->actual_cost,
+                'funding_availability' => $this->funding_availability,
+                'date_sent_aov_procurement' => $this->date_sent_aov_procurement,
                 'site_visit' => $this->site_visit,
                 'site_visit_date' => $this->site_visit_date,
+                'note_to_ps' => $this->note_to_ps,
+                'note_to_ps_date' => $this->note_to_ps_date,
                 'tender_issue_date' => $this->tender_issue_date,
                 'tender_deadline_date' => $this->tender_deadline_date,
                 'evaluation_start_date' => $this->evaluation_start_date,
@@ -352,6 +367,11 @@ class ViewRequisition extends Component
                     $this->vendors[$index]['id'] = $newvendor->id;
                 }
             }
+
+            $this->requisition->statuslogs()->create([
+                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username,
+                'created_by' => Auth::user()->username,
+            ]);
 
             Log::info('Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
             $this->isEditingProcurement1 = false;
@@ -568,6 +588,11 @@ class ViewRequisition extends Component
             'date_received' => Carbon::now(),
         ]);
 
+        $this->requisition->statuslogs()->create([
+            'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Cost & Budgeting by ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
+
         Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Cost & Budgeting by ' . Auth::user()->name);
 
         //Get Cost & Budgeting users
@@ -729,7 +754,10 @@ class ViewRequisition extends Component
                 ]);
             }
 
-            // $this->setRequisitionStatus();
+            $this->requisition->statuslogs()->create([
+                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username,
+                'created_by' => Auth::user()->username,
+            ]);
 
             Log::info('Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
             $this->isEditingProcurement2 = false;
@@ -761,9 +789,10 @@ class ViewRequisition extends Component
             'updated_by' => Auth::user()->username,
         ]);
 
-        // $this->requisition->ap_requisition()->create([
-        //     'date_received' => Carbon::now(),
-        // ]);
+        $this->requisition->statuslogs()->create([
+            'details' => 'Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username,
+            'created_by' => Auth::user()->username,
+        ]);
 
         //Send email to Accounts Payable
         Log::info('Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username);

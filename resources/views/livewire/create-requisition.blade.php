@@ -158,28 +158,109 @@
                     </div>
                 </div>
 
-                <div class="row" x-data="{ siteVisit: $wire.entangle('site_visit') }">
+                <div class="row">
+
                     <div class="col">
-                        <div class="form-check mt-4">
-                            <input class="form-check-input" type="checkbox" id="siteVisitCheck" x-model="siteVisit">
-                            <label class="form-check-label" for="siteVisitCheck">
-                                Site Visit Required
-                            </label>
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="actual_cost" type="number" step="0.01"
+                                class="form-control @error('actual_cost')is-invalid @enderror" id="actualCostInput"
+                                placeholder="Enter Actual Cost" />
+                            <label for="actualCostInput">Actual Cost</label>
                         </div>
+                        @error('actual_cost')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
                     </div>
 
-                    <div class="col" x-show="siteVisit" x-transition>
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="site_visit_date" type="date"
-                                class="form-control @error('site_visit_date')is-invalid @enderror"
-                                id="siteVisitDateInput" placeholder="Site Visit Date" />
-                            <label for="siteVisitDateInput">Site Visit Date</label>
+                    <div class="col">
+                        <div wire:ignore>
+                            <label style="width:100%" for="fundingSelect">Funding Availability:</label>
+                            <select wire:model="funding_availability" class="js-example-basic-single form-control"
+                                id="fundingSelect" style="width: 100%">
+                                <option value="" selected>Select a Vote</option>
+                                @foreach ($votes as $vote)
+                                    <option value="{{ $vote->number }}">{{ $vote->number }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        @error('site_visit_date')
-                            <div class="text-danger"> {{ $message }} </div>
+                        @error('funding_availability')
+                            <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
+
+                <div class="row mt-6">
+
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input autocomplete="off" wire:model="date_sent_aov_procurement" type="date"
+                                class="form-control @error('date_sent_aov_procurement')is-invalid @enderror"
+                                id="dateSentAOVInput" placeholder="Date Sent to AOV Procurement" />
+                            <label for="dateSentAOVInput">Date Sent to AOV Procurement</label>
+                        </div>
+                        @error('date_sent_aov_procurement')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div x-data="{
+                    siteVisit: $wire.entangle('site_visit'),
+                    noteToPs: $wire.entangle('note_to_ps')
+                }">
+
+                    {{-- 🔹 Row 1: Site Visit --}}
+                    <div class="row mt-4 align-items-center">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="siteVisitCheck"
+                                    x-model="siteVisit">
+                                <label class="form-check-label" for="siteVisitCheck">
+                                    Site Visit Required
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" x-show="siteVisit" x-transition>
+                            <div class="form-floating form-floating-outline">
+                                <input autocomplete="off" wire:model="site_visit_date" type="date"
+                                    class="form-control @error('site_visit_date')is-invalid @enderror"
+                                    id="siteVisitDateInput" placeholder="Site Visit Date" />
+                                <label for="siteVisitDateInput">Site Visit Date</label>
+                            </div>
+                            @error('site_visit_date')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- 🔹 Row 2: Note to PS --}}
+                    <div class="row mt-4 align-items-center" x-show="siteVisit" x-transition>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="noteToPsCheck"
+                                    x-model="noteToPs">
+                                <label class="form-check-label" for="noteToPsCheck">
+                                    Note to PS
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" x-show="noteToPs" x-transition>
+                            <div class="form-floating form-floating-outline">
+                                <input autocomplete="off" wire:model="note_to_ps_date" type="date"
+                                    class="form-control @error('note_to_ps_date')is-invalid @enderror"
+                                    id="noteToPsDateInput" placeholder="Date Sent to PS" />
+                                <label for="noteToPsDateInput">Date Note Sent to PS</label>
+                            </div>
+                            @error('note_to_ps_date')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                </div>
+
 
                 <div class="row mt-6">
                     <div class="col">
@@ -187,7 +268,7 @@
                             <input autocomplete="off" wire:model="tender_issue_date" type="date"
                                 class="form-control @error('tender_issue_date')is-invalid @enderror"
                                 id="tenderIssueDateInput" placeholder="Tender Issue Date" />
-                            <label for="tenderIssueDateInput">Tender Issue Date</label>
+                            <label for="tenderIssueDateInput">Tender/RFQ Issue Date</label>
                         </div>
                         @error('tender_issue_date')
                             <div class="text-danger"> {{ $message }} </div>
@@ -199,7 +280,7 @@
                             <input autocomplete="off" wire:model="tender_deadline_date" type="date"
                                 class="form-control @error('tender_deadline_date')is-invalid @enderror"
                                 id="tenderDeadlineDateInput" placeholder="Tender Deadline Date" />
-                            <label for="tenderDeadlineDateInput">Tender Deadline Date</label>
+                            <label for="tenderDeadlineDateInput">Tender/RFQ Deadline Date</label>
                         </div>
                         @error('tender_deadline_date')
                             <div class="text-danger"> {{ $message }} </div>
@@ -428,6 +509,12 @@
             $('#sofSelect').on('change', function() {
                 var selectedValue = $(this).val(); // Get selected values as an array
                 $wire.set('source_of_funds', selectedValue); // Pass selected values to Livewire
+            });
+
+            $('#fundingSelect').select2();
+            $('#fundingSelect').on('change', function() {
+                var selectedValue = $(this).val(); // Get selected values as an array
+                $wire.set('funding_availability', selectedValue); // Pass selected values to Livewire
             });
         });
 

@@ -124,33 +124,76 @@
                                 @endcan
 
                                 <div x-transition x-show="!isEditingProcurement1">
+
+                                    {{-- 🔹 Row 1: Requisition Number & Requesting Unit --}}
                                     <div class="row mt-8">
-
-                                        <div class="col mx-5">
-                                            <label><strong>Requisition Number:
-                                                </strong>{{ $this->requisition_no }}</label>
+                                        <div class="col-md-6">
+                                            <label><strong>Requisition Number:</strong>
+                                                {{ $this->requisition_no }}</label>
                                         </div>
-
-                                        <div class="col mx-5">
+                                        <div class="col-md-6">
                                             <label><strong>Requesting Unit:</strong>
                                                 {{ $this->requisition->department->name }}</label>
                                         </div>
                                     </div>
 
-                                    <div class="row mt-7">
-
-                                        <div class="col mx-5">
+                                    {{-- 🔹 Row 2: File Number / Form & Item --}}
+                                    <div class="row mt-6">
+                                        <div class="col">
                                             <label><strong>File Number / Form:</strong> {{ $this->file_no }}</label>
                                         </div>
-
-                                        <div class="col mx-5">
+                                        <div class="col">
                                             <label><strong>Item:</strong> {{ $this->item }}</label>
                                         </div>
-
                                     </div>
 
-                                    <div class="row mt-7">
-                                        <div class="col mx-5">
+                                    {{-- 🔹 Row 3: Source of Funds & Date Received by Procurement --}}
+                                    <div class="row mt-6">
+                                        <div class="col-md-6">
+                                            <label><strong>Source of Funds:</strong>
+                                                {{ $this->source_of_funds }}</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label><strong>Date Received by Procurement:</strong>
+                                                {{ $this->getFormattedDate($this->requisition->date_received_procurement) }}</label>
+                                        </div>
+                                    </div>
+
+                                    {{-- 🔹 Row 4: Assigned To & Date Assigned to Officer --}}
+                                    <div class="row mt-6">
+                                        <div class="col">
+                                            <label><strong>Assigned To:</strong>
+                                                {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}</label>
+                                        </div>
+                                        <div class="col">
+                                            <label><strong>Date Assigned to Officer:</strong>
+                                                {{ $this->getFormattedDateAssigned() }}</label>
+                                        </div>
+                                    </div>
+
+                                    {{-- 🔹 Row 5: Actual Cost & Funding Availability --}}
+                                    <div class="row mt-6">
+                                        <div class="col">
+                                            <label><strong>Actual Cost:</strong>
+                                                ${{ number_format($this->actual_cost, 2) }}</label>
+                                        </div>
+                                        <div class="col">
+                                            <label><strong>Funding Availability:</strong>
+                                                {{ $this->funding_availability }}</label>
+                                        </div>
+                                    </div>
+
+                                    {{-- 🔹 Row 6: Date Sent to AOV Procurement --}}
+                                    <div class="row mt-6">
+                                        <div class="col-md-6">
+                                            <label><strong>Date Sent to AOV Procurement:</strong>
+                                                {{ $this->getFormattedDate($this->date_sent_aov_procurement) }}</label>
+                                        </div>
+                                    </div>
+
+                                    {{-- 🔹 Row 7: Site Visit & Site Visit Date --}}
+                                    <div class="row mt-4 align-items-center">
+                                        <div class="col-md-6">
                                             <label><strong>Site Visit Required:</strong>
                                                 @if ($this->requisition->site_visit)
                                                     <i class="fa-solid fa-check text-success"></i>
@@ -159,68 +202,60 @@
                                                 @endif
                                             </label>
                                         </div>
-                                        <div class="col mx-5">
+                                        <div class="col-md-6">
                                             <label><strong>Site Visit Date:</strong>
                                                 {{ $this->getFormattedDate($this->requisition->site_visit_date) }}</label>
                                         </div>
                                     </div>
 
-                                    <div class="row mt-7">
-                                        <div class="col mx-5">
-                                            <label><strong>Tender Issue Date:</strong>
+                                    {{-- 🔹 Row 7: Site Visit & Site Visit Date --}}
+                                    <div class="row mt-4 align-items-center">
+                                        <div class="col-md-6">
+                                            <label><strong>Note to PS:</strong>
+                                                @if ($this->requisition->note_to_ps)
+                                                    <i class="fa-solid fa-check text-success"></i>
+                                                @else
+                                                    <i class="fa-solid fa-xmark text-danger"></i>
+                                                @endif
+                                            </label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label><strong>Note to PS Date:</strong>
+                                                {{ $this->getFormattedDate($this->requisition->note_to_ps_date) }}</label>
+                                        </div>
+                                    </div>
+
+                                    {{-- 🔹 Row 8: Tender Issue & Deadline Dates --}}
+                                    <div class="row mt-6">
+                                        <div class="col">
+                                            <label><strong>Tender/RFQ Issue Date:</strong>
                                                 {{ $this->getFormattedDate($this->requisition->tender_issue_date) }}</label>
                                         </div>
-                                        <div class="col mx-5">
-                                            <label><strong>Tender Deadline Date:</strong>
+                                        <div class="col">
+                                            <label><strong>Tender/RFQ Deadline Date:</strong>
                                                 {{ $this->getFormattedDate($this->requisition->tender_deadline_date) }}</label>
                                         </div>
                                     </div>
 
-                                    <div class="row mt-7">
-                                        <div class="col mx-5">
+                                    {{-- 🔹 Row 9: Evaluation Start & End Dates --}}
+                                    <div class="row mt-6">
+                                        <div class="col">
                                             <label><strong>Evaluation Start Date:</strong>
                                                 {{ $this->getFormattedDate($this->requisition->evaluation_start_date) }}</label>
                                         </div>
-                                        <div class="col mx-5">
+                                        <div class="col">
                                             <label><strong>Evaluation End Date:</strong>
                                                 {{ $this->getFormattedDate($this->requisition->evaluation_end_date) }}</label>
                                         </div>
                                     </div>
 
-                                    <div class="row mt-7">
-
-                                        <div class="col mx-5">
-                                            <label><strong>Source of Funds:</strong>
-                                                {{ $this->source_of_funds }}</label>
-                                        </div>
-
-                                        <div class="col mx-5">
-                                            <label><strong>Assigned To:</strong>
-                                                @if ($this->requisition->procurement_officer)
-                                                    {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}
-                                            </label>
-                                            @endif
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row mt-7">
-
-                                        <div class="col mx-5">
-                                            <label><strong>Date Assigned to Officer:</strong>
-                                                {{ $this->getFormattedDateAssigned() }}</label>
-                                        </div>
-
-                                        <div class="col mx-5">
+                                    {{-- 🔹 Row 10: Date sent to DPS & PS Approval --}}
+                                    <div class="row mt-6">
+                                        <div class="col">
                                             <label><strong>Date sent to DPS:</strong>
                                                 {{ $this->getFormattedDateSentPs() }}</label>
                                         </div>
-
-                                    </div>
-
-                                    <div class="row mt-7">
-
-                                        <div class="col mx-5">
+                                        <div class="col">
                                             <label><strong>PS Approval:</strong>
                                                 @if ($this->ps_approval == 'Pending')
                                                     <span class="badge rounded-pill bg-danger fs-6">Pending</span>
@@ -229,35 +264,26 @@
                                                 @endif
                                             </label>
                                         </div>
-
-                                        <div class="col mx-5">
-                                            <label><strong>Date Received by Procurement:</strong>
-                                                {{ $this->getFormattedDate($this->requisition->date_received_procurement) }}</label>
-                                        </div>
-
                                     </div>
 
+                                    {{-- 🔹 Row 11: Vendors & Amounts --}}
                                     @if ($this->ps_approval == 'Approved')
                                         @foreach ($this->vendors as $index => $vendor)
-                                            <div class="row mt-7">
-
-                                                <div class="col mx-5">
+                                            <div class="row mt-6">
+                                                <div class="col">
                                                     <label><strong>Vendor #{{ $index + 1 }}:</strong>
                                                         {{ $vendor['vendor_name'] }}</label>
                                                 </div>
-
-                                                <div class="col mx-5">
+                                                <div class="col">
                                                     <label><strong>Amount:</strong>
                                                         ${{ number_format($vendor['amount'], 2) }}</label>
                                                 </div>
-
                                             </div>
                                         @endforeach
 
                                         @if (count($vendors) > 0)
-                                            <div class="row mt-7">
-
-                                                <div class="col mx-5">
+                                            <div class="row mt-6">
+                                                <div class="col">
                                                     <label><strong>Total Amount:</strong>
                                                         ${{ number_format($this->totalAmount, 2) }}</label>
                                                 </div>
@@ -265,38 +291,32 @@
                                         @endif
                                     @endif
 
+                                    {{-- 🔹 Row 12: Date Sent to Cost & Budgeting --}}
                                     @if ($this->sent_to_cb)
-                                        <div class="row mt-7">
-
-                                            <div class="col mx-5">
+                                        <div class="row mt-6">
+                                            <div class="col-md-6">
                                                 <label><strong>Date Sent to Cost & Budgeting:</strong>
                                                     {{ $this->getFormattedDateSentCB() }}</label>
                                             </div>
-
-                                            <div class="col mx-5">
-                                            </div>
-
                                         </div>
                                     @endif
 
+                                    {{-- 🔹 Row 13: Reason for Denial --}}
                                     @if ($this->ps_approval == 'Approval Denied')
-                                        <div class="row mt-7">
-
-                                            <div class="col mx-5">
+                                        <div class="row mt-6">
+                                            <div class="col">
                                                 <label><strong>Reason for Denial:</strong>
                                                     {{ $this->denied_note }}</label>
                                             </div>
-
                                         </div>
                                     @endif
 
-
-
                                 </div>
 
-                                <div x-transition x-show="isEditingProcurement1">
-                                    <div class="row mt-8">
 
+                                <div x-transition x-show="isEditingProcurement1">
+
+                                    <div class="row mt-8">
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="requisition_no" type="text"
@@ -309,10 +329,10 @@
                                                 <div class="text-danger"> {{ $message }} </div>
                                             @enderror
                                         </div>
+
                                         <div class="col-md-6">
                                             <div wire:ignore>
                                                 <label style="width:100%" for="unitSelect">Requesting Unit:</label>
-
                                                 <select wire:model="requesting_unit"
                                                     class="js-example-basic-single form-control" id="unitSelect"
                                                     style="width: 100%">
@@ -321,7 +341,6 @@
                                                         <option value="{{ $department->id }}">{{ $department->name }}
                                                         </option>
                                                     @endforeach
-
                                                 </select>
                                             </div>
                                             @error('requesting_unit')
@@ -330,8 +349,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="row mt-7">
-
+                                    <div class="row mt-6">
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="file_no" type="text"
@@ -359,27 +377,167 @@
                                         </div>
                                     </div>
 
-                                    <div class="row mt-6" x-data="{ siteVisit: $wire.entangle('site_visit') }">
+                                    <div class="row mt-6">
+                                        <div class="col-md-6">
+                                            <div wire:ignore>
+                                                <label style="width:100%" for="sofSelect">Source of Funds:</label>
+                                                <select wire:model="source_of_funds"
+                                                    class="js-example-basic-single form-control" id="sofSelect"
+                                                    style="width: 100%">
+                                                    <option value="" selected>Select a Vote</option>
+                                                    @foreach ($votes as $vote)
+                                                        <option value="{{ $vote->number }}">{{ $vote->number }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @error('source_of_funds')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="date_received_procurement"
+                                                    type="date"
+                                                    class="form-control @error('date_received_procurement')is-invalid @enderror"
+                                                    id="floatingInput" aria-describedby="floatingInputHelp" />
+                                                <label for="floatingInput">Date Received by Procurement</label>
+                                            </div>
+                                            @error('date_received_procurement')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-6">
                                         <div class="col">
-                                            <div class="form-check mt-4">
-                                                <input class="form-check-input" type="checkbox" id="siteVisitCheck"
-                                                    x-model="siteVisit">
-                                                <label class="form-check-label" for="siteVisitCheck">
-                                                    Site Visit Required
-                                                </label>
+                                            <div class="form-floating form-floating-outline mb-6">
+                                                <select wire:model="assigned_to"
+                                                    class="form-select @error('assigned_to')is-invalid @enderror"
+                                                    id="exampleFormControlSelect1"
+                                                    aria-label="Default select example">
+                                                    <option value="" selected>Select Employee</option>
+                                                    @foreach ($staff as $staff)
+                                                        <option value="{{ $staff->id }}">{{ $staff->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <label for="exampleFormControlSelect1">Assigned To</label>
+                                                @error('assigned_to')
+                                                    <div class="text-danger"> {{ $message }} </div>
+                                                @enderror
                                             </div>
                                         </div>
 
-                                        <div class="col" x-show="siteVisit" x-transition>
+                                        <div class="col">
                                             <div class="form-floating form-floating-outline">
-                                                <input autocomplete="off" wire:model="site_visit_date" type="date"
-                                                    class="form-control @error('site_visit_date')is-invalid @enderror"
-                                                    id="siteVisitDateInput" placeholder="Site Visit Date" />
-                                                <label for="siteVisitDateInput">Site Visit Date</label>
+                                                <input autocomplete="off" wire:model="date_assigned" type="date"
+                                                    class="form-control @error('date_assigned')is-invalid @enderror"
+                                                    id="floatingInput" aria-describedby="floatingInputHelp" />
+                                                <label for="floatingInput">Date Assigned to Officer</label>
                                             </div>
-                                            @error('site_visit_date')
+                                            @error('date_assigned')
                                                 <div class="text-danger"> {{ $message }} </div>
                                             @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="actual_cost" type="number"
+                                                    step="0.01"
+                                                    class="form-control @error('actual_cost')is-invalid @enderror"
+                                                    id="actualCostInput" placeholder="Enter Actual Cost" />
+                                                <label for="actualCostInput">Actual Cost</label>
+                                            </div>
+                                            @error('actual_cost')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col">
+                                            <div wire:ignore>
+                                                <label style="width:100%" for="fundingSelect">Funding
+                                                    Availability:</label>
+                                                <select wire:model="funding_availability"
+                                                    class="js-example-basic-single form-control" id="fundingSelect"
+                                                    style="width: 100%">
+                                                    <option value="" selected>Select a Vote</option>
+                                                    @foreach ($votes as $vote)
+                                                        <option value="{{ $vote->number }}">{{ $vote->number }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @error('funding_availability')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-6">
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="date_sent_aov_procurement"
+                                                    type="date"
+                                                    class="form-control @error('date_sent_aov_procurement')is-invalid @enderror"
+                                                    id="dateSentAOVInput"
+                                                    placeholder="Date Sent to AOV Procurement" />
+                                                <label for="dateSentAOVInput">Date Sent to AOV Procurement</label>
+                                            </div>
+                                            @error('date_sent_aov_procurement')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div x-data="{ siteVisit: $wire.entangle('site_visit'), noteToPs: $wire.entangle('note_to_ps') }">
+                                        <div class="row mt-4 align-items-center">
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        id="siteVisitCheck" x-model="siteVisit">
+                                                    <label class="form-check-label" for="siteVisitCheck">Site Visit
+                                                        Required</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" x-show="siteVisit" x-transition>
+                                                <div class="form-floating form-floating-outline">
+                                                    <input autocomplete="off" wire:model="site_visit_date"
+                                                        type="date"
+                                                        class="form-control @error('site_visit_date')is-invalid @enderror"
+                                                        id="siteVisitDateInput" placeholder="Site Visit Date" />
+                                                    <label for="siteVisitDateInput">Site Visit Date</label>
+                                                </div>
+                                                @error('site_visit_date')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-4 align-items-center" x-show="siteVisit" x-transition>
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        id="noteToPsCheck" x-model="noteToPs">
+                                                    <label class="form-check-label" for="noteToPsCheck">Note to
+                                                        PS</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" x-show="noteToPs" x-transition>
+                                                <div class="form-floating form-floating-outline">
+                                                    <input autocomplete="off" wire:model="note_to_ps_date"
+                                                        type="date"
+                                                        class="form-control @error('note_to_ps_date')is-invalid @enderror"
+                                                        id="noteToPsDateInput" placeholder="Date Sent to PS" />
+                                                    <label for="noteToPsDateInput">Date Note Sent to PS</label>
+                                                </div>
+                                                @error('note_to_ps_date')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
                                     </div>
 
@@ -390,7 +548,7 @@
                                                     type="date"
                                                     class="form-control @error('tender_issue_date')is-invalid @enderror"
                                                     id="tenderIssueDateInput" placeholder="Tender Issue Date" />
-                                                <label for="tenderIssueDateInput">Tender Issue Date</label>
+                                                <label for="tenderIssueDateInput">Tender/RFQ Issue Date</label>
                                             </div>
                                             @error('tender_issue_date')
                                                 <div class="text-danger"> {{ $message }} </div>
@@ -403,7 +561,7 @@
                                                     type="date"
                                                     class="form-control @error('tender_deadline_date')is-invalid @enderror"
                                                     id="tenderDeadlineDateInput" placeholder="Tender Deadline Date" />
-                                                <label for="tenderDeadlineDateInput">Tender Deadline Date</label>
+                                                <label for="tenderDeadlineDateInput">Tender/RFQ Deadline Date</label>
                                             </div>
                                             @error('tender_deadline_date')
                                                 <div class="text-danger"> {{ $message }} </div>
@@ -440,86 +598,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="row mt-7">
-
-                                        <div class="col-md-6">
-                                            <div wire:ignore>
-                                                <label style="width:100%" for="sofSelect">Source of Funds:</label>
-
-                                                <select wire:model="source_of_funds"
-                                                    class="js-example-basic-single form-control" id="sofSelect"
-                                                    style="width: 100%">
-                                                    <option value="" selected>Select a Unit</option>
-                                                    @foreach ($votes as $vote)
-                                                        <option value="{{ $vote->number }}">{{ $vote->number }}
-                                                        </option>
-                                                    @endforeach
-
-                                                </select>
-                                            </div>
-                                            {{-- <div class="form-floating form-floating-outline">
-                                                <input autocomplete="off" wire:model="source_of_funds" type="text"
-                                                    class="form-control @error('source_of_funds')is-invalid @enderror"
-                                                    id="floatingInput" placeholder="Source of Funds"
-                                                    aria-describedby="floatingInputHelp" />
-                                                <label for="floatingInput">Source of Funds</label>
-                                            </div> --}}
-                                            @error('source_of_funds')
-                                                <div class="text-danger"> {{ $message }} </div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col">
-                                            <div class="form-floating form-floating-outline">
-                                                <input autocomplete="off" wire:model="date_received_procurement"
-                                                    type="date"
-                                                    class="form-control @error('date_received_procurement')is-invalid @enderror"
-                                                    id="floatingInput" aria-describedby="floatingInputHelp" />
-                                                <label for="floatingInput">Date Received by Procurement</label>
-                                            </div>
-                                            @error('date_received_procurement')
-                                                <div class="text-danger"> {{ $message }} </div>
-                                            @enderror
-                                        </div>
-                                    </div>
-
-                                    <div class="row mt-7">
-
-                                        <div class="col">
-                                            <div class="form-floating form-floating-outline">
-                                                <input autocomplete="off" wire:model="date_assigned" type="date"
-                                                    class="form-control @error('date_assigned')is-invalid @enderror"
-                                                    id="floatingInput" aria-describedby="floatingInputHelp" />
-                                                <label for="floatingInput">Date Assigned</label>
-                                            </div>
-                                            @error('date_assigned')
-                                                <div class="text-danger"> {{ $message }} </div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col">
-                                            <div class="form-floating form-floating-outline mb-6">
-                                                <select wire:model="assigned_to"
-                                                    class="form-select @error('assigned_to')is-invalid @enderror"
-                                                    id="exampleFormControlSelect1"
-                                                    aria-label="Default select example">
-                                                    <option value="" selected>Select Employee</option>
-                                                    @foreach ($staff as $staff)
-                                                        <option value="{{ $staff->id }}">{{ $staff->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <label for="exampleFormControlSelect1">Assigned To</label>
-                                                @error('assigned_to')
-                                                    <div class="text-danger"> {{ $message }} </div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-
-
+                                    <div class="row mt-6">
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="date_sent_dps" type="date"
@@ -551,10 +630,9 @@
                                         </div>
                                     </div>
 
+                                    {{-- Vendors Section --}}
                                     <div class="row mt-2" x-show="ps_approval == 'Approved'" x-transition>
-
                                         <h4 class="text-center fw-bold">Vendors</h4>
-
                                         @forelse ($vendors as $index => $vendor)
                                             <div class="row mx-auto mt-2">
                                                 <div class="col">
@@ -562,28 +640,23 @@
                                                         <input autocomplete="off"
                                                             wire:model="vendors.{{ $index }}.vendor_name"
                                                             type="text"
-                                                            class="form-control @error('vendors.' . $index . '.vendor_name')is-invalid @enderror"
-                                                            id="floatingInput" placeholder="ex. Fujitsu"
-                                                            aria-describedby="floatingInputHelp" />
-                                                        <label for="floatingInput">Vendor Name</label>
+                                                            class="form-control @error('vendors.' . $index . '.vendor_name')is-invalid @enderror" />
+                                                        <label>Vendor Name</label>
                                                     </div>
                                                     @error('vendors.' . $index . '.vendor_name')
-                                                        <div class="text-danger"> {{ $message }} </div>
+                                                        <div class="text-danger">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-
                                                 <div class="col">
                                                     <div class="form-floating form-floating-outline">
                                                         <input autocomplete="off"
                                                             wire:model="vendors.{{ $index }}.amount"
                                                             type="number" step="0.01"
-                                                            class="form-control @error('vendors.' . $index . '.amount')is-invalid @enderror"
-                                                            id="floatingInput" placeholder="0.00"
-                                                            aria-describedby="floatingInputHelp" />
-                                                        <label for="floatingInput">Amount</label>
+                                                            class="form-control @error('vendors.' . $index . '.amount')is-invalid @enderror" />
+                                                        <label>Amount</label>
                                                     </div>
                                                     @error('vendors.' . $index . '.amount')
-                                                        <div class="text-danger"> {{ $message }} </div>
+                                                        <div class="text-danger">{{ $message }}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-1">
@@ -597,31 +670,27 @@
                                         @empty
                                             <p class="text-center">Click the button below to add a vendor</p>
                                         @endforelse
-
                                         <button type="button" x-on:click="$wire.addVendor"
                                             class="btn rounded-pill btn-icon btn-primary mx-auto mt-2">
                                             <span class="tf-icons ri-add-line ri-22px"></span>
                                         </button>
                                     </div>
 
+                                    {{-- Reason for Denial --}}
                                     <div class="row" x-show="ps_approval == 'Approval Denied'" x-transition>
-
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="denied_note" type="text"
-                                                    class="form-control @error('denied_note')is-invalid @enderror"
-                                                    id="floatingInput" placeholder="ex. Fujitsu"
-                                                    aria-describedby="floatingInputHelp" />
-                                                <label for="floatingInput">Reason for Denial</label>
+                                                    class="form-control @error('denied_note')is-invalid @enderror" />
+                                                <label>Reason for Denial</label>
                                             </div>
                                             @error('denied_note')
-                                                <div class="text-danger"> {{ $message }} </div>
+                                                <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
 
                                     <div class="row text-center mt-6">
-
                                         <div x-show="isEditingProcurement1">
                                             <button class="btn btn-primary waves-effect waves-light"
                                                 style="width: 100px">
@@ -629,13 +698,14 @@
                                             </button>
                                             &nbsp;
                                             <button type="button"
-                                                @click="isEditingProcurement1 = ! isEditingProcurement1"
+                                                @click="isEditingProcurement1 = !isEditingProcurement1"
                                                 class="btn btn-dark waves-effect waves-light" style="width: 100px">
                                                 <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
                                             </button>
                                         </div>
                                     </div>
                                 </div>
+
                             </form>
 
                             @can('edit-records')
@@ -1001,7 +1071,8 @@
                                         </div>
 
                                         <div class="col mx-5">
-                                            <label><strong>Voucher Number: </strong>{{ $vendor['voucher_no'] }}</label>
+                                            <label><strong>Voucher Number:
+                                                </strong>{{ $vendor['voucher_no'] }}</label>
                                         </div>
                                     </div>
 
@@ -1272,6 +1343,12 @@
                 var selectedValue = $(this).val(); // Get selected values as an array
                 $wire.set('requesting_unit', selectedValue); // Pass selected values to Livewire
                 $wire.set('active_pane', 'procurement1');
+            });
+
+            $('#fundingSelect').select2();
+            $('#fundingSelect').on('change', function() {
+                var selectedValue = $(this).val(); // Get selected values as an array
+                $wire.set('funding_availability', selectedValue); // Pass selected values to Livewire
             });
 
             $('#sofSelect').select2();

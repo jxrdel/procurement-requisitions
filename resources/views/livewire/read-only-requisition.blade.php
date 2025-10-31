@@ -64,33 +64,71 @@
         <div @class(['tab-pane fade', 'show active' => $this->panes === '1']) id="navs-justified-procurement-1" role="tabpanel">
 
             <div>
+
+                {{-- 🔹 Row 1: Requisition Number & Requesting Unit --}}
                 <div class="row mt-8">
-
-                    <div class="col mx-5">
-                        <label><strong>Requisition Number:
-                            </strong>{{ $this->requisition_no }}</label>
+                    <div class="col-md-6">
+                        <label><strong>Requisition Number:</strong> {{ $this->requisition_no }}</label>
                     </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Requesting Unit:</strong>
-                            {{ $this->requisition->department->name }}</label>
+                    <div class="col-md-6">
+                        <label><strong>Requesting Unit:</strong> {{ $this->requisition->department->name }}</label>
                     </div>
                 </div>
 
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
+                {{-- 🔹 Row 2: File Number / Form & Item --}}
+                <div class="row mt-6">
+                    <div class="col">
                         <label><strong>File Number / Form:</strong> {{ $this->file_no }}</label>
                     </div>
-
-                    <div class="col mx-5">
+                    <div class="col">
                         <label><strong>Item:</strong> {{ $this->item }}</label>
                     </div>
-
                 </div>
 
-                <div class="row mt-7">
-                    <div class="col mx-5">
+                {{-- 🔹 Row 3: Source of Funds & Date Received by Procurement --}}
+                <div class="row mt-6">
+                    <div class="col-md-6">
+                        <label><strong>Source of Funds:</strong> {{ $this->source_of_funds }}</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label><strong>Date Received by Procurement:</strong>
+                            {{ $this->getFormattedDate($this->requisition->date_received_procurement) }}</label>
+                    </div>
+                </div>
+
+                {{-- 🔹 Row 4: Assigned To & Date Assigned to Officer --}}
+                <div class="row mt-6">
+                    <div class="col">
+                        <label><strong>Assigned To:</strong>
+                            {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}</label>
+                    </div>
+                    <div class="col">
+                        <label><strong>Date Assigned to Officer:</strong>
+                            {{ $this->getFormattedDateAssigned() }}</label>
+                    </div>
+                </div>
+
+                {{-- 🔹 Row 5: Actual Cost & Funding Availability --}}
+                <div class="row mt-6">
+                    <div class="col">
+                        <label><strong>Actual Cost:</strong> ${{ number_format($this->actual_cost, 2) }}</label>
+                    </div>
+                    <div class="col">
+                        <label><strong>Funding Availability:</strong> {{ $this->funding_availability }}</label>
+                    </div>
+                </div>
+
+                {{-- 🔹 Row 6: Date Sent to AOV Procurement --}}
+                <div class="row mt-6">
+                    <div class="col-md-6">
+                        <label><strong>Date Sent to AOV Procurement:</strong>
+                            {{ $this->getFormattedDate($this->date_sent_aov_procurement) }}</label>
+                    </div>
+                </div>
+
+                {{-- 🔹 Row 7: Site Visit & Site Visit Date --}}
+                <div class="row mt-4 align-items-center">
+                    <div class="col-md-6">
                         <label><strong>Site Visit Required:</strong>
                             @if ($this->requisition->site_visit)
                                 <i class="fa-solid fa-check text-success"></i>
@@ -99,68 +137,59 @@
                             @endif
                         </label>
                     </div>
-                    <div class="col mx-5">
+                    <div class="col-md-6">
                         <label><strong>Site Visit Date:</strong>
                             {{ $this->getFormattedDate($this->requisition->site_visit_date) }}</label>
                     </div>
                 </div>
 
-                <div class="row mt-7">
-                    <div class="col mx-5">
-                        <label><strong>Tender Issue Date:</strong>
+                {{-- 🔹 Row 8: Note to PS & Note to PS Date --}}
+                <div class="row mt-4 align-items-center">
+                    <div class="col-md-6">
+                        <label><strong>Note to PS:</strong>
+                            @if ($this->requisition->note_to_ps)
+                                <i class="fa-solid fa-check text-success"></i>
+                            @else
+                                <i class="fa-solid fa-xmark text-danger"></i>
+                            @endif
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                        <label><strong>Note to PS Date:</strong>
+                            {{ $this->getFormattedDate($this->requisition->note_to_ps_date) }}</label>
+                    </div>
+                </div>
+
+                {{-- 🔹 Row 9: Tender Issue & Deadline Dates --}}
+                <div class="row mt-6">
+                    <div class="col">
+                        <label><strong>Tender/RFQ Issue Date:</strong>
                             {{ $this->getFormattedDate($this->requisition->tender_issue_date) }}</label>
                     </div>
-                    <div class="col mx-5">
-                        <label><strong>Tender Deadline Date:</strong>
+                    <div class="col">
+                        <label><strong>Tender/RFQ Deadline Date:</strong>
                             {{ $this->getFormattedDate($this->requisition->tender_deadline_date) }}</label>
                     </div>
                 </div>
 
-                <div class="row mt-7">
-                    <div class="col mx-5">
+                {{-- 🔹 Row 10: Evaluation Start & End Dates --}}
+                <div class="row mt-6">
+                    <div class="col">
                         <label><strong>Evaluation Start Date:</strong>
                             {{ $this->getFormattedDate($this->requisition->evaluation_start_date) }}</label>
                     </div>
-                    <div class="col mx-5">
+                    <div class="col">
                         <label><strong>Evaluation End Date:</strong>
                             {{ $this->getFormattedDate($this->requisition->evaluation_end_date) }}</label>
                     </div>
                 </div>
 
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Source of Funds:</strong>
-                            {{ $this->source_of_funds }}</label>
+                {{-- 🔹 Row 11: Date sent to DPS & PS Approval --}}
+                <div class="row mt-6">
+                    <div class="col">
+                        <label><strong>Date sent to DPS:</strong> {{ $this->getFormattedDateSentPs() }}</label>
                     </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Assigned To:</strong>
-                            @if ($this->requisition->procurement_officer)
-                                {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}
-                        </label>
-                        @endif
-                    </div>
-
-                </div>
-
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Date Assigned to Officer:</strong>
-                            {{ $this->getFormattedDate($this->date_assigned) }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Date sent to DPS:</strong>
-                            {{ $this->getFormattedDate($this->date_sent_dps) }}</label>
-                    </div>
-
-                </div>
-
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
+                    <div class="col">
                         <label><strong>PS Approval:</strong>
                             @if ($this->ps_approval == 'Pending')
                                 <span class="badge rounded-pill bg-danger fs-6">Pending</span>
@@ -169,14 +198,6 @@
                             @endif
                         </label>
                     </div>
-
-                    <div class="col mx-5">
-                        @if ($this->sent_to_cb)
-                            <label><strong>Date Sent to Cost & Budgeting:</strong>
-                                {{ $this->getFormattedDate($this->date_sent_cb) }}</label>
-                        @endif
-                    </div>
-
                 </div>
 
                 @if ($this->ps_approval == 'Approved')

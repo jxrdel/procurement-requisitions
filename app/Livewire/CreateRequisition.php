@@ -36,6 +36,11 @@ class CreateRequisition extends Component
     public $assigned_to;
     public $date_assigned;
     public $date_received_procurement;
+    public $actual_cost;
+    public $funding_availability;
+    public $date_sent_aov_procurement;
+    public $note_to_ps = false;
+    public $note_to_ps_date;
     public $site_visit = false;
     public $site_visit_date;
     public $tender_issue_date;
@@ -96,6 +101,14 @@ class CreateRequisition extends Component
                 $this->site_visit_date = null;
             }
 
+            if ($this->note_to_ps_date === '') {
+                $this->note_to_ps_date = null;
+            }
+
+            if ($this->date_sent_aov_procurement === '') {
+                $this->date_sent_aov_procurement = null;
+            }
+
             if ($this->tender_issue_date === '') {
                 $this->tender_issue_date = null;
             }
@@ -131,8 +144,13 @@ class CreateRequisition extends Component
             if (!$this->validateForm()) {
                 return;  // Stop execution if form validation fails
             }
+            $this->requisition_status = 'Requisition Created';
 
-            if ($this->tender_issue_date === null && $this->tender_deadline_date === null) {
+            if ($this->assigned_to) {
+                $this->requisition_status = 'Assigned to Procurement Officer';
+            }
+
+            if ($this->date_sent_aov_procurement && $this->tender_issue_date === null && $this->tender_deadline_date === null) {
                 $this->requisition_status = 'Tender To Be Issued';
             }
 
@@ -175,8 +193,13 @@ class CreateRequisition extends Component
                 'assigned_to' => $this->assigned_to,
                 'date_assigned' => $this->date_assigned,
                 'date_received_procurement' => $this->date_received_procurement,
+                'actual_cost' => $this->actual_cost,
+                'funding_availability' => $this->funding_availability,
+                'date_sent_aov_procurement' => $this->date_sent_aov_procurement,
                 'site_visit' => $this->site_visit,
                 'site_visit_date' => $this->site_visit_date,
+                'note_to_ps' => $this->note_to_ps,
+                'note_to_ps_date' => $this->note_to_ps_date,
                 'tender_issue_date' => $this->tender_issue_date,
                 'tender_deadline_date' => $this->tender_deadline_date,
                 'evaluation_start_date' => $this->evaluation_start_date,
@@ -198,6 +221,12 @@ class CreateRequisition extends Component
                     ]);
                 }
             }
+
+            //Create status log saying that requisition was created
+            $newrequisition->statuslogs()->create([
+                'details' => 'Requisition created with Requisition No: ' . $this->requisition_no . ' by ' . Auth::user()->name,
+                'created_by' => Auth::user()->username,
+            ]);
 
             foreach ($this->logs as $log) {
                 $newrequisition->statuslogs()->create([
@@ -229,7 +258,7 @@ class CreateRequisition extends Component
             ]);
 
             Log::info('Requisition #' . $this->requisition_no . ' was created by ' . Auth::user()->name);
-            return redirect()->route('requisitions.index')->with('success', 'Requisition created successfully');
+            return redirect()->route('requisitions.view', $newrequisition->id)->with('success', 'Requisition created successfully');
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while creating a requisition: ' . $e->getMessage());
             Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
@@ -330,7 +359,7 @@ class CreateRequisition extends Component
 
     public function updating($name, $value)
     {
-        if ($name == 'requesting_unit' || $name == 'uploads' || $name == 'source_of_funds') {
+        if ($name == 'requesting_unit' || $name == 'uploads' || $name == 'source_of_funds' || $name == 'funding_availability') {
             $this->skipRender();
         } else {
             $this->dispatch('preserveScroll');
