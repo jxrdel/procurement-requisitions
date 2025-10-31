@@ -131,83 +131,45 @@
                         </li>
                     @endcan
 
-                    @can('view-cost-budgeting-requisitions')
+                    @php
+                        $requisitionRoute = null;
+                        $isRequisitionActive = false;
+                        $headerText = null;
+
+                        if (Auth::user()->can('view-cost-budgeting-requisitions')) {
+                            $requisitionRoute = route('cost_and_budgeting.index');
+                            $isRequisitionActive = request()->routeIs('cost_and_budgeting.*');
+                            $headerText = 'Cost & Budgeting';
+                        } elseif (Auth::user()->can('view-accounts-payable-requisitions')) {
+                            $requisitionRoute = route('accounts_payable.index');
+                            $isRequisitionActive = request()->routeIs('accounts_payable.*');
+                            $headerText = 'Accounts Payable';
+                        } elseif (Auth::user()->can('view-vote-control-requisitions')) {
+                            $requisitionRoute = route('vote_control.index');
+                            $isRequisitionActive = request()->routeIs('vote_control.*');
+                            $headerText = 'Vote Control';
+                        } elseif (Auth::user()->can('view-check-room-requisitions')) {
+                            $requisitionRoute = route('check_room.index');
+                            $isRequisitionActive = request()->routeIs('check_room.*');
+                            $headerText = 'Check Staff';
+                        } elseif (Auth::user()->can('view-cheque-processing-requisitions')) {
+                            $requisitionRoute = route('cheque_processing.index');
+                            $isRequisitionActive = request()->routeIs('cheque_processing.*');
+                            $headerText = 'Cheque Processing';
+                        }
+                    @endphp
+
+                    @if ($requisitionRoute && (Auth::user()->role->name !== 'Super Admin' || Auth::user()->role->name !== 'Admin'))
                         <li class="menu-header mt-7">
-                            <span class="menu-header-text">Cost &amp; Budgeting</span>
+                            <span class="menu-header-text">{{ $headerText }}</span>
                         </li>
-                        <!-- Apps -->
-                        <li @class([
-                            'menu-item',
-                            'active' => request()->routeIs('cost_and_budgeting.*'),
-                        ])>
-                            <a href="{{ route('cost_and_budgeting.index') }}" class="menu-link">
+                        <li @class(['menu-item', 'active' => $isRequisitionActive])>
+                            <a href="{{ $requisitionRoute }}" class="menu-link">
                                 <i class="menu-icon ri-file-edit-line"></i>
                                 <div data-i18n="Basic">Requisitions</div>
                             </a>
                         </li>
-                    @endcan
-
-                    @can('view-accounts-payable-requisitions')
-                        <li class="menu-header mt-7">
-                            <span class="menu-header-text">Accounts Payable</span>
-                        </li>
-                        <!-- Apps -->
-                        <li @class([
-                            'menu-item',
-                            'active' => request()->routeIs('accounts_payable.*'),
-                        ])>
-                            <a href="{{ route('accounts_payable.index') }}" class="menu-link">
-                                <i class="menu-icon ri-file-edit-line"></i>
-                                <div data-i18n="Basic">Requisitions</div>
-                            </a>
-                        </li>
-                    @endcan
-
-                    @can('view-vote-control-requisitions')
-                        <li class="menu-header mt-7">
-                            <span class="menu-header-text">Vote Control</span>
-                        </li>
-                        <!-- Apps -->
-                        <li @class([
-                            'menu-item',
-                            'active' => request()->routeIs('vote_control.*'),
-                        ])>
-                            <a href="{{ route('vote_control.index') }}" class="menu-link">
-                                <i class="menu-icon ri-file-edit-line"></i>
-                                <div data-i18n="Basic">Requisitions</div>
-                            </a>
-                        </li>
-                    @endcan
-
-                    @can('view-check-room-requisitions')
-                        <li class="menu-header mt-7">
-                            <span class="menu-header-text">Check Staff</span>
-                        </li>
-                        <!-- Apps -->
-                        <li @class(['menu-item', 'active' => request()->routeIs('check_room.*')])>
-                            <a href="{{ route('check_room.index') }}" class="menu-link">
-                                <i class="menu-icon ri-file-edit-line"></i>
-                                <div data-i18n="Basic">Requisitions</div>
-                            </a>
-                        </li>
-                    @endcan
-
-
-                    @can('view-cheque-processing-requisitions')
-                        <li class="menu-header mt-7">
-                            <span class="menu-header-text">Cheque Processing</span>
-                        </li>
-                        <!-- Apps -->
-                        <li @class([
-                            'menu-item',
-                            'active' => request()->routeIs('cheque_processing.*'),
-                        ])>
-                            <a href="{{ route('cheque_processing.index') }}" class="menu-link">
-                                <i class="menu-icon ri-file-edit-line"></i>
-                                <div data-i18n="Basic">Requisitions</div>
-                            </a>
-                        </li>
-                    @endcan
+                    @endif
 
                     <li @class([
                         'menu-item mb-3',
