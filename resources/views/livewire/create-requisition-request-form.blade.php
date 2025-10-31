@@ -275,6 +275,13 @@
                 <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
             </div>
 
+            {{-- Error message for items --}}
+
+            @error('items')
+                <div class="text-danger fw-bold text-center mb-5"> {{ $message }} </div>
+            @enderror
+
+
             {{-- <p class="mt-6 fw-medium text-center">For items with multiple specifications, please attach additional
                 documentation as necessary <span class="text-danger">*</span></p> --}}
 

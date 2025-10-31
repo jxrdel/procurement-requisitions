@@ -91,26 +91,15 @@ class CreateRequisitionRequestForm extends Component
             'location_of_delivery' => 'nullable|string|max:255',
             'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
             'estimated_value' => 'nullable|numeric|min:0',
-            'items' => 'required|array|min:1',
+            'items' => 'array|min:1',
             'uploads' => 'required|array|min:2',
             'uploads.*' => 'file|max:10240',
         ];
 
-        foreach ($this->items as $index => $item) {
-            $rules["items.{$index}.name"] = 'required|string';
-            $rules["items.{$index}.qty_in_stock"] = 'required|integer|min:0';
-            $rules["items.{$index}.qty_requesting"] = 'required|integer|min:1';
-            $rules["items.{$index}.unit_of_measure"] = 'nullable|string|max:50';
-            $rules["items.{$index}.size"] = 'nullable|string|max:50';
-            $rules["items.{$index}.colour"] = 'nullable|string|max:50';
-            $rules["items.{$index}.brand_model"] = 'nullable|string|max:255';
-            $rules["items.{$index}.other"] = 'nullable|string|max:255';
-        }
-
         try {
             $this->validate($rules, [
                 'uploads.required' => 'Please upload at least 1 document.',
-                'items.*.name.required' => 'This field is required.',
+                'items.min' => 'Please add at least 1 item.',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->validationErrors = $e->validator->errors()->toArray();

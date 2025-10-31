@@ -17,13 +17,20 @@
 
                     <div class="row">
                         <div class="col-12">
-                            <p class="mb-3">Select the recipient of the approved requisition.</p>
+                            <p class="mb-3">
+                                By clicking "<strong>Accept</strong>", you are confirming your Non-Objection to the
+                                requisition.
+                                Once accepted, it may be forwarded to another Reporting Officer or sent to the
+                                Procurement Unit as required.
+                            </p>
+
 
                             <div wire:ignore class="mx-auto" style="width: 100%;">
                                 <select required wire:model="selectedOfficer"
                                     class="form-select form-select-lg @error('selectedOfficer')is-invalid @enderror"
                                     id="officerSelect">
-                                    <option value="" selected>Select Officer</option>
+                                    <option value="" selected>Select Recipient</option>
+                                    <option value="Procurement">Procurement Unit</option>
                                     @foreach ($reportingOfficers as $officer)
                                         <option value="{{ $officer->id }}">{{ $officer->reporting_officer_role }} |
                                             {{ $officer->name }}</option>
@@ -34,15 +41,15 @@
                             @error('selectedOfficer')
                                 <div class="text-danger mt-1"> {{ $message }} </div>
                             @enderror
-                            <div class="form-floating form-floating-outline mt-4">
-                                <textarea wire:model="hod_note" class="form-control @error('hod_note')is-invalid @enderror"
-                                    placeholder="Enter minute here" id="hodNoteInput" style="height: 100px"></textarea>
-                                <label for="hodNoteInput">Minute</label>
+                            {{-- <div class="form-floating form-floating-outline mt-4">
+                                <textarea wire:model="reporting_officer_note" class="form-control @error('reporting_officer_note')is-invalid @enderror"
+                                    placeholder="Enter minute here" id="reportingOfficerNoteInput" style="height: 100px"></textarea>
+                                <label for="reportingOfficerNoteInput">Minute</label>
                             </div>
 
-                            @error('hod_note')
+                            @error('reporting_officer_note')
                                 <div class="text-danger mt-1"> {{ $message }} </div>
-                            @enderror
+                            @enderror --}}
                         </div>
                     </div>
                 </form>

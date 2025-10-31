@@ -362,7 +362,7 @@ class ViewRequisitionForm extends Component
         ], [
             'selectedOfficer.required' => 'Please select a Reporting Officer to send the form to.',
             'selectedOfficer.exists' => 'The selected Reporting Officer is invalid.',
-            'hod_note.required' => 'Please enter a note',
+            'hod_note.required' => 'Please enter a minute',
         ]);
 
         $reportingOfficer = User::find($this->selectedOfficer);
@@ -397,25 +397,74 @@ class ViewRequisitionForm extends Component
 
     public function approveRequisitionReportingOfficer()
     {
-        $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
-        $this->requisitionForm->reporting_officer_approval = true;
-        $this->requisitionForm->reporting_officer_approval_date = now();
-        $this->requisitionForm->reporting_officer_digital_signature = Auth::user()->digital_signature;
+        $currentUser = Auth::user();
+        $logDetails = '';
+        $message = '';
+
+        $this->validate([
+            'selectedOfficer' => 'required|string',
+            'reporting_officer_note' => 'nullable|string',
+        ]);
+
+        // Determine which RO is approving and update the form
+        if ($this->requisitionForm->reporting_officer_approval !== true) {
+            if ($currentUser->id != $this->requisitionForm->reporting_officer_id) abort(403, 'You are not authorized to approve this requisition at this stage.');
+            $this->requisitionForm->reporting_officer_approval = true;
+            $this->requisitionForm->reporting_officer_approval_date = now();
+            $this->requisitionForm->reporting_officer_digital_signature = $currentUser->digital_signature;
+            $this->requisitionForm->reporting_officer_note = $this->reporting_officer_note;
+        } elseif ($this->requisitionForm->second_reporting_officer_approval !== true) {
+            if ($currentUser->id != $this->requisitionForm->second_reporting_officer_id) abort(403, 'You are not authorized to approve this requisition at this stage.');
+            $this->requisitionForm->second_reporting_officer_approval = true;
+        } elseif ($this->requisitionForm->third_reporting_officer_approval !== true) {
+            if ($currentUser->id != $this->requisitionForm->third_reporting_officer_id) abort(403, 'You are not authorized to approve this requisition at this stage.');
+            $this->requisitionForm->third_reporting_officer_approval = true;
+        }
+
+        // Handle forwarding
+        if ($this->selectedOfficer !== 'Procurement') {
+
+
+            $nextReportingOfficer = User::find($this->selectedOfficer);
+
+            if ($this->requisitionForm->second_reporting_officer_id === null) {
+                $this->requisitionForm->second_reporting_officer_id = $this->selectedOfficer;
+            } elseif ($this->requisitionForm->third_reporting_officer_id === null) {
+                $this->requisitionForm->third_reporting_officer_id = $this->selectedOfficer;
+            }
+
+            if ($nextReportingOfficer->reporting_officer_role == 'Permanent Secretary') {
+                $this->requisitionForm->status = RequestFormStatus::SENT_TO_PS;
+            } elseif ($nextReportingOfficer->reporting_officer_role == 'Deputy Permanent Secretary') {
+                $this->requisitionForm->status = RequestFormStatus::SENT_TO_DPS;
+            } elseif ($nextReportingOfficer->reporting_officer_role == 'Chief Medical Officer') {
+                $this->requisitionForm->status = RequestFormStatus::SENT_TO_CMO;
+            }
+
+            $logDetails = 'Requisition form approved by ' . $currentUser->name . ' and sent to ' . $nextReportingOfficer->name . ' for approval.';
+            $message = 'Requisition form approved and forwarded for further approval.';
+            // Notification::send($nextReportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
+        } else {
+            $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
+            $logDetails = 'Requisition form approved by ' . $currentUser->name . ' and sent to Procurement.';
+            $message = 'Requisition form approved and sent to Procurement.';
+
+            $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
+            if ($procurementHOD) {
+                // Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
+            }
+        }
+
         $this->requisitionForm->save();
 
         $this->requisitionForm->logs()->create([
-            'details' => 'Requisition form approved by ' . Auth::user()->reporting_officer_role . ' ' . Auth::user()->name . ' and sent to Procurement.',
-            'created_by' => Auth::user()->username,
+            'details' => $logDetails,
+            'created_by' => $currentUser->username,
         ]);
 
-        // Get user where the name is Marryann Basdeo
-        $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
-        if ($procurementHOD) {
-            // Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
-        }
-
-
-        $this->dispatch('show-message', message: 'Requisition form approved successfully.');
+        $this->reset(['selectedOfficer', 'reporting_officer_note']);
+        $this->dispatch('close-ro-approval-modal');
+        $this->dispatch('show-message', message: $message);
     }
 
     public function approveRequisitionProcurement()

@@ -68,9 +68,8 @@
                             $requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_DPS ||
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO)
-                            @if (Auth::user()->id == $requisitionForm->reporting_officer_id)
-                                {{-- Approve and Decline Buttons for Reporting Officer --}}
-                                {{-- <button type="button"
+                            {{-- Approve and Decline Buttons for Reporting Officer --}}
+                            {{-- <button type="button"
                                     wire:confirm="Are you sure you want to approve this requisition form?"
                                     wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
                                     wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-dark">
@@ -81,6 +80,15 @@
                                         <i class="ri-loader-2-line ri-spin me-1"></i>
                                     </span>
                                 </button> --}}
+                            @if (
+                                (Auth::user()->reporting_officer_role == 'Permanent Secretary' &&
+                                    $requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS) ||
+                                    (Auth::user()->reporting_officer_role == 'Deputy Permanent Secretary' &&
+                                        $requisitionForm->status === \App\RequestFormStatus::SENT_TO_DPS) ||
+                                    (Auth::user()->reporting_officer_role == 'Chief Medical Officer' &&
+                                        $requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO))
+                                {{-- Approve and Decline Buttons for Reporting Officer --}}
+
                                 <button type="button" wire:loading.attr="disabled" data-bs-toggle="modal"
                                     data-bs-target="#approveRequisitionFormReportingOfficer" type="button"
                                     class="btn btn-sm btn-success">
@@ -96,7 +104,9 @@
                                     Decline
                                 </button>
                             @endif
-                        @elseif ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_PROCUREMENT)
+                        @elseif (
+                            $requisitionForm->status === \App\RequestFormStatus::SENT_TO_PROCUREMENT &&
+                                Auth::user()->department->name == 'Procurement Unit')
                             <button type="button"
                                 wire:confirm="Are you sure you want to approve this requisition form?"
                                 wire:loading.attr="disabled" wire:target="approveRequisitionProcurement"
@@ -584,7 +594,7 @@
                     </div>
                 @endif
 
-                @if ($requisitionForm->reporting_officer_approval)
+                @if ($requisitionForm->reporting_officer_approval || $requisitionForm->second_reporting_officer_approval || $requisitionForm->third_reporting_officer_approval)
                     <div class="divider mt-6">
                         <div class="divider-text fw-bold fs-5"><i class="fa-solid fa-user-tie me-2"></i>
                             Non-Objection Required From</div>
@@ -599,78 +609,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Permanent Secretary</td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
-                                                {{ $requisitionForm->reportingOfficer->name }}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
-                                                {{ $requisitionForm->reportingOfficer->initials }}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
-                                                {{ $requisitionForm->reporting_officer_approval_date->format('d/m/Y H:i:s') }}
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Deputy Permanent Secretary</td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
-                                                {{ $requisitionForm->reportingOfficer->name }}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
-                                                {{ $requisitionForm->reportingOfficer->initials }}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
-                                                {{ $requisitionForm->reporting_officer_approval_date->format('d/m/Y H:i:s') }}
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Chief Medical Officer</td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
-                                                {{ $requisitionForm->reportingOfficer->name }}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
-                                                {{ $requisitionForm->reportingOfficer->initials }}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if (
-                                                $requisitionForm->reportingOfficer &&
-                                                    $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
-                                                {{ $requisitionForm->reporting_officer_approval_date->format('d/m/Y H:i:s') }}
-                                            @endif
-                                        </td>
-                                    </tr>
+                                    @if ($requisitionForm->reporting_officer_approval && $requisitionForm->reportingOfficer)
+                                        <tr>
+                                            <td>{{ $requisitionForm->reportingOfficer->reporting_officer_role ?? 'Reporting Officer' }}</td>
+                                            <td>{{ $requisitionForm->reportingOfficer->name }}</td>
+                                            <td>{{ $requisitionForm->reportingOfficer->initials }}</td>
+                                            <td>{{ $requisitionForm->reporting_officer_approval_date ? $requisitionForm->reporting_officer_approval_date->format('d/m/Y H:i:s') : '' }}</td>
+                                        </tr>
+                                    @endif
+                                    @if ($requisitionForm->second_reporting_officer_approval && $requisitionForm->secondReportingOfficer)
+                                        <tr>
+                                            <td>{{ $requisitionForm->secondReportingOfficer->reporting_officer_role ?? 'Reporting Officer' }}</td>
+                                            <td>{{ $requisitionForm->secondReportingOfficer->name }}</td>
+                                            <td>{{ $requisitionForm->secondReportingOfficer->initials }}</td>
+                                            <td></td>
+                                        </tr>
+                                    @endif
+                                    @if ($requisitionForm->third_reporting_officer_approval && $requisitionForm->thirdReportingOfficer)
+                                        <tr>
+                                            <td>{{ $requisitionForm->thirdReportingOfficer->reporting_officer_role ?? 'Reporting Officer' }}</td>
+                                            <td>{{ $requisitionForm->thirdReportingOfficer->name }}</td>
+                                            <td>{{ $requisitionForm->thirdReportingOfficer->initials }}</td>
+                                            <td></td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -930,6 +892,10 @@
 
             window.addEventListener('close-log-modal', event => {
                 $('#addLogModal').modal('hide');
+            });
+
+            window.addEventListener('close-ro-approval-modal', event => {
+                $('#approveRequisitionFormReportingOfficer').modal('hide');
             });
 
             window.addEventListener('close-hod-approval-modal', event => {

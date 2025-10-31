@@ -21,7 +21,7 @@
                             <div class="form-floating form-floating-outline mb-3">
                                 {{-- Textarea for contact_person_note --}}
                                 <textarea required wire:model="contact_person_note"
-                                    class="form-control @error('contact_person_note')is-invalid @enderror" placeholder="Please enter a note"
+                                    class="form-control @error('contact_person_note')is-invalid @enderror" placeholder="Please enter a minute"
                                     id="contactPersonNoteInput" style="height: 150px"></textarea>
                                 <label for="contactPersonNoteInput">Minute to HOD</label>
                             </div>

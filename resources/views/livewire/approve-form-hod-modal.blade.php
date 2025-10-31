@@ -17,7 +17,11 @@
 
                     <div class="row">
                         <div class="col-12">
-                            <p class="mb-3">Select the recipient of the requisition.</p>
+                            <p class="mb-3">
+                                Click "<strong>Accept</strong>" to
+                                confirm your non-objection.
+                                The requisition will be automatically sent to the selected reporting officer.
+                            </p>
 
                             <div wire:ignore class="mx-auto" style="width: 100%;">
                                 <select required wire:model="selectedOfficer"
