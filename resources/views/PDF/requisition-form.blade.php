@@ -322,87 +322,28 @@
                 <th style="width: 20%;">Date (dd/mm/yyyy)</th>
             </tr>
         </thead>
+
         <tbody>
             <tr>
                 <td>Permanent Secretary</td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
-                        {{ $requisitionForm->reportingOfficer->name ?? '' }}
-                    @endif
-                </td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
-                        {{ $requisitionForm->reportingOfficer->initials ?? '' }}
-                    @endif
-                </td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Permanent Secretary')
-                        {{ $requisitionForm->reporting_officer_approval_date ? $requisitionForm->reporting_officer_approval_date->format('d/m/Y') : '' }}
-                    @endif
-                </td>
+                @php $officer = $officersByRole['Permanent Secretary']; $date = $datesByRole['Permanent Secretary']; @endphp
+                <td>{{ $officer?->name ?? '' }}</td>
+                <td>{{ $officer?->initials ?? '' }}</td>
+                <td>{{ $date ? $date->format('d/m/Y') : '' }}</td>
             </tr>
             <tr>
                 <td>Deputy Permanent Secretary</td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
-                        {{ $requisitionForm->reportingOfficer->name ?? '' }}
-                    @endif
-                </td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
-                        {{ $requisitionForm->reportingOfficer->initials ?? '' }}
-                    @endif
-                </td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Deputy Permanent Secretary')
-                        {{ $requisitionForm->reporting_officer_approval_date ? $requisitionForm->reporting_officer_approval_date->format('d/m/Y') : '' }}
-                    @endif
-                </td>
+                @php $officer = $officersByRole['Deputy Permanent Secretary']; $date = $datesByRole['Deputy Permanent Secretary']; @endphp
+                <td>{{ $officer?->name ?? '' }}</td>
+                <td>{{ $officer?->initials ?? '' }}</td>
+                <td>{{ $date ? $date->format('d/m/Y') : '' }}</td>
             </tr>
             <tr>
                 <td>Chief Medical Officer</td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
-                        {{ $requisitionForm->reportingOfficer->name ?? '' }}
-                    @endif
-                </td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
-                        {{ $requisitionForm->reportingOfficer->initials ?? '' }}
-                    @endif
-                </td>
-                <td>
-                    @if (
-                        $requisitionForm->reportingOfficer &&
-                            $requisitionForm->reporting_officer_approval &&
-                            $requisitionForm->reportingOfficer->reporting_officer_role === 'Chief Medical Officer')
-                        {{ $requisitionForm->reporting_officer_approval_date ? $requisitionForm->reporting_officer_approval_date->format('d/m/Y') : '' }}
-                    @endif
-                </td>
+                @php $officer = $officersByRole['Chief Medical Officer']; $date = $datesByRole['Chief Medical Officer']; @endphp
+                <td>{{ $officer?->name ?? '' }}</td>
+                <td>{{ $officer?->initials ?? '' }}</td>
+                <td>{{ $date ? $date->format('d/m/Y') : '' }}</td>
             </tr>
         </tbody>
     </table>

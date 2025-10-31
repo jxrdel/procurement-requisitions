@@ -65,11 +65,39 @@ class RequisitionFormController extends Controller
             'contactPerson',
             'items',
             'votes',
-            'reportingOfficer'
+            'reportingOfficer',
+            'secondReportingOfficer',
+            'thirdReportingOfficer'
         ])->findOrFail($id);
 
-        $pdf = Pdf::loadView('PDF.requisition-form', compact('requisitionForm'))
-            ->setPaper('legal', 'portrait');
+        $officersByRole = [
+            'Permanent Secretary' => null,
+            'Deputy Permanent Secretary' => null,
+            'Chief Medical Officer' => null,
+        ];
+        $datesByRole = [
+            'Permanent Secretary' => null,
+            'Deputy Permanent Secretary' => null,
+            'Chief Medical Officer' => null,
+        ];
+
+        $allOfficers = [
+            ['officer' => $requisitionForm->reportingOfficer, 'approval' => $requisitionForm->reporting_officer_approval, 'date' => $requisitionForm->reporting_officer_approval_date],
+            ['officer' => $requisitionForm->secondReportingOfficer, 'approval' => $requisitionForm->second_reporting_officer_approval, 'date' => $requisitionForm->second_reporting_officer_approval_date],
+            ['officer' => $requisitionForm->thirdReportingOfficer, 'approval' => $requisitionForm->third_reporting_officer_approval, 'date' => $requisitionForm->third_reporting_officer_approval_date],
+        ];
+
+        foreach ($allOfficers as $data) {
+            if ($data['approval'] && $data['officer']) {
+                $role = $data['officer']->reporting_officer_role;
+                if (array_key_exists($role, $officersByRole) && $officersByRole[$role] === null) {
+                    $officersByRole[$role] = $data['officer'];
+                    $datesByRole[$role] = $data['date'];
+                }
+            }
+        }
+
+        $pdf = Pdf::loadView('PDF.requisition-form', compact('requisitionForm', 'officersByRole', 'datesByRole'))->setPaper('legal', 'portrait');
 
         return $pdf->stream('requisition-form-' . $requisitionForm->form_code . '.pdf');
     }
