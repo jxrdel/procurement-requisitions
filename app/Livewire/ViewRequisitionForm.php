@@ -115,7 +115,21 @@ class ViewRequisitionForm extends Component
         $this->items = $this->requisitionForm->items->toArray();
         $this->selected_votes = $this->requisitionForm->votes()->pluck('vote_id')->toArray();
 
-        $this->reportingOfficers = User::reportingOfficers()->orderBy('name')->get();
+        $excludedOfficerIds = array_filter([
+            Auth::id(),
+            $this->requisitionForm->reporting_officer_id,
+            $this->requisitionForm->second_reporting_officer_id,
+            $this->requisitionForm->third_reporting_officer_id,
+        ]);
+
+        $this->reportingOfficers = User::reportingOfficers()
+            ->whereNotIn('id', array_unique($excludedOfficerIds))
+            ->orderBy('name')
+            ->get();
+
+        if ($this->requisitionForm->status === RequestFormStatus::SENT_TO_HOD) {
+            $this->reportingOfficers = User::reportingOfficers()->orderBy('name')->get();
+        }
     }
 
     public function save()

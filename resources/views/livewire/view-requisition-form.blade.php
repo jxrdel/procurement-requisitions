@@ -70,7 +70,7 @@
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO)
                             @if (Auth::user()->id == $requisitionForm->reporting_officer_id)
                                 {{-- Approve and Decline Buttons for Reporting Officer --}}
-                                <button type="button"
+                                {{-- <button type="button"
                                     wire:confirm="Are you sure you want to approve this requisition form?"
                                     wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
                                     wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-dark">
@@ -80,7 +80,7 @@
                                     <span wire:loading>
                                         <i class="ri-loader-2-line ri-spin me-1"></i>
                                     </span>
-                                </button>
+                                </button> --}}
                                 <button type="button" wire:loading.attr="disabled" data-bs-toggle="modal"
                                     data-bs-target="#approveRequisitionFormReportingOfficer" type="button"
                                     class="btn btn-sm btn-success">
