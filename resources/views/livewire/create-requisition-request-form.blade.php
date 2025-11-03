@@ -387,20 +387,16 @@
                                             <td>{{ $file->getClientOriginalName() }}</td>
                                             <td class="text-center">
                                                 <button class="btn btn-danger mx-auto"
-                                                    wire:click="removeUpload({{ $index }})"
-                                                    wire:confirm="Are you sure you want to delete this file?">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
+                                                    wire:click="deleteFile({{ $index }})"
+                                                    wire:confirm="Are you sure you want to delete this file?"><i
+                                                        class="fa-solid fa-trash-can"></i></button>
                                             </td>
                                         </tr>
                                     @endforeach
-
                                 </tbody>
                             </table>
                         </div>
                     @endif
-
-
 
                     {{-- Upload Instructions List --}}
                     <div class="text-start m-auto mt-5" style="max-width: 400px;">

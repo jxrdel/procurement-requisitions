@@ -169,9 +169,8 @@ class CreateRequisitionRequestForm extends Component
         $this->reset('uploads');
     }
 
-    public function removeUpload($index)
+    public function deleteFile($index)
     {
-        dd($index);
         unset($this->uploadedFiles[$index]);
         $this->uploadedFiles = array_values($this->uploadedFiles);
     }
