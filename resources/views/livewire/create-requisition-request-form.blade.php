@@ -134,9 +134,9 @@
                 </div>
             </div>
 
-            <p class="mt-6 fw-medium text-center">Please ensure this form is submitted with a covering memo
+            <h5 class="mt-6 fw-bold text-center">Please ensure this form is submitted with a covering memo
                 explaining the
-                request</p>
+                request</h5>
 
             {{-- Category --}}
             <div class="row mt-6">
@@ -236,8 +236,9 @@
             </div>
 
             {{-- - Finance Section and Checkboxes - --}}
-            <p class="text-center mt-6 fw-medium">Please contact the Finance & Accounts department to obtain the
-                following information <span class="text-danger">*</span></p>
+            <h5 class="text-center mt-6 fw-bold">Please contact the Finance & Accounts (Cost & Budgeting) department to
+                obtain the
+                following information</h5>
 
             <div class="row mt-6">
                 <div class="col-md-6">
@@ -278,7 +279,10 @@
             {{-- Error message for items --}}
 
             @error('items')
-                <div class="text-danger fw-bold text-center mb-5"> {{ $message }} </div>
+                <div class="alert alert-danger alert-dismissible text-center" role="alert">
+                    <strong>{{ $message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @enderror
 
 
@@ -347,7 +351,11 @@
             <div class="row">
                 <div class="col" style="text-align: center;padding-bottom:10px">
                     @error('uploads')
-                        <div class="text-danger fw-bold"> {{ $message }} </div>
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <strong>{{ $message }}</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
                     @enderror
 
                     <input wire:model="uploads" type="file" multiple class="form-control"
@@ -361,7 +369,7 @@
                     <div class="text-start m-auto mt-5" style="max-width: 400px;">
                         <ul class="list-unstyled text-danger">
                             <li><i class="fa-solid fa-circle-dot me-2"></i><strong>At least 2</strong> uploads are
-                                required.</li>
+                                required (Justification Memo and Cost & Budgeting Approval Email).</li>
                             <li><i class="fa-solid fa-circle-dot me-2"></i>File must be <strong>less than
                                     10MB</strong>.
                             </li>

@@ -159,7 +159,11 @@
                         }
                     @endphp
 
-                    @if ($requisitionRoute && (Auth::user()->role->name !== 'Super Admin' || Auth::user()->role->name !== 'Admin'))
+                    @if (
+                        $requisitionRoute &&
+                            Auth::user()->role->name !== 'Super Admin' &&
+                            Auth::user()->role->name !== 'Admin' &&
+                            Auth::user()->department->name !== 'Procurement Unit')
                         <li class="menu-header mt-7">
                             <span class="menu-header-text">{{ $headerText }}</span>
                         </li>

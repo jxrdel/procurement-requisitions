@@ -89,7 +89,7 @@ class CreateRequisitionRequestForm extends Component
             'contact_info' => 'nullable|string|max:255',
             'justification' => 'required|string',
             'location_of_delivery' => 'nullable|string|max:255',
-            'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
+            'date_required_by' => 'nullable|date|after:date|date_format:Y-m-d',
             'estimated_value' => 'nullable|numeric|min:0',
             'items' => 'array|min:1',
             'uploads' => 'required|array|min:2',
@@ -98,7 +98,8 @@ class CreateRequisitionRequestForm extends Component
 
         try {
             $this->validate($rules, [
-                'uploads.required' => 'Please upload at least 1 document.',
+                'date_required_by.after' => 'The date required by must be after today',
+                'uploads.required' => 'Please upload at least 2 documents.',
                 'items.min' => 'Please add at least 1 item.',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
