@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -78,6 +79,12 @@ class ViewRequisitionForm extends Component
     public $isEditing = false;
 
     public $details;
+
+    #[Computed]
+    public function sendToHodDisabled()
+    {
+        return !$this->availability_of_funds || !$this->verified_by_accounts || empty($this->selected_votes);
+    }
 
     //HOD Approval/Denial Modal
     public $selectedOfficer;

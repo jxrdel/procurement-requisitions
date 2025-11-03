@@ -509,7 +509,7 @@
                     <div class="row mt-8" x-show="!isEditing">
                         <div class="text-center m-auto">
                             <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                data-bs-target="#sendToHodModal">
+                                data-bs-target="#sendToHodModal" @disabled($this->sendToHodDisabled)>
                                 <i class="tf-icons ri-mail-send-line me-1_5"></i>
                                 <span>Send to Head of Department</span>
                             </button>
