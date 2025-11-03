@@ -3,7 +3,7 @@
     <div class="app-brand justify-content-center mt-5">
         <a href="/" class="app-brand-link gap-3">
             <span class="app-brand-logo demo">
-                <i class="ri-contract-fill fs-2"></i>
+                <i class="ri-currency-fill fs-2"></i>
                 <span class="app-brand-text demo text-heading fw-semibold fs-4">Procurement Requisition
                     Application</span>
         </a>

@@ -350,7 +350,7 @@
 
             <div class="row">
                 <div class="col" style="text-align: center;padding-bottom:10px">
-                    @error('uploads')
+                    @error('uploadedFiles')
                         <div class="alert alert-danger alert-dismissible" role="alert">
                             <strong>{{ $message }}</strong>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"
@@ -358,12 +358,49 @@
                         </div>
                     @enderror
 
-                    <input wire:model="uploads" type="file" multiple class="form-control"
-                        style="display: inline;width: 400px;height:45px">
-                    <div wire:loading wire:target="uploads" class="spinner-border spinner-border-sm text-secondary"
-                        role="status">
-                        <span class="visually-hidden">Loading...</span>
+                    <div class="d-flex justify-content-center">
+                        <input wire:model="uploads" type="file" multiple class="form-control"
+                            style="display: inline;width: 400px;height:45px">
+
+                        <button @disabled(!$this->uploads) wire:click="uploadFiles" wire:loading.attr="disabled"
+                            wire:target="uploads,uploadFiles" class="btn btn-primary ms-2"><i
+                                class="fas fa-plus me-2"></i>Upload</button>
+                        <div wire:loading wire:target="uploads,uploadFiles" class="mt-3 mx-1">
+                            <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
+
+                    @if ($uploadedFiles)
+                        <div class="table-responsive mt-4">
+                            <table class="table table-hover table-bordered w-100 m-auto">
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($uploadedFiles as $index => $file)
+                                        <tr>
+                                            <td>{{ $file->getClientOriginalName() }}</td>
+                                            <td class="text-center">
+                                                <button class="btn btn-danger mx-auto"
+                                                    wire:click="removeUpload({{ $index }})"
+                                                    wire:confirm="Are you sure you want to delete this file?">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+
+
 
                     {{-- Upload Instructions List --}}
                     <div class="text-start m-auto mt-5" style="max-width: 400px;">

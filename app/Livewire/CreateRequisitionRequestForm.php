@@ -55,7 +55,8 @@ class CreateRequisitionRequestForm extends Component
     public $other;
     public $editItemKey;
 
-    public $uploads;
+    public $uploads = [];
+    public $uploadedFiles = [];
     public $selected_votes = [];
     public $categories;
 
@@ -92,14 +93,14 @@ class CreateRequisitionRequestForm extends Component
             'date_required_by' => 'nullable|date|after:date|date_format:Y-m-d',
             'estimated_value' => 'nullable|numeric|min:0',
             'items' => 'array|min:1',
-            'uploads' => 'required|array|min:2',
-            'uploads.*' => 'file|max:10240',
+            'uploadedFiles' => 'required|array|min:2',
+            'uploadedFiles.*' => 'file|max:10240',
         ];
 
         try {
             $this->validate($rules, [
                 'date_required_by.after' => 'The date required by must be after today',
-                'uploads.required' => 'Please upload at least 2 documents.',
+                'uploadedFiles.required' => 'Please upload at least 2 documents.',
                 'items.min' => 'Please add at least 1 item.',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -134,8 +135,8 @@ class CreateRequisitionRequestForm extends Component
             $form->votes()->attach($this->selected_votes);
         }
 
-        if (!empty($this->uploads)) {
-            foreach ($this->uploads as $upload) {
+        if (!empty($this->uploadedFiles)) {
+            foreach ($this->uploadedFiles as $upload) {
                 $filename = $upload->getClientOriginalName();
                 $uploadPath = $upload->store('file_uploads', 'public');
                 $form->uploads()->create([
@@ -153,6 +154,26 @@ class CreateRequisitionRequestForm extends Component
         ]);
 
         return redirect()->route('requisition_forms.view', ['id' => $form->id])->with('success', 'Requisition form created successfully.');
+    }
+
+    public function uploadFiles()
+    {
+        $this->validate([
+            'uploads.*' => 'file|max:10240', // 10MB Max
+        ]);
+
+        foreach ($this->uploads as $upload) {
+            $this->uploadedFiles[] = $upload;
+        }
+
+        $this->reset('uploads');
+    }
+
+    public function removeUpload($index)
+    {
+        dd($index);
+        unset($this->uploadedFiles[$index]);
+        $this->uploadedFiles = array_values($this->uploadedFiles);
     }
 
     public function addItem()
