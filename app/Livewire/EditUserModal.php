@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
 use Livewire\Attributes\On;
@@ -17,9 +18,11 @@ class EditUserModal extends Component
     public $roles;
     public $is_active;
     public $role_id;
+    public $departments;
 
     public function render()
     {
+        $this->departments = Department::orderBy('name')->get();
         $this->roles = Role::all();
         return view('livewire.edit-user-modal');
     }
@@ -31,7 +34,7 @@ class EditUserModal extends Component
         $this->name = $this->user->name;
         $this->username = $this->user->username;
         $this->email = $this->user->email;
-        $this->department = $this->user->department->name;
+        // $this->department = $this->user->department->id;
         $this->is_active = $this->user->is_active == 1 ? true : false;
         $this->role_id = $this->user->role_id;
         $this->dispatch('display-edit-modal');
@@ -51,7 +54,7 @@ class EditUserModal extends Component
             'name' => $this->name,
             'username' => $this->username,
             'email' => $this->email,
-            'department' => $this->department,
+            'department_id' => $this->department,
             'is_active' => $this->is_active,
             'role_id' => $this->role_id
         ]);

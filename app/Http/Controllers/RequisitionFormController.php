@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class RequisitionFormController extends Controller
 {
@@ -18,7 +19,12 @@ class RequisitionFormController extends Controller
 
     public function getForms()
     {
+        $user = Auth::user();
         $forms = RequisitionRequestForm::with(['items', 'requisition'])->select('requisition_request_forms.*');
+
+        if ($user->role->name !== 'Super Admin' && $user->department->name !== 'Office of the Permanent Secretary') {
+            $forms->where('requesting_unit', $user->department_id);
+        }
 
         return DataTables::of($forms)
             ->addColumn('date_created_formatted', function ($row) {

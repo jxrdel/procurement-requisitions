@@ -53,15 +53,9 @@
                                 class="form-select @error('department')is-invalid @enderror"
                                 id="exampleFormControlSelect1" aria-label="Default select example">
                                 <option value="">Select a Department</option>
-                                <option value="Accounts Payable">Accounts Payable</option>
-                                <option value="Procurement">Procurement</option>
-                                <option value="Cost & Budgeting">Cost & Budgeting</option>
-                                <option value="Vote Control">Vote Control</option>
-                                <option value="Check Staff">Check Staff</option>
-                                <option value="Cheque Processing">Cheque Processing</option>
-                                <option value="Office of the Permanent Secretary">Office of the Permanent Secretary
-                                </option>
-                                <option value="ICT">ICT</option>
+                                @foreach ($departments as $department)
+                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         @error('department')

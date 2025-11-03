@@ -15,17 +15,23 @@ class Controller
 {
     public function index()
     {
-        if (Auth::user()->department->name === 'Cost & Budgeting') {
-            return redirect()->route('cost_and_budgeting.index');
-        } elseif (Auth::user()->department->name === 'Vote Control') {
-            return redirect()->route('vote_control.index');
-        } elseif (Auth::user()->department->name === 'Check Staff') {
-            return redirect()->route('check_room.index');
-        } elseif (Auth::user()->department->name === 'Cheque Processing') {
-            return redirect()->route('cheque_processing.index');
-        } elseif (Auth::user()->department->name === 'Accounts Payable') {
-            return redirect()->route('accounts_payable.index');
+        if (Auth::user()->role->name !== 'Super Admin' && Auth::user()->department->name !== 'Office of the Permanent Secretary' && Auth::user()->department->name !== 'Procurement Unit') {
+            //Redirect users to their department dashboards
+            if (Auth::user()->department->name === 'Cost & Budgeting') {
+                return redirect()->route('cost_and_budgeting.index');
+            } elseif (Auth::user()->department->name === 'Vote Control') {
+                return redirect()->route('vote_control.index');
+            } elseif (Auth::user()->department->name === 'Check Staff') {
+                return redirect()->route('check_room.index');
+            } elseif (Auth::user()->department->name === 'Cheque Processing') {
+                return redirect()->route('cheque_processing.index');
+            } elseif (Auth::user()->department->name === 'Accounts Payable') {
+                return redirect()->route('accounts_payable.index');
+            } else {
+                return redirect()->route('requisition_forms.index');
+            }
         }
+
         //Count of all requisitions
         $allRequisitionsCount = Requisition::count();
 

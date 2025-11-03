@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Mail\NewUserEmail;
+use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -17,10 +18,12 @@ class CreateUserModal extends Component
     public $role_id;
     public $roles;
     public $sendEmail = true;
+    public $departments;
 
     public function render()
     {
         $this->roles = Role::all();
+        $this->departments = Department::orderBy('name')->get();
         return view('livewire.create-user-modal');
     }
 
@@ -30,7 +33,7 @@ class CreateUserModal extends Component
             'name' => 'required',
             'username' => 'required|unique:users',
             'email' => 'required|email|unique:users',
-            'department' => 'required',
+            'department' => 'required|exists:departments,id',
             'role_id' => 'required'
         ]);
 
@@ -43,7 +46,7 @@ class CreateUserModal extends Component
         ]);
 
         if ($this->sendEmail) {
-            Mail::to($this->email)->queue(new NewUserEmail($newuser));
+            Mail::to($this->email)->send(new NewUserEmail($newuser));
         }
 
         $this->reset();
