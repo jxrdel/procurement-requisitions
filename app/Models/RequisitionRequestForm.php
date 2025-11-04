@@ -49,6 +49,7 @@ class RequisitionRequestForm extends Model
         'third_reporting_officer_id',
         'second_reporting_officer_approval_date',
         'third_reporting_officer_approval_date',
+        'forwarding_minute',
     ];
 
     protected $casts = [

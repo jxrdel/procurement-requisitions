@@ -6,6 +6,7 @@
     @include('livewire.decline-form-modal')
     @include('livewire.add-form-log')
     @include('livewire.send-to-hod-modal')
+    @include('livewire.forward-form-modal')
     <div class="card">
         <div class="card-body" x-data="{ isEditing: $wire.entangle('isEditing') }">
 
@@ -68,18 +69,6 @@
                             $requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_DPS ||
                                 $requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO)
-                            {{-- Approve and Decline Buttons for Reporting Officer --}}
-                            <button type="button"
-                                wire:confirm="Are you sure you want to approve this requisition form?"
-                                wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
-                                wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-dark">
-                                <span wire:loading.remove>
-                                    <i class="ri-mail-send-line me-1"></i> Forward
-                                </span>
-                                <span wire:loading>
-                                    <i class="ri-loader-2-line ri-spin me-1"></i>
-                                </span>
-                            </button>
                             @if (
                                 (Auth::user()->reporting_officer_role == 'Permanent Secretary' &&
                                     $requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS) ||
@@ -88,6 +77,16 @@
                                     (Auth::user()->reporting_officer_role == 'Chief Medical Officer' &&
                                         $requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO))
                                 {{-- Approve and Decline Buttons for Reporting Officer --}}
+                                <button type="button" wire:loading.attr="disabled" data-bs-toggle="modal"
+                                    data-bs-target="#forwardFormReportingOfficer" type="button"
+                                    class="btn btn-sm btn-dark">
+                                    <span wire:loading.remove>
+                                        <i class="ri-mail-send-line me-1"></i> Forward
+                                    </span>
+                                    <span wire:loading>
+                                        <i class="ri-loader-2-line ri-spin me-1"></i>
+                                    </span>
+                                </button>
 
                                 <button type="button" wire:loading.attr="disabled" data-bs-toggle="modal"
                                     data-bs-target="#approveRequisitionFormReportingOfficer" type="button"

@@ -27,7 +27,7 @@
                                     class="form-select form-select-lg @error('forwardedOfficer')is-invalid @enderror"
                                     id="officerSelect">
                                     <option value="" selected>Select Recipient</option>
-                                    @foreach ($allReportingOfficers as $officer)
+                                    @foreach ($forwardingOfficers as $officer)
                                         <option value="{{ $officer->id }}">{{ $officer->reporting_officer_role }} |
                                             {{ $officer->name }}</option>
                                     @endforeach
@@ -38,12 +38,12 @@
                                 <div class="text-danger mt-1"> {{ $message }} </div>
                             @enderror
                             <div class="form-floating form-floating-outline mt-4">
-                                <textarea wire:model="reporting_officer_note" class="form-control @error('reporting_officer_note')is-invalid @enderror"
+                                <textarea wire:model="forwarding_minute" class="form-control @error('forwarding_minute')is-invalid @enderror"
                                     placeholder="Enter minute here" id="reportingOfficerNoteInput" style="height: 100px"></textarea>
                                 <label for="reportingOfficerNoteInput">Minute</label>
                             </div>
 
-                            @error('reporting_officer_note')
+                            @error('forwarding_minute')
                                 <div class="text-danger mt-1"> {{ $message }} </div>
                             @enderror
                         </div>
@@ -54,7 +54,7 @@
 
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-success" wire:click="forwardForm" wire:loading.attr="disabled"
-                    wire:target="forwardForm">
+                    wire:target="forwardForm"><i class="ri-mail-send-line me-1"></i>
                     <span>Forward</span>
                     <div wire:loading wire:target="forwardForm" class="spinner-border spinner-border-sm text-white mx-1"
                         role="status">
