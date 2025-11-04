@@ -42,7 +42,7 @@ class ForwardForm extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = route('request-forms.view', $this->requisitionForm->id);
+        $url = route('requisition_forms.view', $this->requisitionForm->id);
 
         return (new MailMessage)
             ->subject('Requisition Form Forwarded')
@@ -62,9 +62,9 @@ class ForwardForm extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'requisition_form_id' => $this->requisitionForm->id,
-            'message' => 'Requisition form ' . $this->requisitionForm->form_code . ' has been forwarded to you.',
-            'url' => route('request-forms.view', $this->requisitionForm->id),
+            "title" => "Requisition Form Forwarded by " . ($this->forwardedBy->reporting_officer_role ?? $this->forwardedBy->name),
+            "message" => "The requisition form #" . $this->requisitionForm->form_code . " has been forwarded to you. Minute: " . $this->forwarding_minute,
+            "url" => route('requisition_forms.view', $this->requisitionForm->id),
         ];
     }
 }

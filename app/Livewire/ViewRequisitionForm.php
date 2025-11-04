@@ -459,7 +459,7 @@ class ViewRequisitionForm extends Component
 
             $logDetails = 'Requisition form approved by ' . $currentUser->name . ' and sent to ' . $nextReportingOfficer->name . ' for approval.';
             $message = 'Requisition form approved and forwarded for further approval.';
-            // Notification::send($nextReportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
+            Notification::send($nextReportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
         } else {
             $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
             $logDetails = 'Requisition form approved by ' . $currentUser->name . ' and sent to Procurement.';

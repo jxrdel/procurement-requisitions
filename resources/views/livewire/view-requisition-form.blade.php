@@ -167,6 +167,19 @@
                         <ul class="mt-1">{{ $requisitionForm->procurement_reason_for_denial }}</ul>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
+                    {{-- @elseif (
+                    $requisitionForm->forwarding_minute &&
+                        ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_PS ||
+                            $requisitionForm->status === \App\RequestFormStatus::SENT_TO_DPS ||
+                            $requisitionForm->status === \App\RequestFormStatus::SENT_TO_CMO))
+                    <div class="alert alert-info alert-dismissible" role="alert">
+                        <div class="text-center">
+                            <strong>Forwarding Minute</strong>
+                        </div>
+                        <ul class="mt-1">{{ $requisitionForm->forwarding_minute }}</ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                    </div> --}}
                 @endif
                 <div class="row mt-6">
                     <div class="col-md-6">
