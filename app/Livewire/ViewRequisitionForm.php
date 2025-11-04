@@ -13,6 +13,7 @@ use App\Notifications\DeclinedByHOD;
 use App\Notifications\DeclinedByProcurement;
 use App\Notifications\DeclinedByReportingOfficer;
 use App\Notifications\ForwardForm;
+use App\Notifications\RequestForFurtherApproval;
 use App\Notifications\RequestForHODApproval;
 use App\Notifications\RequestForProcurementApproval;
 use App\Notifications\RequestForReportingOfficerApproval;
@@ -459,7 +460,7 @@ class ViewRequisitionForm extends Component
 
             $logDetails = 'Requisition form approved by ' . $currentUser->name . ' and sent to ' . $nextReportingOfficer->name . ' for approval.';
             $message = 'Requisition form approved and forwarded for further approval.';
-            Notification::send($nextReportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
+            // Notification::send($nextReportingOfficer, new RequestForFurtherApproval($this->requisitionForm, $currentUser, 'This requisition requires your approval.'));
         } else {
             $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
             $logDetails = 'Requisition form approved by ' . $currentUser->name . ' and sent to Procurement.';
