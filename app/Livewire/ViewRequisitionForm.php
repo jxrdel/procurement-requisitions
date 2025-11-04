@@ -12,6 +12,7 @@ use App\Notifications\ApprovedByReportingOfficer;
 use App\Notifications\DeclinedByHOD;
 use App\Notifications\DeclinedByProcurement;
 use App\Notifications\DeclinedByReportingOfficer;
+use App\Notifications\ForwardForm;
 use App\Notifications\RequestForHODApproval;
 use App\Notifications\RequestForProcurementApproval;
 use App\Notifications\RequestForReportingOfficerApproval;
@@ -640,6 +641,8 @@ class ViewRequisitionForm extends Component
             'details' => 'Requisition form forwarded to ' . $reportingOfficer->name . ' by ' . Auth::user()->name,
             'created_by' => Auth::user()->username,
         ]);
+
+        Notification::send($reportingOfficer, new ForwardForm($this->requisitionForm, Auth::user(), $this->forwarding_minute));
 
         $this->dispatch('show-message', message: 'Form forwarded successfully.');
     }
