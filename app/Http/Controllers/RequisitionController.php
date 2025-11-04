@@ -6,12 +6,16 @@ use App\Models\Requisition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\DataTables;
 
 class RequisitionController extends Controller
 {
     public function index()
     {
+        if (Gate::denies('view-procurement-requisitions')) {
+            abort(403);
+        }
         return view('requisitions.index');
     }
     public function getRequisitions()

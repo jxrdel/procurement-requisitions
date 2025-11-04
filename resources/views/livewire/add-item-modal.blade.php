@@ -20,7 +20,7 @@
                                 <input required wire:model="item_name" type="text"
                                     class="form-control @error('item_name')is-invalid @enderror" autocomplete="off"
                                     id="itemInput" placeholder="Item Name" aria-describedby="itemInputHelp" />
-                                <label for="itemInput">Item</label>
+                                <label for="itemInput">Item <span class="text-danger">*</span></label>
                             </div>
                             @error('item_name')
                                 <div class="text-danger"> {{ $message }} </div>
@@ -35,7 +35,7 @@
                                 <input required wire:model="qty_in_stock" type="number"
                                     class="form-control @error('qty_in_stock')is-invalid @enderror" autocomplete="off"
                                     id="qtyInStockInput" placeholder="Quantity in Stock" />
-                                <label for="qtyInStockInput">Qty in Stock</label>
+                                <label for="qtyInStockInput">Qty in Stock <span class="text-danger">*</span></label>
                             </div>
                             @error('qty_in_stock')
                                 <div class="text-danger"> {{ $message }} </div>
@@ -47,7 +47,8 @@
                                 <input required wire:model="qty_requesting" type="number"
                                     class="form-control @error('qty_requesting')is-invalid @enderror" autocomplete="off"
                                     id="qtyRequestingInput" placeholder="Quantity Requesting" />
-                                <label for="qtyRequestingInput">Qty Requesting</label>
+                                <label for="qtyRequestingInput">Qty Requesting <span
+                                        class="text-danger">*</span></label>
                             </div>
                             @error('qty_requesting')
                                 <div class="text-danger"> {{ $message }} </div>

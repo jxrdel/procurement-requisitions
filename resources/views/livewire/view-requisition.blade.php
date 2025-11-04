@@ -736,7 +736,7 @@
 
 
 
-                            @foreach ($vendors as $vendor)
+                            @forelse ($vendors as $vendor)
                                 <div class="divider">
                                     <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
                                 </div>
@@ -787,7 +787,55 @@
                                             {{ $vendor['change_of_vote_no'] }}</label>
                                     </div>
                                 </div>
-                            @endforeach
+                            @empty
+
+
+                                <div class="row mt-8">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Request Sent to Ministry of Finance:
+                                            </strong></label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                    </div>
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Request Category:</strong>
+                                        </label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Request Number:</strong></label>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Release Type:</strong></label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Release Number:</strong></label>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Release Date:</strong>
+                                        </label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Change of Vote Number:</strong></label>
+                                    </div>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                     <div wire:ignore.self @class([
@@ -814,7 +862,7 @@
                                 <div x-transition x-show="!isEditingProcurement2">
 
 
-                                    @foreach ($vendors as $vendor)
+                                    @forelse ($vendors as $vendor)
                                         <div class="row mt-5">
                                             <div class="divider">
                                                 <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}
@@ -886,7 +934,34 @@
                                                 @endif
                                             @endcan
                                         </div>
-                                    @endforeach
+                                    @empty
+                                        <div class="row mt-5">
+
+                                            <div class="row mt-8">
+
+                                                <div class="col mx-5">
+                                                    <label><strong>Purchase Order Number:
+                                                        </strong></label>
+                                                </div>
+
+                                                <div class="col mx-5">
+                                                    <label><strong>ETA:</strong></label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-7">
+
+                                                <div class="col mx-5">
+                                                    <label><strong>Date Sent to Commit:</strong></label>
+                                                </div>
+
+                                                <div class="col mx-5">
+                                                    <label><strong>Date Sent to AP:</strong></label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    @endforelse
 
 
                                 </div>
@@ -1027,7 +1102,7 @@
 
                         <div>
 
-                            @foreach ($vendors as $vendor)
+                            @forelse ($vendors as $vendor)
                                 <div class="row mt-2">
                                     <div class="divider">
                                         <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
@@ -1046,7 +1121,19 @@
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
+                            @empty
+
+                                <div class="row mt-8">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Received From Procurement :</strong></label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Sent to Vote Control:</strong></label>
+                                    </div>
+                                </div>
+                            @endforelse
 
                         </div>
                     </div>
@@ -1058,7 +1145,7 @@
 
                         <div>
 
-                            @foreach ($vendors as $vendor)
+                            @forelse ($vendors as $vendor)
                                 <div class="row mt-2">
                                     <div class="divider">
                                         <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
@@ -1087,7 +1174,29 @@
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
+                            @empty
+                                <div class="row mt-2">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Batch Number:</strong></label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Voucher Number:
+                                            </strong></label>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-7">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Sent to Check Staff:</strong></label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                    </div>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
 
@@ -1099,7 +1208,7 @@
 
                         <div>
 
-                            @foreach ($vendors as $vendor)
+                            @forelse ($vendors as $vendor)
                                 <div class="row">
                                     <div class="divider">
                                         <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
@@ -1144,7 +1253,41 @@
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
+                            @empty
+                                <div class="row mt-2">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Voucher Received from Vote Control:</strong></label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Voucher Sent To:
+                                            </strong></label>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-8">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Sent to Audit:</strong></label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Received from Audit:
+                                            </strong></label>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-8">
+
+                                    <div class="col mx-5">
+                                        <label><strong>Date Voucher Sent to Cheque Processing:</strong></label>
+                                    </div>
+
+                                    <div class="col mx-5">
+                                    </div>
+                                </div>
+                            @endforelse
 
                         </div>
                     </div>
@@ -1230,7 +1373,7 @@
                     <thead>
                         <tr>
                             <th>Details</th>
-                            <th class="text-center" style="width: 20%">Actions</th>
+                            <th class="text-center" style="width: 20%">Date</th>
                         </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
@@ -1238,14 +1381,7 @@
                             <tr>
                                 <td>{{ $log->details }}</td>
                                 <td class="text-center">
-
-                                    <button @cannot('delete-records') disabled @endcannot
-                                        wire:confirm="Are you sure you want to delete this log?"
-                                        wire:click="deleteLog({{ $log->id }})" type="button"
-                                        class="btn btn-danger">
-                                        <i class="ri-delete-bin-2-line me-1"></i> Delete
-                                    </button>
-
+                                    {{ $log->created_at->format('d/m/Y H:i:s') }}
                                 </td>
                             </tr>
                         @empty

@@ -48,7 +48,7 @@ class ApprovedByReportingOfficer extends Notification
             $ccRecipients[] = $this->form->contactPerson->email;
         }
         return (new MailMessage)
-            ->subject('Requisition Form Approved by ' . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ' | PRA')
+            ->subject('Non-Objection received from ' . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ' | PRA')
             ->cc($ccRecipients)
             ->markdown('emails.approved-by-reporting-officer', [
                 "recipient" => $notifiable->name,
@@ -65,8 +65,8 @@ class ApprovedByReportingOfficer extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            "title" => "Requisition Form Approved by " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer'),
-            "message" => "Requisition Form #{$this->form->form_code} has been approved by the " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ".",
+            "title" => "Non-Objection received from " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer'),
+            "message" => "Requisition Form #{$this->form->form_code} has obtained non-objection from the " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ".",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

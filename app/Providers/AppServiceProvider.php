@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('edit-records', function ($user) {
-            return $user->role->name !== 'Viewer';
+            return $user->role->name !== 'Viewer' && $user->role->name !== 'Requisition Form User';
         });
 
         Gate::define('create-requisitions', function ($user, $form) {
@@ -44,7 +44,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-procurement-requisitions', function ($user) {
-            return $user->department->name === 'Procurement Unit' || ($user->role->name === 'Viewer');
+            return $user->department->name === 'Procurement Unit' || ($user->role->name !== 'Requisition Form User');
+        });
+
+        Gate::define('view-requisition', function ($user, $requisition) {
+            return $user->department->name === 'Procurement Unit' || ($user->role->name === 'Viewer') || $user->department->id == $requisition->requesting_unit;
         });
 
         Gate::define('view-accounts-payable-requisitions', function ($user) {
