@@ -102,7 +102,7 @@
                         "name": "requisition.status",
                         "title": "Requisition Status",
                         "orderable": false,
-                        "searchable": false,
+                        "searchable": true,
                         "className": "text-center"
                     },
                     {

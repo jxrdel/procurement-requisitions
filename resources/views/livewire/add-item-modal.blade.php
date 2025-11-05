@@ -60,7 +60,7 @@
                                 <input wire:model="unit_of_measure" type="text"
                                     class="form-control @error('unit_of_measure')is-invalid @enderror"
                                     autocomplete="off" id="unitOfMeasureInput" placeholder="Unit of Measure" />
-                                <label for="unitOfMeasureInput">Unit of Measure</label>
+                                <label for="unitOfMeasureInput">Unit of Measure <span class="text-danger">*</span></label>
                             </div>
                             @error('unit_of_measure')
                                 <div class="text-danger"> {{ $message }} </div>

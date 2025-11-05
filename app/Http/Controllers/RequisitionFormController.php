@@ -55,6 +55,11 @@ class RequisitionFormController extends Controller
                     $q->where('name', 'like', "%{$keyword}%");
                 });
             })
+            ->filterColumn('requisition.status', function (Builder $query, $keyword) {
+                $query->whereHas('requisition', function (Builder $q) use ($keyword) {
+                    $q->where('requisition_status', 'like', "%{$keyword}%");
+                });
+            })
             ->addColumn('actions', function ($row) {
                 $viewUrl = route('requisition_forms.view', $row->id);
                 return '<div style="text-align:center"><a href="' . $viewUrl . '" class="btn btn-primary btn-sm">View</a></div>';
