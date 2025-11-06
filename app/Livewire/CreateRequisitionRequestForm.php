@@ -7,8 +7,10 @@ use App\Models\Department;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
 use App\Models\Vote;
+use App\Notifications\RequestForCABApproval;
 use App\RequestFormStatus;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -91,16 +93,14 @@ class CreateRequisitionRequestForm extends Component
             'justification' => 'required|string',
             'location_of_delivery' => 'nullable|string|max:255',
             'date_required_by' => 'nullable|date|after:date|date_format:Y-m-d',
-            'estimated_value' => 'nullable|numeric|min:0',
+            'estimated_value' => 'required|numeric|min:0',
             'items' => 'array|min:1',
-            'uploadedFiles' => 'required|array|min:2',
             'uploadedFiles.*' => 'file|max:10240',
         ];
 
         try {
             $this->validate($rules, [
                 'date_required_by.after' => 'The date required by must be after today',
-                'uploadedFiles.required' => 'Please upload at least 2 documents.',
                 'items.min' => 'Please add at least 1 item.',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -120,19 +120,12 @@ class CreateRequisitionRequestForm extends Component
             'justification' => $this->justification,
             'date_required_by' => $this->date_required_by,
             'estimated_value' => $this->estimated_value,
-            'availability_of_funds' => $this->availability_of_funds,
-            'verified_by_accounts' => $this->verified_by_accounts,
-            'status' => RequestFormStatus::CREATED,
+            'status' => RequestFormStatus::SENT_TO_COST_BUDGETING,
             'created_by' => Auth::user()->username ?? null,
         ]);
 
         foreach ($this->items as $item) {
             $form->items()->create($item);
-        }
-
-        //Attach selected votes
-        if (!empty($this->selected_votes)) {
-            $form->votes()->attach($this->selected_votes);
         }
 
         if (!empty($this->uploadedFiles)) {
@@ -150,6 +143,14 @@ class CreateRequisitionRequestForm extends Component
         //Create log entry
         $form->logs()->create([
             'details' => 'Form Created by ' . (Auth::user()->name),
+            'created_by' => Auth::user()->username ?? null,
+        ]);
+
+        $costAndBudgetingUsers = User::costBudgeting()->get();
+        Notification::send($costAndBudgetingUsers, new RequestForCABApproval($form));
+        //Create log entry
+        $form->logs()->create([
+            'details' => 'Form sent to Cost and Budgeting for Approval',
             'created_by' => Auth::user()->username ?? null,
         ]);
 

@@ -166,6 +166,13 @@
                         </a>
                     </li>
 
+                    <li @class(['menu-item', 'active' => request()->routeIs('queue')])>
+                        <a href="{{ route('queue') }}" class="menu-link">
+                            <i class="menu-icon ri-list-ordered-2"></i>
+                            <div data-i18n="Basic">Queue</div>
+                        </a>
+                    </li>
+
                     @can('view-users-page')
                         <li @class(['menu-item', 'active' => request()->routeIs('users')])>
                             <a href="{{ route('users') }}" class="menu-link">

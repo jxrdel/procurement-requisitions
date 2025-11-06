@@ -5,6 +5,7 @@ namespace App;
 enum RequestFormStatus
 {
     public const CREATED = 'Created';
+    public const SENT_TO_COST_BUDGETING = 'Sent to Cost & Budgeting';
     public const APPROVED_BY_HOD = 'Approved By HOD';
     public const DENIED_BY_HOD = 'Denied By HOD';
     public const SENT_TO_HOD = 'Sent to HOD';

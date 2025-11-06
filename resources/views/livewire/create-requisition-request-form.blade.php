@@ -218,7 +218,8 @@
             <div class="row mt-6">
                 <div class="col-md-6">
                     <div class="mb-3 row">
-                        <label for="estimated_value_input" class="col-md-4 col-form-label">Estimated Value</label>
+                        <label for="estimated_value_input" class="col-md-4 col-form-label">Estimated Value <span
+                                class="text-danger">*</span></label>
                         <div class="col-md-8">
                             <input autocomplete="off" wire:model="estimated_value" type="number" step="0.01"
                                 class="form-control @error('estimated_value')is-invalid @enderror"
@@ -232,43 +233,6 @@
                 </div>
 
                 <div class="col-md-6">
-                </div>
-            </div>
-
-            {{-- - Finance Section and Checkboxes - --}}
-            <h5 class="text-center mt-6 fw-bold">Please contact the Finance & Accounts (Cost & Budgeting) department to
-                obtain the
-                following information</h5>
-
-            <div class="row mt-6">
-                <div class="col-md-6">
-                    <div class="form-check mt-4">
-                        <label class="form-check-label" for="defaultCheck1"> Availability of Funds </label>
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
-                            wire:model="availability_of_funds">
-                    </div>
-                    <div class="form-check mt-4">
-                        <label class="form-check-label" for="defaultCheck2"> Verified by Accounts </label>
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck2"
-                            wire:model="verified_by_accounts">
-                    </div>
-                </div>
-
-                <div wire:ignore class="col-md-6">
-                    <div class="mb-3 row">
-                        <label for="vote_no_input" class="col-md-4 col-form-label">Vote Number(s)</label>
-                        <div class="col mt-3">
-                            <select style="width: 100%;" id="voteSelect" class="js-example-basic-multiple"
-                                multiple="multiple">
-
-                                @foreach ($votes as $vote)
-                                    <option value="{{ $vote->id }}">{{ $vote->number }} | {{ $vote->name }}
-                                    </option>
-                                @endforeach
-
-                            </select>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -401,8 +365,6 @@
                     {{-- Upload Instructions List --}}
                     <div class="text-start m-auto mt-5" style="max-width: 400px;">
                         <ul class="list-unstyled text-danger">
-                            <li><i class="fa-solid fa-circle-dot me-2"></i><strong>At least 2</strong> uploads are
-                                required (Justification Memo and Cost & Budgeting Approval Email).</li>
                             <li><i class="fa-solid fa-circle-dot me-2"></i>File must be <strong>less than
                                     10MB</strong>.
                             </li>
@@ -433,9 +395,25 @@
             <form wire:submit.prevent="save">
                 <div class="row mt-8">
                     <button type="submit" wire:loading.attr="disabled" wire:target="save,uploads,justification"
-                        class="btn btn-primary waves-effect waves-light m-auto" style="width: 100px">
-                        <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                        class="btn btn-primary d-flex align-items-center justify-content-center gap-2 m-auto"
+                        style="width: 120px;">
+
+                        {{-- Normal state icon + text --}}
+                        <span wire:loading.class="d-none" wire:target="save,uploads,justification"
+                            class="d-flex align-items-center gap-2">
+                            <i class="ri-save-3-line"></i>
+                            <span>Save</span>
+                        </span>
+
+                        {{-- Loading state spinner + text --}}
+                        <span wire:loading.class.remove="d-none" wire:target="save,uploads,justification"
+                            class="d-none d-flex align-items-center gap-2">
+                            <div class="spinner-border spinner-border-sm text-light" role="status"
+                                aria-hidden="true"></div>
+                            <span>Saving...</span>
+                        </span>
                     </button>
+
                 </div>
             </form>
 

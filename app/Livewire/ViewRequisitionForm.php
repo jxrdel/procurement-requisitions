@@ -383,10 +383,13 @@ class ViewRequisitionForm extends Component
         $reportingOfficer = User::find($this->selectedOfficer);
         if ($reportingOfficer->reporting_officer_role == 'Permanent Secretary') {
             $this->requisitionForm->status = RequestFormStatus::SENT_TO_PS;
+            $this->requisitionForm->sent_to_ps = true;
         } elseif ($reportingOfficer->reporting_officer_role == 'Deputy Permanent Secretary') {
             $this->requisitionForm->status = RequestFormStatus::SENT_TO_DPS;
+            $this->requisitionForm->sent_to_dps = true;
         } elseif ($reportingOfficer->reporting_officer_role == 'Chief Medical Officer') {
             $this->requisitionForm->status = RequestFormStatus::SENT_TO_CMO;
+            $this->requisitionForm->sent_to_cmo = true;
         }
 
         $this->requisitionForm->hod_approval = true;

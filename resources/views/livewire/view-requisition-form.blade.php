@@ -399,42 +399,6 @@
                     </div>
                 </div>
 
-                <p class="text-center mt-6 fw-medium">Please contact the Finance & Accounts department to
-                    obtain the
-                    following information <span class="text-danger">*</span></p>
-
-                <div class="row mt-6">
-                    <div class="col">
-                        <div class="form-check mt-4">
-                            <label class="form-check-label" for="defaultCheck1"> Availability of Funds </label>
-                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
-                                x-bind:disabled="!isEditing" wire:model="availability_of_funds">
-                        </div>
-                        <div class="form-check mt-4">
-                            <label class="form-check-label" for="defaultCheck2"> Verified by Accounts </label>
-                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck2"
-                                x-bind:disabled="!isEditing" wire:model="verified_by_accounts">
-                        </div>
-                    </div>
-
-                    <div wire:ignore class="col-md-6">
-                        <div class="mb-3 row">
-                            <label for="vote_no_input" class="col-md-4 col-form-label">Vote Number(s)</label>
-                            <div class="col mt-3">
-                                <select x-bind:disabled="!isEditing" style="width: 100%;" id="voteSelect"
-                                    class="js-example-basic-multiple" multiple="multiple">
-
-                                    @foreach ($votes as $vote)
-                                        <option value="{{ $vote->id }}">{{ $vote->number }} |
-                                            {{ $vote->name }}
-                                        </option>
-                                    @endforeach
-
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="divider mt-6">
                     <div class="divider-text fw-bold fs-5"><i class="ri-list-ordered me-2"></i>Items</div>
                 </div>
@@ -442,8 +406,8 @@
                 @if (!$requisitionForm->hod_approval)
                     <div class="row">
                         <button type="button" data-bs-toggle="modal" data-bs-target="#addItemModal"
-                            x-bind:class="{ 'pointer-events-none opacity-50': !isEditing }"
-                            x-bind:disabled="!isEditing" class="btn btn-primary waves-effect waves-light w-25 m-auto">
+                            x-bind:class="{ 'pointer-events-none opacity-50': !isEditing }" x-bind:disabled="!isEditing"
+                            class="btn btn-primary waves-effect waves-light w-25 m-auto">
                             <span class="fa-solid fa-file-circle-plus me-1_5"></span>Add Item
                         </button>
                     </div>
@@ -503,6 +467,44 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <div class="divider mt-6">
+                    <div class="divider-text fw-bold fs-5"><i class="fa-solid fa-money-check-dollar me-2"></i>Cost &
+                        Budgeting</div>
+                </div>
+
+                <div class="row mt-6">
+                    <div class="col">
+                        <div class="form-check mt-4">
+                            <label class="form-check-label" for="defaultCheck1"> Availability of Funds </label>
+                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
+                                disabled wire:model="availability_of_funds">
+                        </div>
+                        <div class="form-check mt-4">
+                            <label class="form-check-label" for="defaultCheck2"> Verified by Accounts </label>
+                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck2"
+                                disabled wire:model="verified_by_accounts">
+                        </div>
+                    </div>
+
+                    <div wire:ignore class="col-md-6">
+                        <div class="mb-3 row">
+                            <label for="vote_no_input" class="col-md-4 col-form-label">Vote Number(s)</label>
+                            <div class="col mt-3">
+                                <select disabled style="width: 100%;" id="voteSelect"
+                                    class="js-example-basic-multiple" multiple="multiple">
+
+                                    @foreach ($votes as $vote)
+                                        <option value="{{ $vote->id }}">{{ $vote->number }} |
+                                            {{ $vote->name }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

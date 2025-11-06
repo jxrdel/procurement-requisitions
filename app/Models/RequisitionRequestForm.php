@@ -50,6 +50,11 @@ class RequisitionRequestForm extends Model
         'second_reporting_officer_approval_date',
         'third_reporting_officer_approval_date',
         'forwarding_minute',
+        'sent_to_cab',
+        'completed_by_cab',
+        'sent_to_ps',
+        'sent_to_dps',
+        'sent_to_cmo',
     ];
 
     protected $casts = [
@@ -67,6 +72,11 @@ class RequisitionRequestForm extends Model
         'second_reporting_officer_approval_date' => 'datetime',
         'third_reporting_officer_approval_date' => 'datetime',
         'estimated_value' => 'decimal:2',
+        'sent_to_cab' => 'boolean',
+        'completed_by_cab' => 'boolean',
+        'sent_to_ps' => 'boolean',
+        'sent_to_dps' => 'boolean',
+        'sent_to_cmo' => 'boolean',
     ];
 
     protected static function booted(): void

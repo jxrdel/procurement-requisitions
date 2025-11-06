@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Users | PRA</title>
+    <title>Departments | PRA</title>
 @endsection
 
 @section('content')
@@ -13,7 +13,7 @@
 
             <div class="d-sm-flex align-items-center justify-content-between mb-7">
                 <h1 class="h3 mb-0 text-gray-800" style="margin: auto"><strong><i class="fa-solid fa-users"></i> &nbsp;
-                        Users</strong></h1>
+                        Departments</strong></h1>
             </div>
 
             <div class="row">

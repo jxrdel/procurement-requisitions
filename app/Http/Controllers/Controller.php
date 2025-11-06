@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Requisition;
+use App\Models\RequisitionRequestForm;
 use App\Models\User;
 use App\Models\Vote;
 use Carbon\Carbon;
@@ -162,5 +163,26 @@ class Controller
         $votes = Vote::all();
 
         return DataTables::of($votes)->make(true);
+    }
+
+    public function queue()
+    {
+        return view('queue');
+    }
+
+    public function getQueue()
+    {
+        $user = Auth::user();
+        $ps_user = User::where('reporting_officer_role', 'Permanent Secretary')->first();
+
+        if (Auth::user()->department->name === 'Procurement Unit') {
+            $forms = RequisitionRequestForm::with(['items'])
+                ->where('reporting_officer_approval', true);
+        } elseif (Auth::user()->department->name === 'Office of the Permanent Secretary') {
+            $forms = RequisitionRequestForm::with(['items'])
+                ->where('head_of_department_id', $user->id)
+                ->where('head_of_department_approval', true)
+                ->where('reporting_officer_approval', true);
+        }
     }
 }
