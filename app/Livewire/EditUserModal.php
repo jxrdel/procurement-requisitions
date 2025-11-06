@@ -19,6 +19,8 @@ class EditUserModal extends Component
     public $is_active;
     public $role_id;
     public $departments;
+    public $is_reporting_officer;
+    public $reporting_officer_role;
 
     public function render()
     {
@@ -37,6 +39,8 @@ class EditUserModal extends Component
         $this->department = $this->user->department->id;
         $this->is_active = $this->user->is_active == 1 ? true : false;
         $this->role_id = $this->user->role_id;
+        $this->is_reporting_officer = $this->user->is_reporting_officer;
+        $this->reporting_officer_role = $this->user->reporting_officer_role;
         $this->dispatch('display-edit-modal');
     }
 
@@ -47,7 +51,8 @@ class EditUserModal extends Component
             'username' => 'required|unique:users,username,' . $this->user->id,
             'email' => 'required|email|unique:users,email,' . $this->user->id,
             'department' => 'required',
-            'role_id' => 'required'
+            'role_id' => 'required',
+            'reporting_officer_role' => 'required_if:is_reporting_officer,true'
         ]);
 
         $this->user->update([
@@ -56,7 +61,9 @@ class EditUserModal extends Component
             'email' => $this->email,
             'department_id' => $this->department,
             'is_active' => $this->is_active,
-            'role_id' => $this->role_id
+            'role_id' => $this->role_id,
+            'is_reporting_officer' => $this->is_reporting_officer,
+            'reporting_officer_role' => $this->is_reporting_officer ? $this->reporting_officer_role : null
         ]);
 
         $this->dispatch('close-edit-modal');

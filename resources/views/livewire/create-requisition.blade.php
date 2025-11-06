@@ -158,7 +158,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                {{-- <div class="row">
 
                     <div class="col">
                         <div class="form-floating form-floating-outline">
@@ -187,7 +187,7 @@
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="row mt-6">
 

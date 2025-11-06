@@ -19,6 +19,8 @@ class CreateUserModal extends Component
     public $roles;
     public $sendEmail = true;
     public $departments;
+    public $is_reporting_officer = false;
+    public $reporting_officer_role;
 
     public function render()
     {
@@ -34,15 +36,18 @@ class CreateUserModal extends Component
             'username' => 'required|unique:users',
             'email' => 'required|email|unique:users',
             'department' => 'required|exists:departments,id',
-            'role_id' => 'required'
+            'role_id' => 'required',
+            'reporting_officer_role' => 'required_if:is_reporting_officer,true'
         ]);
 
         $newuser = User::create([
             'name' => $this->name,
             'username' => $this->username,
             'email' => $this->email,
-            'department' => $this->department,
-            'role_id' => $this->role_id
+            'department_id' => $this->department,
+            'role_id' => $this->role_id,
+            'is_reporting_officer' => $this->is_reporting_officer,
+            'reporting_officer_role' => $this->is_reporting_officer ? $this->reporting_officer_role : null
         ]);
 
         if ($this->sendEmail) {

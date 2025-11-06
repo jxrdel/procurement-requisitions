@@ -710,9 +710,9 @@
 
                         <input wire:model="uploads" type="file" multiple class="form-control"
                             style="display: inline;width: 400px;height:45px">
-                        <button wire:click.prevent="uploadFiles()" class="btn btn-primary"
-                            wire:loading.attr="disabled" wire:target="uploads,uploadFiles" style="width: 8rem"><i
-                                class="fas fa-plus me-2"></i> Upload</button>
+                        <button @disabled(!$this->uploads) wire:click.prevent="uploadFiles()"
+                            class="btn btn-primary" wire:loading.attr="disabled" wire:target="uploads,uploadFiles"
+                            style="width: 8rem"><i class="fas fa-plus me-2"></i> Upload</button>
                         <div wire:loading wire:target="uploads,uploadFiles"
                             class="spinner-border spinner-border-sm text-secondary" role="status">
                             <span class="visually-hidden">Loading...</span>
@@ -929,6 +929,10 @@
 
             window.addEventListener('close-sent-to-hod-modal', event => {
                 $('#sendToHodModal').modal('hide');
+            });
+
+            window.addEventListener('close-forward-form-modal', event => {
+                $('#forwardFormReportingOfficer').modal('hide');
             });
         });
 

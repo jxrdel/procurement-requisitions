@@ -171,18 +171,6 @@
                                         </div>
                                     </div>
 
-                                    {{-- 🔹 Row 5: Actual Cost & Funding Availability --}}
-                                    <div class="row mt-6">
-                                        <div class="col">
-                                            <label><strong>Actual Cost:</strong>
-                                                ${{ number_format($this->actual_cost, 2) }}</label>
-                                        </div>
-                                        <div class="col">
-                                            <label><strong>Funding Availability:</strong>
-                                                {{ $this->funding_availability }}</label>
-                                        </div>
-                                    </div>
-
                                     {{-- 🔹 Row 6: Date Sent to AOV Procurement --}}
                                     <div class="row mt-6">
                                         <div class="col-md-6">
@@ -248,6 +236,18 @@
                                                 {{ $this->getFormattedDate($this->requisition->evaluation_end_date) }}</label>
                                         </div>
                                     </div>
+
+                                    {{-- 🔹 Row 5: Actual Cost & Funding Availability --}}
+                                    {{-- <div class="row mt-6">
+                                        <div class="col">
+                                            <label><strong>Actual Cost:</strong>
+                                                ${{ number_format($this->actual_cost, 2) }}</label>
+                                        </div>
+                                        <div class="col">
+                                            <label><strong>Funding Availability:</strong>
+                                                {{ $this->funding_availability }}</label>
+                                        </div>
+                                    </div> --}}
 
                                     {{-- 🔹 Row 10: Date sent to DPS & PS Approval --}}
                                     <div class="row mt-6">
@@ -443,40 +443,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-floating form-floating-outline">
-                                                <input autocomplete="off" wire:model="actual_cost" type="number"
-                                                    step="0.01"
-                                                    class="form-control @error('actual_cost')is-invalid @enderror"
-                                                    id="actualCostInput" placeholder="Enter Actual Cost" />
-                                                <label for="actualCostInput">Actual Cost</label>
-                                            </div>
-                                            @error('actual_cost')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col">
-                                            <div wire:ignore>
-                                                <label style="width:100%" for="fundingSelect">Funding
-                                                    Availability:</label>
-                                                <select wire:model="funding_availability"
-                                                    class="js-example-basic-single form-control" id="fundingSelect"
-                                                    style="width: 100%">
-                                                    <option value="" selected>Select a Vote</option>
-                                                    @foreach ($votes as $vote)
-                                                        <option value="{{ $vote->number }}">{{ $vote->number }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            @error('funding_availability')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-
                                     <div class="row mt-6">
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
@@ -597,6 +563,40 @@
                                             @enderror
                                         </div>
                                     </div>
+
+                                    {{-- <div class="row mt-6">
+                                        <div class="col">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="actual_cost" type="number"
+                                                    step="0.01"
+                                                    class="form-control @error('actual_cost')is-invalid @enderror"
+                                                    id="actualCostInput" placeholder="Enter Actual Cost" />
+                                                <label for="actualCostInput">Actual Cost</label>
+                                            </div>
+                                            @error('actual_cost')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col">
+                                            <div wire:ignore>
+                                                <label style="width:100%" for="fundingSelect">Funding
+                                                    Availability:</label>
+                                                <select wire:model="funding_availability"
+                                                    class="js-example-basic-single form-control" id="fundingSelect"
+                                                    style="width: 100%">
+                                                    <option value="" selected>Select a Vote</option>
+                                                    @foreach ($votes as $vote)
+                                                        <option value="{{ $vote->number }}">{{ $vote->number }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @error('funding_availability')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div> --}}
 
                                     <div class="row mt-6">
                                         <div class="col">

@@ -48,7 +48,7 @@
                     </div>
 
                     <div class="row mt-4">
-                        <div class="">
+                        <div class="form-floating form-floating-outline">
                             <select required wire:model="department"
                                 class="form-select @error('department')is-invalid @enderror"
                                 id="exampleFormControlSelect1" aria-label="Default select example">
@@ -57,6 +57,7 @@
                                     <option value="{{ $department->id }}">{{ $department->name }}</option>
                                 @endforeach
                             </select>
+                            <label for="exampleFormControlSelect1">Department</label>
                         </div>
                         @error('department')
                             <div class="text-danger"> {{ $message }} </div>
@@ -64,7 +65,7 @@
                     </div>
 
                     <div class="row mt-4">
-                        <div class="">
+                        <div class="form-floating form-floating-outline">
                             <select required wire:model="role_id"
                                 class="form-select @error('role_id')is-invalid @enderror" id="exampleFormControlSelect1"
                                 aria-label="Default select example">
@@ -73,10 +74,38 @@
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                                 @endforeach
                             </select>
+                            <label for="exampleFormControlSelect1">Role</label>
                         </div>
                         @error('role_id')
                             <div class="text-danger"> {{ $message }} </div>
                         @enderror
+                    </div>
+
+                    <div x-data="{ is_reporting_officer: @entangle('is_reporting_officer') }">
+                        <div class="row mt-4">
+                            <div class="form-check form-switch form-check-primary mx-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_reporting_officer"
+                                    x-model="is_reporting_officer">
+                                <label class="form-check-label" for="is_reporting_officer">Reporting Officer</label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4" x-show="is_reporting_officer" x-transition>
+                            <div class="form-floating form-floating-outline">
+                                <select wire:model="reporting_officer_role"
+                                    class="form-select @error('reporting_officer_role')is-invalid @enderror"
+                                    id="reporting_officer_role" aria-label="Default select example">
+                                    <option value="">Select a Reporting Officer Role</option>
+                                    <option value="Permanent Secretary">Permanent Secretary</option>
+                                    <option value="Deputy Permanent Secretary">Deputy Permanent Secretary</option>
+                                    <option value="Chief Medical Officer">Chief Medical Officer</option>
+                                </select>
+                                <label for="reporting_officer_role">Reporting Officer Role</label>
+                            </div>
+                            @error('reporting_officer_role')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
                     </div>
 
                     <div class="row mt-4">
