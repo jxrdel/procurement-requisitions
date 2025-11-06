@@ -13,6 +13,7 @@ use App\Notifications\DeclinedByHOD;
 use App\Notifications\DeclinedByProcurement;
 use App\Notifications\DeclinedByReportingOfficer;
 use App\Notifications\ForwardForm;
+use App\Notifications\ApprovedByCAB;
 use App\Notifications\RequestForFurtherApproval;
 use App\Notifications\RequestForHODApproval;
 use App\Notifications\RequestForProcurementApproval;
@@ -79,6 +80,7 @@ class ViewRequisitionForm extends Component
     public $categories;
 
     public $isEditing = false;
+    public $isCabEditing = false;
 
     public $details;
 
@@ -88,7 +90,7 @@ class ViewRequisitionForm extends Component
     #[Computed]
     public function sendToHodDisabled()
     {
-        return !$this->availability_of_funds || !$this->verified_by_accounts || empty($this->selected_votes);
+        return !$this->availability_of_funds || !$this->verified_by_accounts || empty($this->selected_votes) || !$this->requisitionForm->completed_by_cab;
     }
 
     //HOD Approval/Denial Modal
@@ -656,5 +658,34 @@ class ViewRequisitionForm extends Component
 
         $this->dispatch('show-message', message: 'Form forwarded successfully.');
         $this->dispatch('close-forward-form-modal');
+    }
+
+    public function saveCAB()
+    {
+        $this->requisitionForm->availability_of_funds = $this->availability_of_funds;
+        $this->requisitionForm->verified_by_accounts = $this->verified_by_accounts;
+        $this->requisitionForm->votes()->sync($this->selected_votes);
+        $this->requisitionForm->save();
+
+        $this->dispatch('show-message', message: 'Cost & Budgeting details saved successfully.');
+        $this->isCabEditing = false;
+    }
+
+    public function approvedByCAB()
+    {
+        // sleep(2); // Simulate processing delay
+        // dd($this->requisitionForm->requestingUnit->name);
+        $this->requisitionForm->status = RequestFormStatus::APPROVED_BY_COST_BUDGETING;
+        $this->requisitionForm->completed_by_cab = true;
+        $this->requisitionForm->save();
+
+        $this->requisitionForm->logs()->create([
+            'details' => 'Requisition form approved by Cost & Budgeting user ' . Auth::user()->name . ' and sent to ' . $this->requisitionForm->requestingUnit->name,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        Notification::send($this->requisitionForm->contactPerson, new ApprovedByCAB($this->requisitionForm));
+
+        return redirect()->route('queue')->with('success', 'Requisition form approved by Cost & Budgeting.');
     }
 }
