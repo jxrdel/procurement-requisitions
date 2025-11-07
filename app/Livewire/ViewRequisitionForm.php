@@ -14,6 +14,7 @@ use App\Notifications\DeclinedByProcurement;
 use App\Notifications\DeclinedByReportingOfficer;
 use App\Notifications\ForwardForm;
 use App\Notifications\ApprovedByCAB;
+use App\Notifications\RequestForCABApproval;
 use App\Notifications\RequestForFurtherApproval;
 use App\Notifications\RequestForHODApproval;
 use App\Notifications\RequestForProcurementApproval;
@@ -58,6 +59,7 @@ class ViewRequisitionForm extends Component
     public $contact_person_note;
     public $hod_note;
     public $reporting_officer_note;
+    public $cab_note;
 
     public $units;
     public $users;
@@ -126,6 +128,7 @@ class ViewRequisitionForm extends Component
         $this->availability_of_funds = $this->requisitionForm->availability_of_funds;
         $this->verified_by_accounts = $this->requisitionForm->verified_by_accounts;
         $this->vote_no = $this->requisitionForm->vote_no;
+        $this->cab_note = $this->requisitionForm->cab_note;
 
         $this->items = $this->requisitionForm->items->toArray();
         $this->selected_votes = $this->requisitionForm->votes()->pluck('vote_id')->toArray();
@@ -342,7 +345,7 @@ class ViewRequisitionForm extends Component
 
         $hod = $this->requisitionForm->headOfDepartment;
         if ($hod) {
-            Notification::send($hod, new RequestForHODApproval($this->requisitionForm));
+            // Notification::send($hod, new RequestForHODApproval($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
@@ -402,7 +405,7 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->save();
 
         if ($reportingOfficer) {
-            Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
+            // Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
@@ -417,77 +420,24 @@ class ViewRequisitionForm extends Component
 
     public function approveRequisitionReportingOfficer()
     {
-        $currentUser = Auth::user();
-        $logDetails = '';
-        $message = '';
-
-        $this->validate([
-            'selectedOfficer' => 'required|string',
-            'reporting_officer_note' => 'nullable|string',
-        ]);
-
-        // Determine which RO is approving and update the form
-        if ($this->requisitionForm->reporting_officer_approval !== true) {
-            // if ($currentUser->id != $this->requisitionForm->reporting_officer_id) abort(403, 'You are not authorized to approve this requisition at this stage.');
-            $this->requisitionForm->reporting_officer_id = $currentUser->id;
-            $this->requisitionForm->reporting_officer_approval = true;
-            $this->requisitionForm->reporting_officer_approval_date = now();
-            $this->requisitionForm->reporting_officer_digital_signature = $currentUser->digital_signature;
-            $this->requisitionForm->reporting_officer_note = $this->reporting_officer_note;
-        } elseif ($this->requisitionForm->second_reporting_officer_approval !== true) {
-            // if ($currentUser->id != $this->requisitionForm->second_reporting_officer_id) abort(403, 'You are not authorized to approve this requisition at this stage.');
-            $this->requisitionForm->second_reporting_officer_approval = true;
-            $this->requisitionForm->second_reporting_officer_approval_date = now();
-        } elseif ($this->requisitionForm->third_reporting_officer_approval !== true) {
-            // if ($currentUser->id != $this->requisitionForm->third_reporting_officer_id) abort(403, 'You are not authorized to approve this requisition at this stage.');
-            $this->requisitionForm->third_reporting_officer_approval = true;
-            $this->requisitionForm->third_reporting_officer_approval_date = now();
-        }
-
-        // Handle forwarding
-        if ($this->selectedOfficer !== 'Procurement') {
-
-
-            $nextReportingOfficer = User::find($this->selectedOfficer);
-
-            if ($this->requisitionForm->second_reporting_officer_id === null) {
-                $this->requisitionForm->second_reporting_officer_id = $this->selectedOfficer;
-            } elseif ($this->requisitionForm->third_reporting_officer_id === null) {
-                $this->requisitionForm->third_reporting_officer_id = $this->selectedOfficer;
-            }
-
-            if ($nextReportingOfficer->reporting_officer_role == 'Permanent Secretary') {
-                $this->requisitionForm->status = RequestFormStatus::SENT_TO_PS;
-            } elseif ($nextReportingOfficer->reporting_officer_role == 'Deputy Permanent Secretary') {
-                $this->requisitionForm->status = RequestFormStatus::SENT_TO_DPS;
-            } elseif ($nextReportingOfficer->reporting_officer_role == 'Chief Medical Officer') {
-                $this->requisitionForm->status = RequestFormStatus::SENT_TO_CMO;
-            }
-
-            $logDetails = 'Requisition form received non-objection from ' . $currentUser->name . ' and sent to ' . $nextReportingOfficer->name . ' for approval.';
-            $message = 'Requisition form approved and forwarded for further approval.';
-            Notification::send($nextReportingOfficer, new RequestForFurtherApproval($this->requisitionForm, $currentUser, 'This requisition requires your approval.'));
-        } else {
-            $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
-            $logDetails = 'Requisition form received non-objection from ' . $currentUser->name . ' and sent to Procurement.';
-            $message = 'Requisition form received non-objection from ' . $currentUser->name . ' and sent to Procurement.';
-
-            $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
-            if ($procurementHOD) {
-                Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
-            }
-        }
-
+        $this->requisitionForm->reporting_officer_approval = true;
+        $this->requisitionForm->reporting_officer_approval_date = now();
+        $this->requisitionForm->reporting_officer_digital_signature = Auth::user()->digital_signature;
+        $this->requisitionForm->status = RequestFormStatus::SENT_TO_PROCUREMENT;
         $this->requisitionForm->save();
 
+        $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
+        if ($procurementHOD) {
+            // Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
+        }
+
         $this->requisitionForm->logs()->create([
-            'details' => $logDetails,
-            'created_by' => $currentUser->username,
+            'details' => 'Requisition form received non-objection from ' . Auth::user()->name . ' and sent to Procurement.',
+            'created_by' => Auth::user()->username,
         ]);
 
-        $this->reset(['selectedOfficer', 'reporting_officer_note']);
         $this->dispatch('close-ro-approval-modal');
-        $this->dispatch('show-message', message: $message);
+        $this->dispatch('show-message', message: 'Form sent to Procurement successfully.');
     }
 
     public function approveRequisitionProcurement()
@@ -503,7 +453,7 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        Notification::send($this->requisitionForm->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
+        // Notification::send($this->requisitionForm->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
 
 
         $this->dispatch('show-message', message: 'Requisition form approved successfully.');
@@ -521,7 +471,7 @@ class ViewRequisitionForm extends Component
             $this->requisitionForm->hod_approval = false;
             $this->requisitionForm->hod_reason_for_denial = $this->declineReason;
             //Reset approval flags
-            Notification::send($this->requisitionForm->contactPerson, new DeclinedByHOD($this->requisitionForm));
+            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByHOD($this->requisitionForm));
         }
 
         if (Auth::user()->id == $this->requisitionForm->reporting_officer_id && Auth::user()->is_reporting_officer) {
@@ -537,14 +487,14 @@ class ViewRequisitionForm extends Component
             $this->requisitionForm->reporting_officer_approval = false;
             $this->requisitionForm->reporting_officer_reason_for_denial = $this->declineReason;
             //Reset approval flags
-            Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
+            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
         }
 
         if (Auth::user()->department->name == 'Procurement Unit') {
             $this->requisitionForm->status = RequestFormStatus::DENIED_BY_PROCUREMENT;
             $this->requisitionForm->procurement_approval = false;
             $this->requisitionForm->procurement_reason_for_denial = $this->declineReason;
-            Notification::send($this->requisitionForm->contactPerson, new DeclinedByProcurement($this->requisitionForm));
+            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByProcurement($this->requisitionForm));
         }
 
         $this->requisitionForm->save();
@@ -568,7 +518,7 @@ class ViewRequisitionForm extends Component
         // Get user where the name is Marryann Basdeo
         $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
         if ($procurementHOD) {
-            Notification::send($procurementHOD, new RequestForProcurementApproval($this->requisitionForm));
+            // Notification::send($procurementHOD, new RequestForProcurementApproval($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
@@ -654,27 +604,35 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        Notification::send($reportingOfficer, new ForwardForm($this->requisitionForm, Auth::user(), $this->forwarding_minute));
+        // Notification::send($reportingOfficer, new ForwardForm($this->requisitionForm, Auth::user(), $this->forwarding_minute));
 
         $this->dispatch('show-message', message: 'Form forwarded successfully.');
         $this->dispatch('close-forward-form-modal');
     }
 
-    public function saveCAB()
+    public function sendToCAB()
     {
-        $this->requisitionForm->availability_of_funds = $this->availability_of_funds;
-        $this->requisitionForm->verified_by_accounts = $this->verified_by_accounts;
-        $this->requisitionForm->votes()->sync($this->selected_votes);
+        $this->requisitionForm->status = RequestFormStatus::SENT_TO_COST_BUDGETING;
+        $this->requisitionForm->sent_to_cab = true;
         $this->requisitionForm->save();
+        $costAndBudgetingUsers = User::costBudgeting()->get();
+        // Notification::send($costAndBudgetingUsers, new RequestForCABApproval($this->requisitionForm));
+        $this->dispatch('show-message', message: 'Form sent to Cost and Budgeting for Funding Availability.');
 
-        $this->dispatch('show-message', message: 'Cost & Budgeting details saved successfully.');
-        $this->isCabEditing = false;
+        $this->requisitionForm->logs()->create([
+            'details' => 'Form sent to Cost and Budgeting for Funding Availability',
+            'created_by' => Auth::user()->username ?? null,
+        ]);
     }
 
     public function approvedByCAB()
     {
         // sleep(2); // Simulate processing delay
         // dd($this->requisitionForm->requestingUnit->name);
+        $this->requisitionForm->availability_of_funds = $this->availability_of_funds;
+        $this->requisitionForm->verified_by_accounts = $this->verified_by_accounts;
+        $this->requisitionForm->cab_note = $this->cab_note;
+        $this->requisitionForm->votes()->sync($this->selected_votes);
         $this->requisitionForm->status = RequestFormStatus::APPROVED_BY_COST_BUDGETING;
         $this->requisitionForm->completed_by_cab = true;
         $this->requisitionForm->save();
@@ -684,7 +642,7 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        Notification::send($this->requisitionForm->contactPerson, new ApprovedByCAB($this->requisitionForm));
+        // Notification::send($this->requisitionForm->contactPerson, new ApprovedByCAB($this->requisitionForm));
 
         return redirect()->route('queue')->with('success', 'Requisition form approved by Cost & Budgeting.');
     }

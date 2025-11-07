@@ -248,6 +248,9 @@ class CreateRequisition extends Component
                 }
             }
             $this->form->update([
+                'procurement_approval' => true,
+                'procurement_approval_date' => now(),
+                'procurement_digital_signature' => Auth::user()->digital_signature,
                 'requisition_id' => $newrequisition->id,
                 'status' => RequestFormStatus::COMPLETED,
             ]);

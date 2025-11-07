@@ -55,6 +55,7 @@ class RequisitionRequestForm extends Model
         'sent_to_ps',
         'sent_to_dps',
         'sent_to_cmo',
+        'cab_note',
     ];
 
     protected $casts = [

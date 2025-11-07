@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('create-requisitions', function ($user, $form) {
-            return $user->department->name === 'Procurement Unit' && $form->procurement_approval;
+            return $user->department->name === 'Procurement Unit';
         });
 
         Gate::define('view-procurement-requisitions', function ($user) {

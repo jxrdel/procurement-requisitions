@@ -120,7 +120,7 @@ class CreateRequisitionRequestForm extends Component
             'justification' => $this->justification,
             'date_required_by' => $this->date_required_by,
             'estimated_value' => $this->estimated_value,
-            'status' => RequestFormStatus::SENT_TO_COST_BUDGETING,
+            'status' => RequestFormStatus::CREATED,
             'created_by' => Auth::user()->username ?? null,
         ]);
 
@@ -143,14 +143,6 @@ class CreateRequisitionRequestForm extends Component
         //Create log entry
         $form->logs()->create([
             'details' => 'Form Created by ' . (Auth::user()->name),
-            'created_by' => Auth::user()->username ?? null,
-        ]);
-
-        $costAndBudgetingUsers = User::costBudgeting()->get();
-        Notification::send($costAndBudgetingUsers, new RequestForCABApproval($form));
-        //Create log entry
-        $form->logs()->create([
-            'details' => 'Form sent to Cost and Budgeting for Approval',
             'created_by' => Auth::user()->username ?? null,
         ]);
 

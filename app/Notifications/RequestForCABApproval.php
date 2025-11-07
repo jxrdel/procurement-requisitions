@@ -38,7 +38,7 @@ class RequestForCABApproval extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Requisition Form for Cost and Budgeting Approval')
+            ->subject('Requisition Form for Funding Availability | PRA')
             ->markdown('emails.request-for-cab-approval', [
                 'url' => route('requisition_forms.view', $this->requisitionRequestForm->id),
                 'form' => $this->requisitionRequestForm
@@ -53,7 +53,7 @@ class RequestForCABApproval extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'Requisition Form sent for Cost and Budgeting Approval',
+            'title' => 'Requisition Form sent for Funding Availability',
             'message' => 'A new requisition form requires your attention to determine the availability of funding.',
             'url' => route('requisition_forms.view', $this->requisitionRequestForm->id),
         ];
