@@ -196,6 +196,15 @@
                                         </div>
                                     </div>
 
+                                    {{-- 🔹 Row 7.5: Tender Type --}}
+                                    <div class="row mt-4 align-items-center">
+                                        <div class="col-md-6">
+                                            <label><strong>Tender Type:</strong>
+                                                {{ $this->requisition->tender_type }}
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     {{-- 🔹 Row 7: Site Visit & Site Visit Date --}}
                                     <div class="row mt-4 align-items-center">
                                         <div class="col-md-6">
@@ -265,6 +274,16 @@
                                             </label>
                                         </div>
                                     </div>
+
+                                    {{-- 🔹 Row 10.5: PS Approval Date --}}
+                                    @if ($this->ps_approval == 'Approved')
+                                        <div class="row mt-6">
+                                            <div class="col-md-6">
+                                                <label><strong>PS Approval Date:</strong>
+                                                    {{ $this->getFormattedDate($this->requisition->ps_approval_date) }}</label>
+                                            </div>
+                                        </div>
+                                    @endif
 
                                     {{-- 🔹 Row 11: Vendors & Amounts --}}
                                     @if ($this->ps_approval == 'Approved')
@@ -483,6 +502,20 @@
                                             </div>
                                         </div>
 
+                                        <div class="row mt-4 align-items-center">
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select wire:model="tender_type" class="form-select">
+                                                        <option value="">Select Tender Type</option>
+                                                        <option value="Sole Source">Sole Source</option>
+                                                        <option value="Request for Quotes">Request for Quotes</option>
+                                                        <option value="Open Tender">Open Tender</option>
+                                                    </select>
+                                                    <label>Tender Type</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="row mt-4 align-items-center" x-show="siteVisit" x-transition>
                                             <div class="col-md-6">
                                                 <div class="form-check">
@@ -627,6 +660,21 @@
                                                     <div class="text-danger"> {{ $message }} </div>
                                                 @enderror
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2" x-show="ps_approval == 'Approved'" x-transition>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off" wire:model="ps_approval_date"
+                                                    type="date"
+                                                    class="form-control @error('ps_approval_date')is-invalid @enderror"
+                                                    id="psApprovalDateInput" aria-describedby="floatingInputHelp" />
+                                                <label for="psApprovalDateInput">PS Approval Date</label>
+                                            </div>
+                                            @error('ps_approval_date')
+                                                <div class="text-danger"> {{ $message }} </div>
+                                            @enderror
                                         </div>
                                     </div>
 
@@ -896,7 +944,7 @@
                                             <div class="row mt-7">
 
                                                 <div class="col mx-5">
-                                                    <label><strong>Date Sent to Commit:</strong>
+                                                    <label><strong>Date Sent for Commitment:</strong>
                                                         {{ $this->getFormattedDate($vendor['date_sent_commit']) }}</label>
                                                 </div>
 
@@ -952,7 +1000,7 @@
                                             <div class="row mt-7">
 
                                                 <div class="col mx-5">
-                                                    <label><strong>Date Sent to Commit:</strong></label>
+                                                    <label><strong>Date Sent for Commitment:</strong></label>
                                                 </div>
 
                                                 <div class="col mx-5">
@@ -1032,8 +1080,8 @@
                                                                         class="form-control @error('vendors.' . $index . '.date_sent_commit')is-invalid @enderror"
                                                                         id="floatingInput"
                                                                         aria-describedby="floatingInputHelp" />
-                                                                    <label for="floatingInput">Date Sent to
-                                                                        Commit</label>
+                                                                    <label for="floatingInput">Date Sent for
+                                                                        Commitment</label>
                                                                 </div>
                                                                 @error('vendors.' . $index . '.date_sent_commit')
                                                                     <div class="text-danger"> {{ $message }} </div>
@@ -1111,13 +1159,26 @@
                                     <div class="row mt-8">
 
                                         <div class="col mx-5">
-                                            <label><strong>Date Received From Procurement :</strong>
+                                            <label><strong>Date Received From Procurement For Commitment :</strong>
                                                 {{ $this->getFormattedDate($vendor['date_received_ap']) }}</label>
                                         </div>
 
                                         <div class="col mx-5">
-                                            <label><strong>Date Sent to Vote Control:</strong>
+                                            <label><strong>Date Sent to Vote Control For Commitment:</strong>
                                                 {{ $this->getFormattedDate($vendor['date_sent_vc']) }}</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-8">
+
+                                        <div class="col mx-5">
+                                            <label><strong>Date Received From Procurement For Invoices :</strong>
+                                                {{ $this->getFormattedDate($vendor['date_received_ap_invoices']) }}</label>
+                                        </div>
+
+                                        <div class="col mx-5">
+                                            <label><strong>Date Sent to Vote Control For Invoices:</strong>
+                                                {{ $this->getFormattedDate($vendor['date_sent_vc_invoices']) }}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1126,11 +1187,11 @@
                                 <div class="row mt-8">
 
                                     <div class="col mx-5">
-                                        <label><strong>Date Received From Procurement :</strong></label>
+                                        <label><strong>Date Received From Procurement For Commitment :</strong></label>
                                     </div>
 
                                     <div class="col mx-5">
-                                        <label><strong>Date Sent to Vote Control:</strong></label>
+                                        <label><strong>Date Sent to Vote Control For Commitment:</strong></label>
                                     </div>
                                 </div>
                             @endforelse

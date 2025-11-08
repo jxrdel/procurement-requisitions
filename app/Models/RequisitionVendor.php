@@ -34,6 +34,9 @@ class RequisitionVendor extends Model
         // AP
         'date_received_ap',
         'date_sent_vc',
+        'date_received_ap_invoices',
+        'date_sent_vc_invoices',
+        'date_committed_vc',
 
         // Vote Control
         'batch_no',

@@ -104,17 +104,7 @@
                     </div>
                     <div class="col">
                         <label><strong>Date Assigned to Officer:</strong>
-                            {{ $this->getFormattedDateAssigned() }}</label>
-                    </div>
-                </div>
-
-                {{-- 🔹 Row 5: Actual Cost & Funding Availability --}}
-                <div class="row mt-6">
-                    <div class="col">
-                        <label><strong>Actual Cost:</strong> ${{ number_format($this->actual_cost, 2) }}</label>
-                    </div>
-                    <div class="col">
-                        <label><strong>Funding Availability:</strong> {{ $this->funding_availability }}</label>
+                            {{ $this->getFormattedDate($this->date_assigned) }}</label>
                     </div>
                 </div>
 
@@ -122,7 +112,7 @@
                 <div class="row mt-6">
                     <div class="col-md-6">
                         <label><strong>Date Sent to AOV Procurement:</strong>
-                            {{ $this->getFormattedDate($this->date_sent_aov_procurement) }}</label>
+                            {{ $this->getFormattedDate($this->requisition->date_sent_aov_procurement) }}</label>
                     </div>
                 </div>
 
@@ -187,7 +177,8 @@
                 {{-- 🔹 Row 11: Date sent to DPS & PS Approval --}}
                 <div class="row mt-6">
                     <div class="col">
-                        <label><strong>Date sent to DPS:</strong> {{ $this->getFormattedDateSentPs() }}</label>
+                        <label><strong>Date sent to DPS:</strong>
+                            {{ $this->getFormattedDate($this->requisition->date_sent_dps) }}</label>
                     </div>
                     <div class="col">
                         <label><strong>PS Approval:</strong>
@@ -331,7 +322,7 @@
                         <div class="row mt-7">
 
                             <div class="col mx-5">
-                                <label><strong>Date Sent to Commit:</strong>
+                                <label><strong>Date Sent for Commitment:</strong>
                                     {{ $this->getFormattedDate($vendor['date_sent_commit']) }}</label>
                             </div>
 
@@ -360,13 +351,26 @@
                         <div class="row mt-8">
 
                             <div class="col mx-5">
-                                <label><strong>Date Received From Procurement :</strong>
+                                <label><strong>Date Received From Procurement For Commitment :</strong>
                                     {{ $this->getFormattedDate($vendor['date_received_ap']) }}</label>
                             </div>
 
                             <div class="col mx-5">
-                                <label><strong>Date Sent to Vote Control:</strong>
+                                <label><strong>Date Sent to Vote Control For Commitment:</strong>
                                     {{ $this->getFormattedDate($vendor['date_sent_vc']) }}</label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-8">
+
+                            <div class="col mx-5">
+                                <label><strong>Date Received From Procurement For Invoices :</strong>
+                                    {{ $this->getFormattedDate($vendor['date_received_ap_invoices']) }}</label>
+                            </div>
+
+                            <div class="col mx-5">
+                                <label><strong>Date Sent to Vote Control For Invoices:</strong>
+                                    {{ $this->getFormattedDate($vendor['date_sent_vc_invoices']) }}</label>
                             </div>
                         </div>
                     </div>

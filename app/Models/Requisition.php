@@ -22,6 +22,8 @@ class Requisition extends Model
         'note_to_ps_date',
         'site_visit',
         'site_visit_date',
+        'tender_type',
+        'is_first_pass',
         'tender_issue_date',
         'tender_deadline_date',
         'evaluation_start_date',

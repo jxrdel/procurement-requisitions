@@ -54,6 +54,8 @@ class ViewRequisition extends Component
     public $note_to_ps_date;
     public $site_visit = false;
     public $site_visit_date;
+    public $tender_type;
+    public $is_first_pass;
     public $tender_issue_date;
     public $tender_deadline_date;
     public $evaluation_start_date;
@@ -159,6 +161,8 @@ class ViewRequisition extends Component
         $this->note_to_ps_date = $this->requisition->note_to_ps_date;
         $this->site_visit = $this->requisition->site_visit;
         $this->site_visit_date = $this->requisition->site_visit_date;
+        $this->tender_type = $this->requisition->tender_type;
+        $this->is_first_pass = $this->requisition->is_first_pass;
         $this->tender_issue_date = $this->requisition->tender_issue_date;
         $this->tender_deadline_date = $this->requisition->tender_deadline_date;
         $this->evaluation_start_date = $this->requisition->evaluation_start_date;
@@ -174,52 +178,7 @@ class ViewRequisition extends Component
         $this->vendors = $this->requisition->vendors()
             ->with('invoices')
             ->with('ap')
-            ->select(
-                'id',
-                'vendor_name',
-                'amount',
-                'vendor_status',
-
-                //Procurement
-                'purchase_order_no',
-                'eta',
-                'date_sent_commit',
-                'invoice_no',
-                'date_invoice_received',
-                'date_sent_ap',
-                'sent_to_ap',
-
-                // Cost & Budgeting
-                'date_sent_request_mof',
-                'release_type',
-                'request_category',
-                'request_no',
-                'release_no',
-                'release_date',
-                'change_of_vote_no',
-
-                // AP
-                'date_received_ap',
-                'date_sent_vc',
-
-                // Vote Control
-                'batch_no',
-                'voucher_no',
-                'date_sent_checkstaff',
-
-                // Check Staff
-                'date_received_from_vc',
-                'voucher_destination',
-                'date_sent_audit',
-                'date_received_from_audit',
-                'date_sent_chequeprocessing',
-
-                // Cheque Processing
-                'date_of_cheque',
-                'cheque_no',
-                'date_cheque_processed',
-                'date_sent_dispatch',
-            )->get()
+            ->get()
             ->toArray();
 
         foreach ($this->vendors as $key => $vendor) {
@@ -314,6 +273,10 @@ class ViewRequisition extends Component
                 $this->date_received_procurement = null;
             }
 
+            if ($this->ps_approval_date === '') {
+                $this->ps_approval_date = null;
+            }
+
             if (!$this->validateForm()) {
                 return;  // Stop execution if form validation fails
             }
@@ -328,6 +291,8 @@ class ViewRequisition extends Component
                 'date_sent_aov_procurement' => $this->date_sent_aov_procurement,
                 'site_visit' => $this->site_visit,
                 'site_visit_date' => $this->site_visit_date,
+                'tender_type' => $this->tender_type,
+                'is_first_pass' => $this->is_first_pass,
                 'note_to_ps' => $this->note_to_ps,
                 'note_to_ps_date' => $this->note_to_ps_date,
                 'tender_issue_date' => $this->tender_issue_date,
@@ -399,6 +364,7 @@ class ViewRequisition extends Component
                 'date_sent_dps' => $this->date_sent_dps,
                 'date_sent_procurement' => $this->date_received_procurement,
                 'ps_approval' => $this->ps_approval,
+                'ps_approval_date' => $this->ps_approval_date,
                 // 'sent_to_cb' => $this->sent_to_cb,
                 // 'date_sent_cb' => $this->date_sent_cb,
                 'vendors' => $this->vendors,
@@ -412,6 +378,7 @@ class ViewRequisition extends Component
                 'date_assigned' => 'nullable|date|before_or_equal:today',
                 'date_sent_dps' => 'nullable|date|before_or_equal:today',
                 'date_received_procurement' => 'nullable|date|before_or_equal:today',
+                'ps_approval_date' => 'nullable|date|before_or_equal:today',
                 // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
                 'vendors.*.vendor_name' => 'required',
                 'vendors.*.amount' => 'required|numeric',
@@ -431,6 +398,11 @@ class ViewRequisition extends Component
                 // Ensure 'date_sent_dps' is not null if 'ps_approval' is not 'Not Sent'
                 if ($this->ps_approval !== 'Not Sent' && $this->date_sent_dps === null) {
                     $validator->errors()->add('date_sent_dps', 'Date sent to DPS cannot be null if PS Approval is set to ' . $this->ps_approval);
+                }
+
+                // Ensure 'ps_approval_date' is not null if 'ps_approval' is 'Approved'
+                if ($this->ps_approval === 'Approved' && $this->ps_approval_date === null) {
+                    $validator->errors()->add('ps_approval_date', 'PS Approval Date cannot be null if PS Approval is "Approved".');
                 }
 
                 // Ensure 'date_sent_cb' is not null if 'sent_to_cb' is "Yes"
@@ -642,8 +614,7 @@ class ViewRequisition extends Component
         return
             empty(trim($vendor['purchase_order_no'])) ||
             empty($vendor['eta']) ||
-            empty($vendor['date_sent_ap']) ||
-            empty($vendor['invoices']);
+            empty($vendor['date_sent_ap']);
     }
 
 
@@ -801,7 +772,7 @@ class ViewRequisition extends Component
         $users = User::accountsPayable()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->send(new NotifyAccountsPayable($vendor));
+            // Mail::to($user->email)->send(new NotifyAccountsPayable($vendor));
             // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }
 
@@ -1092,52 +1063,7 @@ class ViewRequisition extends Component
         $this->vendors = $this->requisition->vendors()
             ->with('invoices')
             ->with('ap')
-            ->select(
-                'id',
-                'vendor_name',
-                'amount',
-                'vendor_status',
-
-                //Procurement
-                'purchase_order_no',
-                'eta',
-                'date_sent_commit',
-                'invoice_no',
-                'date_invoice_received',
-                'date_sent_ap',
-                'sent_to_ap',
-
-                // Cost & Budgeting
-                'date_sent_request_mof',
-                'release_type',
-                'request_category',
-                'request_no',
-                'release_no',
-                'release_date',
-                'change_of_vote_no',
-
-                // AP
-                'date_received_ap',
-                'date_sent_vc',
-
-                // Vote Control
-                'batch_no',
-                'voucher_no',
-                'date_sent_checkstaff',
-
-                // Check Staff
-                'date_received_from_vc',
-                'voucher_destination',
-                'date_sent_audit',
-                'date_received_from_audit',
-                'date_sent_chequeprocessing',
-
-                // Cheque Processing
-                'date_of_cheque',
-                'cheque_no',
-                'date_cheque_processed',
-                'date_sent_dispatch',
-            )->get()
+            ->get()
             ->toArray();
 
         foreach ($this->vendors as $key => $vendor) {
