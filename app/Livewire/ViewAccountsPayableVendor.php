@@ -25,6 +25,9 @@ class ViewAccountsPayableVendor extends Component
     public $date_received_ap;
     public $date_sent_vc;
 
+    public $date_received_ap_invoices;
+    public $date_sent_vc_invoices;
+
     public $isEditing = true;
     public $accordionView = 'show';
 
@@ -53,8 +56,10 @@ class ViewAccountsPayableVendor extends Component
         } else {
             $this->date_received_ap = $this->vendor->date_received_ap;
             $this->date_sent_vc = $this->vendor->date_sent_vc;
+            $this->date_received_ap_invoices = $this->vendor->date_received_ap_invoices;
+            $this->date_sent_vc_invoices = $this->vendor->date_sent_vc_invoices;
 
-            if ($this->date_received_ap !== null && $this->date_sent_vc !== null) {
+            if ($this->date_received_ap_invoices !== null && $this->date_sent_vc_invoices !== null) {
                 $this->isEditing = false;
             }
         }
@@ -109,14 +114,26 @@ class ViewAccountsPayableVendor extends Component
                     $this->date_sent_vc = null;
                 }
 
+                if ($this->date_received_ap_invoices == '') {
+                    $this->date_received_ap_invoices = null;
+                }
+
+                if ($this->date_sent_vc_invoices == '') {
+                    $this->date_sent_vc_invoices = null;
+                }
+
                 $this->validate(
                     [
                         'date_received_ap' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
                         'date_sent_vc' => 'nullable|date|after_or_equal:' . $this->date_received_ap,
+                        'date_received_ap_invoices' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+                        'date_sent_vc_invoices' => 'nullable|date|after_or_equal:' . $this->date_received_ap_invoices,
                     ],
                     [
                         'date_received_ap.after_or_equal' => 'Please check date',
                         'date_sent_vc.after_or_equal' => 'Please check date',
+                        'date_received_ap_invoices.after_or_equal' => 'Please check date',
+                        'date_sent_vc_invoices.after_or_equal' => 'Please check date',
                     ]
                 );
 
@@ -126,6 +143,8 @@ class ViewAccountsPayableVendor extends Component
                     'requisition_status' => $status,
                     'date_received_ap' => $this->date_received_ap,
                     'date_sent_vc' => $this->date_sent_vc,
+                    'date_received_ap_invoices' => $this->date_received_ap_invoices,
+                    'date_sent_vc_invoices' => $this->date_sent_vc_invoices,
                 ]);
             }
 
@@ -158,7 +177,7 @@ class ViewAccountsPayableVendor extends Component
             }
             return false;
         } else {
-            return $this->date_received_ap === null || $this->date_sent_vc === null;
+            return $this->date_received_ap_invoices === null || $this->date_sent_vc_invoices === null;
         }
     }
 
@@ -170,7 +189,7 @@ class ViewAccountsPayableVendor extends Component
 
         $status = 'At Accounts Payable';
 
-        if ($this->date_received_ap && $this->date_sent_vc && !$this->ap_vendor->is_completed) {
+        if ($this->date_received_ap_invoices && $this->date_sent_vc_invoices && !$this->ap_vendor->is_completed) {
             $status = 'To Be Sent to Vote Control';
         }
 
@@ -194,9 +213,16 @@ class ViewAccountsPayableVendor extends Component
             'date_completed' => now(),
         ]);
 
-        $this->vendor->voteControl()->create([
-            'date_received' => Carbon::now(),
-        ]);
+        if ($this->vendor->voteControl) {
+            $this->vendor->voteControl->update([
+                'date_received' => Carbon::now(),
+                'is_completed' => false,
+            ]);
+        } else {
+            $this->vendor->voteControl()->create([
+                'date_received' => Carbon::now(),
+            ]);
+        }
 
         //Send email to Vote Control
         if ($this->requisition->is_first_pass) {

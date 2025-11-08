@@ -208,7 +208,7 @@ class ViewVoteControlVendor extends Component
         //Get Emails of Check Staff
         $checkStaff = User::checkStaff()->get();
         foreach ($checkStaff as $staff) {
-            Mail::to($staff->email)->queue(new NotifyCheckRoom($this->vendor));
+            // Mail::to($staff->email)->queue(new NotifyCheckRoom($this->vendor));
         }
 
         return redirect()->route('vote_control.index')->with('success', 'Sent to Check Staff successfully');

@@ -164,6 +164,16 @@
                 </div>
 
                 <div x-show="!isEditing">
+
+                    @if (!$requisition->is_first_pass && $vc_vendor->is_completed)
+                        <div class="row mt-8">
+                            <div class="col mx-5">
+                                <label><strong>Date Committed:</strong>
+                                    {{ $this->getFormattedDate($this->vendor->date_committed_vc) }}</label>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="row mt-8">
                         <div class="col mx-5">
                             <label><strong>Batch Number:</strong> {{ $this->batch_no }}</label>

@@ -121,25 +121,25 @@
                             <div class="row mt-7">
                                 <div class="col">
                                     <div class="form-floating form-floating-outline">
-                                        <input autocomplete="off" wire:model="date_received_ap" type="date"
-                                            class="form-control @error('date_received_ap')is-invalid @enderror"
+                                        <input autocomplete="off" wire:model="date_received_ap_invoices" type="date"
+                                            class="form-control @error('date_received_ap_invoices')is-invalid @enderror"
                                             id="floatingInput" aria-describedby="floatingInputHelp" />
-                                        <label for="floatingInput">Date Received From Procurement For Commitment</label>
+                                        <label for="floatingInput">Date Received From Procurement For Invoices</label>
                                     </div>
-                                    @error('date_received_ap')
+                                    @error('date_received_ap_invoices')
                                         <div class="text-danger"> {{ $message }} </div>
                                     @enderror
                                 </div>
 
                                 <div class="col">
                                     <div class="form-floating form-floating-outline">
-                                        <input autocomplete="off" wire:model="date_sent_vc" type="date"
-                                            class="form-control @error('date_sent_vc')is-invalid @enderror"
+                                        <input autocomplete="off" wire:model="date_sent_vc_invoices" type="date"
+                                            class="form-control @error('date_sent_vc_invoices')is-invalid @enderror"
                                             id="floatingInput" placeholder="Voucher Number"
                                             aria-describedby="floatingInputHelp" />
-                                        <label for="floatingInput">Date Sent to Vote Control For Commitment</label>
+                                        <label for="floatingInput">Date Sent to Vote Control For Invoices</label>
                                     </div>
-                                    @error('date_sent_vc')
+                                    @error('date_sent_vc_invoices')
                                         <div class="text-danger"> {{ $message }} </div>
                                     @enderror
                                 </div>
