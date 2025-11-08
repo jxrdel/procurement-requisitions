@@ -917,16 +917,17 @@
                                                 </div>
                                             </div>
 
-
-                                            <div>
-                                                <div class="col mx-5">
-                                                    <a href="javascript:void(0);"
-                                                        wire:click="displayInvoicesModal({{ $vendor['id'] }})">
-                                                        Invoices
-                                                        ({{ $invoice_count_buttons[$vendor['id']] ?? 0 }})
-                                                    </a>
+                                            @if (!$this->requisition->is_first_pass)
+                                                <div>
+                                                    <div class="col mx-5">
+                                                        <a href="javascript:void(0);"
+                                                            wire:click="displayInvoicesModal({{ $vendor['id'] }})">
+                                                            Invoices
+                                                            ({{ $invoice_count_buttons[$vendor['id']] ?? 0 }})
+                                                        </a>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endif
 
                                             <div class="row mt-8">
 
@@ -1106,14 +1107,16 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="d-flex justify-content-center mt-8">
-                                                            <button type="button"
-                                                                wire:click="displayInvoicesModal({{ $vendor['id'] }})"
-                                                                class="btn btn-success waves-effect waves-light">
-                                                                Invoices
-                                                                ({{ $invoice_count_buttons[$vendor['id']] ?? 0 }})
-                                                            </button>
-                                                        </div>
+                                                        @if (!$this->requisition->is_first_pass)
+                                                            <div class="d-flex justify-content-center mt-8">
+                                                                <button type="button"
+                                                                    wire:click="displayInvoicesModal({{ $vendor['id'] }})"
+                                                                    class="btn btn-success waves-effect waves-light">
+                                                                    Invoices
+                                                                    ({{ $invoice_count_buttons[$vendor['id']] ?? 0 }})
+                                                                </button>
+                                                            </div>
+                                                        @endif
 
                                                     </div>
                                                 </div>
@@ -1217,23 +1220,25 @@
                                     <div class="row mt-2">
 
                                         <div class="col mx-5">
-                                            <label><strong>Batch Number:</strong> {{ $vendor['batch_no'] }}</label>
+                                            <label><strong>Date Committed:</strong>
+                                                {{ $this->getFormattedDate($vendor['date_committed_vc']) }}</label>
                                         </div>
 
                                         <div class="col mx-5">
-                                            <label><strong>Voucher Number:
-                                                </strong>{{ $vendor['voucher_no'] }}</label>
+                                            <label><strong>Batch Number:</strong> {{ $vendor['batch_no'] }}</label>
                                         </div>
                                     </div>
 
                                     <div class="row mt-7">
 
                                         <div class="col mx-5">
-                                            <label><strong>Date Sent to Check Staff:</strong>
-                                                {{ $this->getFormattedDate($vendor['date_sent_checkstaff']) }}</label>
+                                            <label><strong>Voucher Number:
+                                                </strong>{{ $vendor['voucher_no'] }}</label>
                                         </div>
 
                                         <div class="col mx-5">
+                                            <label><strong>Date Sent to Check Staff:</strong>
+                                                {{ $this->getFormattedDate($vendor['date_sent_checkstaff']) }}</label>
                                         </div>
                                     </div>
                                 </div>

@@ -614,7 +614,7 @@ class ViewRequisition extends Component
         return
             empty(trim($vendor['purchase_order_no'])) ||
             empty($vendor['eta']) ||
-            empty($vendor['date_sent_ap']);
+            empty($vendor['date_sent_ap']) || empty($vendor['invoices']);
     }
 
 
@@ -751,9 +751,16 @@ class ViewRequisition extends Component
             'vendor_status' => 'Sent to Accounts Payable',
         ]);
 
-        $vendor->ap()->create([
-            'date_received' => Carbon::now(),
-        ]);
+        if (!isset($vendor->ap)) {
+            $vendor->ap()->create([
+                'date_received' => Carbon::now(),
+            ]);
+        } else {
+            $vendor->ap()->update([
+                'date_received' => Carbon::now(),
+                'is_completed' => false,
+            ]);
+        }
 
         $this->requisition->update([
             'requisition_status' => 'Sent to Accounts Payable',

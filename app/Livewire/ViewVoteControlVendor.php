@@ -23,6 +23,7 @@ class ViewVoteControlVendor extends Component
     public $batch_no;
     public $date_sent_checkstaff;
     public $invoices;
+    public $requisition_vendors = [];
 
     public $isEditing = true;
     public $accordionView = 'show';
@@ -38,12 +39,24 @@ class ViewVoteControlVendor extends Component
 
         $this->requisition = $this->vendor->requisition;
 
-        $this->batch_no = $this->vendor->batch_no;
-        $this->voucher_no = $this->vendor->voucher_no;
-        $this->date_sent_checkstaff = $this->vendor->date_sent_checkstaff;
+        if ($this->requisition->is_first_pass) {
+            $this->requisition_vendors = $this->requisition->vendors()->get()->toArray();
+            $allDatesFilled = true;
+            foreach ($this->requisition_vendors as $vendor) {
+                if (empty($vendor['date_committed_vc'])) {
+                    $allDatesFilled = false;
+                    break;
+                }
+            }
+            $this->isEditing = !$allDatesFilled;
+        } else {
+            $this->batch_no = $this->vendor->batch_no;
+            $this->voucher_no = $this->vendor->voucher_no;
+            $this->date_sent_checkstaff = $this->vendor->date_sent_checkstaff;
 
-        if (($this->batch_no !== null || trim($this->batch_no) == '') && ($this->voucher_no !== null && trim($this->voucher_no) !== '')) {
-            $this->isEditing = false;
+            if (($this->batch_no !== null || trim($this->batch_no) == '') && ($this->voucher_no !== null && trim($this->voucher_no) !== '')) {
+                $this->isEditing = false;
+            }
         }
 
         if (Auth::user()->role->name === 'Viewer') {
@@ -65,32 +78,61 @@ class ViewVoteControlVendor extends Component
 
     public function getIsButtonDisabledProperty()
     {
-        return
-            $this->voucher_no === null || trim($this->voucher_no) === '' ||
-            $this->batch_no === null || trim($this->batch_no) === '' ||
-            $this->date_sent_checkstaff === null;
+        if ($this->requisition->is_first_pass) {
+            foreach ($this->requisition_vendors as $vendor) {
+                if (empty($vendor['date_committed_vc'])) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return
+                $this->voucher_no === null || trim($this->voucher_no) === '' ||
+                $this->batch_no === null || trim($this->batch_no) === '' ||
+                $this->date_sent_checkstaff === null;
+        }
     }
     public function edit()
     {
         try {
-            //Check if the date_received_ap is empty and set it to null
-            if ($this->date_sent_checkstaff == '') {
-                $this->date_sent_checkstaff = null;
+            if ($this->requisition->is_first_pass) {
+                foreach ($this->requisition_vendors as $index => $vendorData) {
+                    if ($vendorData['date_committed_vc'] == '') {
+                        $this->requisition_vendors[$index]['date_committed_vc'] = null;
+                    }
+
+                    $this->validate(
+                        [
+                            'requisition_vendors.' . $index . '.date_committed_vc' => 'required|date|date_format:Y-m-d',
+                        ],
+                        [
+                            'requisition_vendors.' . $index . '.date_committed_vc.required' => 'Please enter date',
+                        ]
+                    );
+
+                    $vendor = RequisitionVendor::find($vendorData['id']);
+                    $vendor->update([
+                        'date_committed_vc' => $this->requisition_vendors[$index]['date_committed_vc'],
+                    ]);
+                }
+            } else {
+                if ($this->date_sent_checkstaff == '') {
+                    $this->date_sent_checkstaff = null;
+                }
+
+                $status = $this->vendor->vendor_status;
+
+                if (!$this->vc_vendor->is_completed) {
+                    $status = $this->getStatus();
+                }
+
+                $this->vendor->update([
+                    'batch_no' => $this->batch_no,
+                    'voucher_no' => $this->voucher_no,
+                    'date_sent_checkstaff' => $this->date_sent_checkstaff,
+                    'vendor_status' => $status,
+                ]);
             }
-
-            $status = $this->vendor->vendor_status;
-
-            if (!$this->vc_vendor->is_completed) {
-                $status = $this->getStatus();
-            }
-
-
-            $this->vendor->update([
-                'batch_no' => $this->batch_no,
-                'voucher_no' => $this->voucher_no,
-                'date_sent_checkstaff' => $this->date_sent_checkstaff,
-                'vendor_status' => $status,
-            ]);
 
             Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Vote Control');
             $this->isEditing = false;
@@ -98,13 +140,14 @@ class ViewVoteControlVendor extends Component
             $this->dispatch('show-message', message: 'Record edited successfully');
             $this->vendor = $this->vendor->fresh();
             $this->vc_vendor = $this->vc_vendor->fresh();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition in Accounts Payable: ' . $e->getMessage());
             Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
             dd('Error editing requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
         }
     }
-
     public function getStatus()
     {
         $status = 'At Vote Control';
@@ -114,6 +157,35 @@ class ViewVoteControlVendor extends Component
         }
 
         return $status;
+    }
+
+    public function sendToProcurement()
+    {
+        $this->vc_vendor->update([
+            'is_completed' => true,
+            'date_completed' => now(),
+        ]);
+
+        //update all requisition vendors
+        foreach ($this->requisition_vendors as $vendorData) {
+            $vendor = RequisitionVendor::find($vendorData['id']);
+            $vendor->update([
+                'vendor_status' => 'Sent to Procurement',
+                'sent_to_ap' => false,
+            ]);
+        }
+
+        $this->requisition->update([
+            'requisition_status' => 'Sent to Procurement',
+            'is_first_pass' => false,
+        ]);
+
+        // foreach ($this->requisition_vendors as $vendorData) {
+        //     $vendor = RequisitionVendor::find($vendorData['id']);
+        //     // Mail::to($procurement_user->email)->send(new NotifyProcurement($vendor));
+        // }
+
+        return redirect()->route('vote_control.index')->with('success', 'Sent to Procurement successfully');
     }
 
     public function sendToCheckStaff()

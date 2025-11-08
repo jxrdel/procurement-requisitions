@@ -10,74 +10,49 @@
                     <i class="ri-arrow-left-circle-line me-1"></i> Back
                 </a>
                 <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
-                    <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i>
-                        {{ $this->vendor->vendor_name }} |
-                        ${{ number_format($this->invoices->sum('invoice_amount'), 2) }}</strong>
+                    @if ($this->requisition->is_first_pass)
+                        <strong style="margin-right: 90px">
+                            #{{ $this->requisition->requisition_no }}</strong>
+                    @else
+                        <strong style="margin-right: 90px"><i class="fa-solid fa-file-circle-plus"></i>
+                            {{ $this->vendor->vendor_name }} |
+                            ${{ number_format($this->invoices->sum('invoice_amount'), 2) }}</strong>
+                    @endif
                 </h1>
             </div>
 
-            {{-- <div class="row mt-2">
-
-                <div class="col mx-5">
-                    <label><strong>Date Received:</strong> {{ $this->getDateSentVC() }}</label>
-                </div>
-            </div> --}}
-            <div x-show="isEditing">
-                <form wire:submit.prevent="edit">
-                    <div id="inputForm">
-
-
-                        <div class="row mt-7">
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="batch_no" type="text"
-                                        class="form-control @error('batch_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Batch Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Batch Number</label>
+            @if ($requisition->is_first_pass)
+                <div x-show="isEditing">
+                    <form wire:submit.prevent="edit">
+                        @foreach ($requisition_vendors as $index => $vendorData)
+                            <div class="row mt-7">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <label
+                                                class="form-label text-black"><strong>{{ $vendorData['vendor_name'] }}:</strong></label>
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off"
+                                                    wire:model="requisition_vendors.{{ $index }}.date_committed_vc"
+                                                    type="date"
+                                                    class="form-control @error('requisition_vendors.' . $index . '.date_committed_vc')is-invalid @enderror"
+                                                    id="date_committed_vc_{{ $index }}"
+                                                    aria-describedby="dateCommittedVcHelp" />
+                                                <label for="date_committed_vc_{{ $index }}">Date
+                                                    Committed</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @error('requisition_vendors.' . $index . '.date_committed_vc')
+                                        <div class="text-danger"> {{ $message }} </div>
+                                    @enderror
                                 </div>
-                                @error('batch_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
                             </div>
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="voucher_no" type="text"
-                                        class="form-control @error('voucher_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Voucher Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Voucher Number</label>
-                                </div>
-                                @error('voucher_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-7">
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_sent_checkstaff" type="date"
-                                        class="form-control @error('date_sent_checkstaff')is-invalid @enderror"
-                                        id="floatingInput" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Date Sent to Check Staff</label>
-                                </div>
-                                @error('date_sent_checkstaff')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                            <div class="col">
-                                <label><strong>Vote Number:</strong>
-                                    {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
-                            </div>
-
-                        </div>
+                        @endforeach
 
                         <div class="row d-flex justify-content-center text-center mt-6">
-
                             <button class="btn btn-primary waves-effect waves-light mt-5" style="width:100px">
                                 <span class="tf-icons ri-save-3-line me-1_5"></span>Save
                             </button>
@@ -87,61 +62,155 @@
                                 <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
                             </button>
                         </div>
-                    </div>
-                </form>
-            </div>
-
-
-            <div x-show="!isEditing">
-                <div class="row mt-8">
-
-                    <div class="col mx-5">
-                        <label><strong>Batch Number:</strong> {{ $this->batch_no }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Voucher Number: </strong>{{ $this->voucher_no }}</label>
-                    </div>
-                </div>
-                <div class="row mt-7">
-
-                    <div class="col mx-5">
-                        <label><strong>Date Sent to Check Staff:</strong>
-                            {{ $this->getFormattedDate($this->date_sent_checkstaff) }}</label>
-                    </div>
-
-                    <div class="col mx-5">
-                        <label><strong>Vote Number:</strong>
-                            {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
-                    </div>
+                    </form>
                 </div>
 
-                <div class="row text-center mt-5">
-                    <div>
-                        @can('edit-records')
-                            <button type="button" @click="isEditing = true" class="btn btn-dark waves-effect waves-light"
-                                style="width: 100px">
-                                <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
-                            </button>
-                            &nbsp;
-                            @if (!$this->vc_vendor->is_completed)
-                                <button @disabled($this->isButtonDisabled)
-                                    wire:confirm="Are you sure you want to send this requisition to Check Staff?"
-                                    wire:loading.attr="disabled" wire:click="sendToCheckStaff"
+                <div x-show="!isEditing">
+                    @foreach ($requisition_vendors as $vendorData)
+                        <div class="row mt-8">
+                            <div class="col mx-5">
+                                <label><strong>{{ $vendorData['vendor_name'] }}:</strong>
+                                    {{ $this->getFormattedDate($vendorData['date_committed_vc']) }}</label>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <div class="row text-center mt-5">
+                        <div>
+                            @can('edit-records')
+                                <button type="button" @click="isEditing = true"
+                                    class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                    <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
+                                </button>
+                                &nbsp;
+                                <button @disabled($this->isButtonDisabled) type="button"
+                                    wire:confirm="Are you sure you want to send this requisition to Procurement?"
+                                    wire:loading.attr="disabled" wire:click="sendToProcurement"
                                     class="btn btn-success waves-effect waves-light" style="width:250px">
-                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Check Staff
+                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Procurement
 
-                                    <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
-                                        role="status">
+                                    <div wire:loading wire:target="sendToProcurement"
+                                        class="spinner-border spinner-border-lg text-white mx-2" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
                                 </button>
-                            @endif
-                        @endcan
+                            @endcan
+                        </div>
                     </div>
                 </div>
+            @else
+                <div x-show="isEditing">
+                    <form wire:submit.prevent="edit">
+                        <div id="inputForm">
+                            <div class="row mt-7">
+                                <div class="col">
+                                    <div class="form-floating form-floating-outline">
+                                        <input autocomplete="off" wire:model="batch_no" type="text"
+                                            class="form-control @error('batch_no')is-invalid @enderror"
+                                            id="floatingInput" placeholder="Batch Number"
+                                            aria-describedby="floatingInputHelp" />
+                                        <label for="floatingInput">Batch Number</label>
+                                    </div>
+                                    @error('batch_no')
+                                        <div class="text-danger"> {{ $message }} </div>
+                                    @enderror
+                                </div>
 
-            </div>
+                                <div class="col">
+                                    <div class="form-floating form-floating-outline">
+                                        <input autocomplete="off" wire:model="voucher_no" type="text"
+                                            class="form-control @error('voucher_no')is-invalid @enderror"
+                                            id="floatingInput" placeholder="Voucher Number"
+                                            aria-describedby="floatingInputHelp" />
+                                        <label for="floatingInput">Voucher Number</label>
+                                    </div>
+                                    @error('voucher_no')
+                                        <div class="text-danger"> {{ $message }} </div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mt-7">
+                                <div class="col">
+                                    <div class="form-floating form-floating-outline">
+                                        <input autocomplete="off" wire:model="date_sent_checkstaff" type="date"
+                                            class="form-control @error('date_sent_checkstaff')is-invalid @enderror"
+                                            id="floatingInput" aria-describedby="floatingInputHelp" />
+                                        <label for="floatingInput">Date Sent to Check Staff</label>
+                                    </div>
+                                    @error('date_sent_checkstaff')
+                                        <div class="text-danger"> {{ $message }} </div>
+                                    @enderror
+                                </div>
+
+                                <div class="col">
+                                    <label><strong>Vote Number:</strong>
+                                        {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
+                                </div>
+                            </div>
+
+                            <div class="row d-flex justify-content-center text-center mt-6">
+                                <button class="btn btn-primary waves-effect waves-light mt-5" style="width:100px">
+                                    <span class="tf-icons ri-save-3-line me-1_5"></span>Save
+                                </button>
+                                &nbsp;
+                                <button type="button" @click="isEditing = ! isEditing"
+                                    class="btn btn-dark waves-effect waves-light mt-5" style="width: 100px">
+                                    <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div x-show="!isEditing">
+                    <div class="row mt-8">
+                        <div class="col mx-5">
+                            <label><strong>Batch Number:</strong> {{ $this->batch_no }}</label>
+                        </div>
+
+                        <div class="col mx-5">
+                            <label><strong>Voucher Number: </strong>{{ $this->voucher_no }}</label>
+                        </div>
+                    </div>
+                    <div class="row mt-7">
+                        <div class="col mx-5">
+                            <label><strong>Date Sent to Check Staff:</strong>
+                                {{ $this->getFormattedDate($this->date_sent_checkstaff) }}</label>
+                        </div>
+
+                        <div class="col mx-5">
+                            <label><strong>Vote Number:</strong>
+                                {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
+                        </div>
+                    </div>
+
+                    <div class="row text-center mt-5">
+                        <div>
+                            @can('edit-records')
+                                <button type="button" @click="isEditing = true"
+                                    class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                    <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
+                                </button>
+                                &nbsp;
+                                @if (!$this->vc_vendor->is_completed)
+                                    <button @disabled($this->isButtonDisabled)
+                                        wire:confirm="Are you sure you want to send this requisition to Check Staff?"
+                                        wire:loading.attr="disabled" wire:click="sendToCheckStaff"
+                                        class="btn btn-success waves-effect waves-light" style="width:250px">
+                                        <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Check Staff
+
+                                        <div wire:loading class="spinner-border spinner-border-lg text-white mx-2"
+                                            role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             @if (!$this->requisition->is_first_pass)
                 <div class="accordion mt-8" id="accordionInvoices" style="margin-top: 15px">
