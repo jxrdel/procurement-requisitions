@@ -20,6 +20,7 @@ class ViewAccountsPayableVendor extends Component
     public $vendor;
     public $invoices;
     public $requisition;
+    public $requisition_vendors = [];
 
     public $date_received_ap;
     public $date_sent_vc;
@@ -39,11 +40,23 @@ class ViewAccountsPayableVendor extends Component
 
         $this->requisition = $this->vendor->requisition;
 
-        $this->date_received_ap = $this->vendor->date_received_ap;
-        $this->date_sent_vc = $this->vendor->date_sent_vc;
+        if ($this->requisition->is_first_pass) {
+            $this->requisition_vendors = $this->requisition->vendors()->get()->toArray();
+            $allDatesFilled = true;
+            foreach ($this->requisition_vendors as $vendor) {
+                if (empty($vendor['date_received_ap']) || empty($vendor['date_sent_vc'])) {
+                    $allDatesFilled = false;
+                    break;
+                }
+            }
+            $this->isEditing = !$allDatesFilled;
+        } else {
+            $this->date_received_ap = $this->vendor->date_received_ap;
+            $this->date_sent_vc = $this->vendor->date_sent_vc;
 
-        if ($this->date_received_ap !== null && $this->date_sent_vc !== null) {
-            $this->isEditing = false;
+            if ($this->date_received_ap !== null && $this->date_sent_vc !== null) {
+                $this->isEditing = false;
+            }
         }
 
         if (Auth::user()->role->name === 'Viewer') {
@@ -59,33 +72,62 @@ class ViewAccountsPayableVendor extends Component
 
     public function edit()
     {
-        if ($this->date_received_ap == '') {
-            $this->date_received_ap = null;
-        }
-
-        if ($this->date_sent_vc == '') {
-            $this->date_sent_vc = null;
-        }
-
-        $this->validate(
-            [
-                'date_received_ap' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                'date_sent_vc' => 'nullable|date|after_or_equal:' . $this->date_received_ap,
-            ],
-            [
-                'date_received_ap.after_or_equal' => 'Please check date',
-                'date_sent_vc.after_or_equal' => 'Please check date',
-            ]
-        );
-
         try {
-            $status = $this->getStatus();
+            if ($this->requisition->is_first_pass) {
+                foreach ($this->requisition_vendors as $index => $vendorData) {
+                    if ($vendorData['date_received_ap'] == '') {
+                        $this->requisition_vendors[$index]['date_received_ap'] = null;
+                    }
 
-            $this->vendor->update([
-                'requisition_status' => $status,
-                'date_received_ap' => $this->date_received_ap,
-                'date_sent_vc' => $this->date_sent_vc,
-            ]);
+                    if ($vendorData['date_sent_vc'] == '') {
+                        $this->requisition_vendors[$index]['date_sent_vc'] = null;
+                    }
+
+                    $this->validate(
+                        [
+                            'requisition_vendors.' . $index . '.date_received_ap' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+                            'requisition_vendors.' . $index . '.date_sent_vc' => 'nullable|date|after_or_equal:requisition_vendors.' . $index . '.date_received_ap',
+                        ],
+                        [
+                            'requisition_vendors.' . $index . '.date_received_ap.after_or_equal' => 'Please check date',
+                            'requisition_vendors.' . $index . '.date_sent_vc.after_or_equal' => 'Please check date',
+                        ]
+                    );
+
+                    $vendor = RequisitionVendor::find($vendorData['id']);
+                    $vendor->update([
+                        'date_received_ap' => $vendorData['date_received_ap'],
+                        'date_sent_vc' => $vendorData['date_sent_vc'],
+                    ]);
+                }
+            } else {
+                if ($this->date_received_ap == '') {
+                    $this->date_received_ap = null;
+                }
+
+                if ($this->date_sent_vc == '') {
+                    $this->date_sent_vc = null;
+                }
+
+                $this->validate(
+                    [
+                        'date_received_ap' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+                        'date_sent_vc' => 'nullable|date|after_or_equal:' . $this->date_received_ap,
+                    ],
+                    [
+                        'date_received_ap.after_or_equal' => 'Please check date',
+                        'date_sent_vc.after_or_equal' => 'Please check date',
+                    ]
+                );
+
+                $status = $this->getStatus();
+
+                $this->vendor->update([
+                    'requisition_status' => $status,
+                    'date_received_ap' => $this->date_received_ap,
+                    'date_sent_vc' => $this->date_sent_vc,
+                ]);
+            }
 
             Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Accounts Payable');
             $this->isEditing = false;
@@ -108,7 +150,16 @@ class ViewAccountsPayableVendor extends Component
 
     public function getIsButtonDisabledProperty()
     {
-        return $this->date_received_ap === null || $this->date_sent_vc === null;
+        if ($this->requisition->is_first_pass) {
+            foreach ($this->requisition_vendors as $vendor) {
+                if (empty($vendor['date_received_ap']) || empty($vendor['date_sent_vc'])) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return $this->date_received_ap === null || $this->date_sent_vc === null;
+        }
     }
 
     public function getStatus()
@@ -148,14 +199,17 @@ class ViewAccountsPayableVendor extends Component
         ]);
 
         //Send email to Vote Control
-        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
+        if ($this->requisition->is_first_pass) {
+            Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable');
+        } else {
+            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
+        }
 
         //Get Vote Control users
         $users = User::voteControl()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->send(new NotifyVoteControl($this->vendor));
-            // Log::info('Email sent to ' . $user->email . ' to notify them of Requisition #' . $this->requisition->requisition_no . ' sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
+            // Mail::to($user->email)->send(new NotifyVoteControl($this->vendor));
         }
 
         return redirect()->route('accounts_payable.index')->with('success', 'Sent to Vote Control successfully');

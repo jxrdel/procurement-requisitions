@@ -1169,18 +1169,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="row mt-8">
+                                    @if (!$this->requisition->is_first_pass)
+                                        <div class="row mt-8">
 
-                                        <div class="col mx-5">
-                                            <label><strong>Date Received From Procurement For Invoices :</strong>
-                                                {{ $this->getFormattedDate($vendor['date_received_ap_invoices']) }}</label>
-                                        </div>
+                                            <div class="col mx-5">
+                                                <label><strong>Date Received From Procurement For Invoices :</strong>
+                                                    {{ $this->getFormattedDate($vendor['date_received_ap_invoices']) }}</label>
+                                            </div>
 
-                                        <div class="col mx-5">
-                                            <label><strong>Date Sent to Vote Control For Invoices:</strong>
-                                                {{ $this->getFormattedDate($vendor['date_sent_vc_invoices']) }}</label>
+                                            <div class="col mx-5">
+                                                <label><strong>Date Sent to Vote Control For Invoices:</strong>
+                                                    {{ $this->getFormattedDate($vendor['date_sent_vc_invoices']) }}</label>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 </div>
                             @empty
 

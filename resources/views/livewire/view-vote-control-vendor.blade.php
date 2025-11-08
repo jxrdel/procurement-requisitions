@@ -143,43 +143,45 @@
 
             </div>
 
-            <div class="accordion mt-8" id="accordionInvoices" style="margin-top: 15px">
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button x-on:click="$wire.toggleAccordionView" class="accordion-button" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#collapseInvoices" aria-expanded="true"
-                            aria-controls="collapseInvoices">
-                            <strong>Invoices ({{ count($invoices) }})</strong>
-                        </button>
-                    </h2>
-                    <div id="collapseInvoices" class="accordion-collapse collapse {{ $accordionView }}"
-                        data-bs-parent="#accordionInvoices">
-                        <div class="accordion-body">
+            @if (!$this->requisition->is_first_pass)
+                <div class="accordion mt-8" id="accordionInvoices" style="margin-top: 15px">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button x-on:click="$wire.toggleAccordionView" class="accordion-button" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#collapseInvoices" aria-expanded="true"
+                                aria-controls="collapseInvoices">
+                                <strong>Invoices ({{ count($invoices) }})</strong>
+                            </button>
+                        </h2>
+                        <div id="collapseInvoices" class="accordion-collapse collapse {{ $accordionView }}"
+                            data-bs-parent="#accordionInvoices">
+                            <div class="accordion-body">
 
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Invoice Number</th>
-                                        <th>Invoice Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($invoices as $invoice)
+                                <table class="table table-bordered table-hover">
+                                    <thead>
                                         <tr>
-                                            <td>{{ $invoice->invoice_no }}</td>
-                                            <td>${{ number_format($invoice->invoice_amount, 2) }}</td>
+                                            <th>Invoice Number</th>
+                                            <th>Invoice Amount</th>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td class="text-center" colspan="4">No Invoices</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($invoices as $invoice)
+                                            <tr>
+                                                <td>{{ $invoice->invoice_no }}</td>
+                                                <td>${{ number_format($invoice->invoice_amount, 2) }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td class="text-center" colspan="4">No Invoices</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
             <hr>
 
