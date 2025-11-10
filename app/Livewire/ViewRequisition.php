@@ -178,6 +178,7 @@ class ViewRequisition extends Component
         $this->vendors = $this->requisition->vendors()
             ->with('invoices')
             ->with('ap')
+            ->with('votes')
             ->get()
             ->toArray();
 
@@ -190,7 +191,6 @@ class ViewRequisition extends Component
         $this->request_no = $this->requisition->request_no;
         $this->release_no = $this->requisition->release_no;
         $this->release_date = $this->requisition->release_date;
-        $this->change_of_vote_no = $this->requisition->change_of_vote_no;
 
         //Procurement 2
         $this->purchase_order_no = $this->requisition->purchase_order_no;
@@ -614,7 +614,7 @@ class ViewRequisition extends Component
         return
             empty(trim($vendor['purchase_order_no'])) ||
             empty($vendor['eta']) ||
-            empty($vendor['date_sent_ap']) || empty($vendor['invoices']);
+            empty($vendor['date_sent_ap']);
     }
 
 
@@ -1068,6 +1068,7 @@ class ViewRequisition extends Component
         });
 
         $this->vendors = $this->requisition->vendors()
+            ->with('votes')
             ->with('invoices')
             ->with('ap')
             ->get()

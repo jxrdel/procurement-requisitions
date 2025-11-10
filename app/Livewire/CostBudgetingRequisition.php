@@ -62,25 +62,7 @@ class CostBudgetingRequisition extends Component
         $this->release_type = $this->requisition->release_type;
         $this->release_no = $this->requisition->release_no;
         $this->release_date = $this->requisition->release_date;
-        $this->vendors = $this->requisition->vendors()
-            ->with('votes')
-            ->select(
-                'id',
-                'vendor_name',
-                'amount',
-                'date_sent_request_mof',
-                'request_category',
-                'request_no',
-                'release_type',
-                'release_no',
-                'release_date',
-            )
-            ->get()->toArray();
-        //Add accordion view to each vendor
-        foreach ($this->vendors as $key => $vendor) {
-            $this->vendors[$key]['accordionView'] = 'show';
-            $this->vendors[$key]['selected_votes'] = $this->requisition->vendors()->find($vendor['id'])->votes()->pluck('vote_id')->toArray();
-        }
+        $this->loadVendors();
         $this->total = $this->requisition->vendors()->sum('amount');
 
         //Requisition Details
@@ -174,6 +156,7 @@ class CostBudgetingRequisition extends Component
             $this->dispatch('show-message', message: 'Record edited successfully');
             $this->requisition = $this->requisition->fresh();
             $this->cb_requisition = $this->cb_requisition->fresh();
+            $this->loadVendors();
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition in Cost & Budgeting: ' . $e->getMessage());
             Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
@@ -250,10 +233,10 @@ class CostBudgetingRequisition extends Component
         //Send email to assigned procurement officer
         $user = $this->requisition->procurement_officer;
         if ($user) {
-            Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+            // Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
             // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
         } else {
-            Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
+            // Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
             // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
         }
 
@@ -299,7 +282,7 @@ class CostBudgetingRequisition extends Component
 
     public function updating($name, $value)
     {
-        if (str_starts_with($name, 'vendors')) {
+        if (str_starts_with($name, 'vendors') && str_ends_with($name, 'selected_votes')) {
             $this->skipRender();
         }
     }
@@ -315,6 +298,29 @@ class CostBudgetingRequisition extends Component
     {
         if ($date !== null) {
             return Carbon::parse($date)->format('F jS, Y');
+        }
+    }
+
+    private function loadVendors()
+    {
+        $this->vendors = $this->requisition->vendors()
+            ->with('votes')
+            ->select(
+                'id',
+                'vendor_name',
+                'amount',
+                'date_sent_request_mof',
+                'request_category',
+                'request_no',
+                'release_type',
+                'release_no',
+                'release_date',
+            )
+            ->get()->toArray();
+        //Add accordion view to each vendor
+        foreach ($this->vendors as $key => $vendor) {
+            $this->vendors[$key]['accordionView'] = 'show';
+            $this->vendors[$key]['selected_votes'] = $this->requisition->vendors()->find($vendor['id'])->votes()->pluck('vote_id')->toArray();
         }
     }
 }

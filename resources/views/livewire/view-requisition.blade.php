@@ -832,7 +832,10 @@
 
                                     <div class="col mx-5">
                                         <label><strong>Change of Vote Number:</strong>
-                                            {{ $vendor['change_of_vote_no'] }}</label>
+                                            @foreach ($vendor['votes'] as $vote)
+                                                <span class="badge bg-label-primary">{{ $vote['number'] }}</span>
+                                            @endforeach
+                                        </label>
                                     </div>
                                 </div>
                             @empty
