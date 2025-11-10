@@ -62,8 +62,8 @@ class CostBudgetingRequisition extends Component
         $this->release_type = $this->requisition->release_type;
         $this->release_no = $this->requisition->release_no;
         $this->release_date = $this->requisition->release_date;
-        $this->change_of_vote_no = $this->requisition->change_of_vote_no;
         $this->vendors = $this->requisition->vendors()
+            ->with('votes')
             ->select(
                 'id',
                 'vendor_name',
@@ -74,12 +74,12 @@ class CostBudgetingRequisition extends Component
                 'release_type',
                 'release_no',
                 'release_date',
-                'change_of_vote_no'
             )
             ->get()->toArray();
         //Add accordion view to each vendor
         foreach ($this->vendors as $key => $vendor) {
             $this->vendors[$key]['accordionView'] = 'show';
+            $this->vendors[$key]['selected_votes'] = $this->requisition->vendors()->find($vendor['id'])->votes()->pluck('vote_id')->toArray();
         }
         $this->total = $this->requisition->vendors()->sum('amount');
 
@@ -164,8 +164,8 @@ class CostBudgetingRequisition extends Component
                     'release_type' => $vendor['release_type'],
                     'release_no' => $vendor['release_no'],
                     'release_date' => $vendor['release_date'],
-                    'change_of_vote_no' => $vendor['change_of_vote_no'],
                 ]);
+                $this->requisition->vendors()->find($vendor['id'])->votes()->sync($vendor['selected_votes']);
             }
 
             Log::info('Cost & Budgeting Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
@@ -269,7 +269,7 @@ class CostBudgetingRequisition extends Component
         $statuses = [];
 
         foreach ($this->vendors as $vendor) {
-            if (!$vendor['date_sent_request_mof'] && !$vendor['request_no'] && !$vendor['release_no'] && !$vendor['release_date'] && !$vendor['change_of_vote_no']) {
+            if (!$vendor['date_sent_request_mof'] && !$vendor['request_no'] && !$vendor['release_no'] && !$vendor['release_date']) {
                 $statuses[] = 'To be sent to MoF';
             } elseif ($vendor['date_sent_request_mof'] && !$vendor['release_no'] && !$vendor['release_date']) {
                 $statuses[] = 'Awaiting Release';
@@ -299,8 +299,7 @@ class CostBudgetingRequisition extends Component
 
     public function updating($name, $value)
     {
-        //Skip rendering when the change_of_vote_no is being updated
-        if ($name === 'change_of_vote_no' || $name === 'vendors') {
+        if (str_starts_with($name, 'vendors')) {
             $this->skipRender();
         }
     }

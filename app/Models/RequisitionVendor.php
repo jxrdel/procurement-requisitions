@@ -29,7 +29,6 @@ class RequisitionVendor extends Model
         'request_no',
         'release_no',
         'release_date',
-        'change_of_vote_no',
 
         // AP
         'date_received_ap',
@@ -96,5 +95,10 @@ class RequisitionVendor extends Model
     public function cheques()
     {
         return $this->hasMany(Cheque::class, 'vendor_id');
+    }
+
+    public function votes()
+    {
+        return $this->belongsToMany(Vote::class, 'requisition_vendor_vote');
     }
 }

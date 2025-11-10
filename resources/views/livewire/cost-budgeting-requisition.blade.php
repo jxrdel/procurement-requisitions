@@ -71,9 +71,11 @@
                                                         aria-label="Default select example">
                                                         <option value="" selected>Select Request Category</option>
                                                         <option value="ADHOC">ADHOC</option>
+                                                        <option value="Development Program">Development Program</option>
                                                         <option value="Recurrent Expenditure">Recurrent Expenditure
                                                         </option>
-                                                        <option value="Development Program">Development Program</option>
+                                                        <option value="Transfer of Release Funds">Transfer of Release
+                                                            Funds</option>
                                                     </select>
                                                     <label for="exampleFormControlSelect1">Request Category</label>
                                                     @error('vendors.' . $index . '.request_category')
@@ -151,25 +153,18 @@
                                                     <div class="text-danger"> {{ $message }} </div>
                                                 @enderror
                                             </div>
-                                            <div class="col">
-                                                <div class="form-floating form-floating-outline">
-                                                    <select wire:model="vendors.{{ $index }}.change_of_vote_no"
-                                                        class="form-select @error('vendors.' . $index . '.change_of_vote_no')is-invalid @enderror"
-                                                        id="exampleFormControlSelect1"
-                                                        aria-label="Default select example">
-                                                        <option value="" selected>Select a Vote</option>
-                                                        @foreach ($votes as $vote)
-                                                            <option value="{{ $vote->number }}">{{ $vote->number }}
-                                                            </option>
-                                                        @endforeach
-
-                                                    </select>
-                                                    <label for="exampleFormControlSelect1">Change of Vote
-                                                        Number</label>
-                                                    @error('vendors.' . $index . '.change_of_vote_no')
-                                                        <div class="text-danger"> {{ $message }} </div>
-                                                    @enderror
-                                                </div>
+                                            <div class="col" wire:ignore>
+                                                <label for="voteSelect{{ $index }}" class="form-label">Change
+                                                    of Vote Number</label>
+                                                <select id="voteSelect{{ $index }}"
+                                                    class="form-select vote-select" multiple>
+                                                    @foreach ($votes as $vote)
+                                                        <option value="{{ $vote->id }}"
+                                                            {{ in_array($vote->id, $vendor['selected_votes']) ? 'selected' : '' }}>
+                                                            {{ $vote->number }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
 
                                         </div>
@@ -190,130 +185,6 @@
                             <span class="tf-icons ri-close-circle-line me-1_5"></span>Cancel
                         </button>
                     </div>
-                    {{-- <div id="inputForm">
-                        <div class="row mt-8">
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="date_sent_request_mof" type="date"
-                                        class="form-control @error('date_sent_request_mof')is-invalid @enderror"
-                                        id="floatingInput" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Date Request Sent to Ministry of Finance</label>
-                                </div>
-                                @error('date_sent_request_mof')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                            <div class="col">
-
-                            </div>
-                        </div>
-
-                        <div class="row mt-7">
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <select wire:model="request_category"
-                                        class="form-select @error('request_category')is-invalid @enderror"
-                                        id="exampleFormControlSelect1" aria-label="Default select example">
-                                        <option value="" selected>Select Request Category</option>
-                                        <option value="Recurrent Expenditure">Recurrent Expenditure</option>
-                                        <option value="Development Program">Development Program</option>
-                                    </select>
-                                    <label for="exampleFormControlSelect1">Request Category</label>
-                                    @error('request_category')
-                                        <div class="text-danger"> {{ $message }} </div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="request_no" type="text"
-                                        class="form-control @error('request_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Request Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Request Number</label>
-                                </div>
-                                @error('request_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-                        </div>
-
-
-                        <div class="row mt-7">
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <select wire:model="release_type"
-                                        class="form-select @error('release_type')is-invalid @enderror"
-                                        id="exampleFormControlSelect1" aria-label="Default select example">
-                                        <option value="" selected>Select Release Type</option>
-                                        <option value="Release of Funds">Release of Funds</option>
-                                        <option value="Transfer of Release Funds">Transfer of Release Funds</option>
-                                    </select>
-                                    <label for="exampleFormControlSelect1">Release Type</label>
-                                    @error('release_type')
-                                        <div class="text-danger"> {{ $message }} </div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="release_no" type="text"
-                                        class="form-control @error('release_no')is-invalid @enderror" id="floatingInput"
-                                        placeholder="Release Number" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Release Number</label>
-                                </div>
-                                @error('release_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                        </div>
-                        <div class="row mt-7">
-
-
-                            <div class="col">
-                                <div class="form-floating form-floating-outline">
-                                    <input autocomplete="off" wire:model="release_date" type="date"
-                                        class="form-control @error('release_date')is-invalid @enderror"
-                                        id="floatingInput" aria-describedby="floatingInputHelp" />
-                                    <label for="floatingInput">Release Date</label>
-                                </div>
-                                @error('release_date')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-                            <div class="col">
-                                <div wire:ignore>
-                                    <label style="width:100%" for="covSelect">Change of Vote Number:</label>
-
-                                    <select class="js-example-basic-single form-control" id="covSelect"
-                                        style="width: 100%" wire:model="change_of_vote_no">
-                                        <option value="" selected>Select a Vote</option>
-                                        @foreach ($votes as $vote)
-                                            <option value="{{ $vote->number }}">{{ $vote->number }}</option>
-                                        @endforeach
-
-                                    </select>
-                                </div>
-                                @error('change_of_vote_no')
-                                    <div class="text-danger"> {{ $message }} </div>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-
-                            <button class="btn btn-primary waves-effect waves-light mx-auto mt-5" style="width:100px">
-                                <span class="tf-icons ri-save-3-line me-1_5"></span>Save
-                            </button>
-                        </div>
-                    </div> --}}
                 </form>
             </div>
 
@@ -367,7 +238,11 @@
                         </div>
 
                         <div class="col mx-5">
-                            <label><strong>Change of Vote Number:</strong> {{ $vendor['change_of_vote_no'] }}</label>
+                            <label><strong>Change of Vote Number:</strong>
+                                @foreach ($this->requisition->vendors()->find($vendor['id'])->votes as $vote)
+                                    <span class="badge bg-label-primary">{{ $vote->number }}</span>
+                                @endforeach
+                            </label>
                         </div>
                     </div>
                 @endforeach
@@ -528,12 +403,26 @@
 @script
     <script>
         $(document).ready(function() {
-            $('#covSelect').select2();
+            initSelect2();
 
-            $('#covSelect').on('change', function() {
-                var selectedValue = $(this).val(); // Get selected values as an array
-                $wire.set('change_of_vote_no', selectedValue); // Pass selected values to Livewire
+            document.addEventListener('livewire:update', function() {
+                initSelect2();
             });
         });
+
+        function initSelect2() {
+            $('.vote-select').each(function(index) {
+                if ($(this).data('select2-initialized')) {
+                    return;
+                }
+                $(this).data('select2-initialized', true);
+
+                $(this).select2();
+                $(this).on('change', function(e) {
+                    var data = $(this).select2("val");
+                    @this.set('vendors.' + index + '.selected_votes', data);
+                });
+            });
+        }
     </script>
 @endscript

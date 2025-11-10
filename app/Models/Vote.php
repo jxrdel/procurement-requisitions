@@ -12,4 +12,9 @@ class Vote extends Model
     {
         return $query->where('is_active', true);
     }
+
+    public function requisitionVendors()
+    {
+        return $this->belongsToMany(RequisitionVendor::class, 'requisition_vendor_vote');
+    }
 }
