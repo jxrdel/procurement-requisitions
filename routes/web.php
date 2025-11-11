@@ -93,4 +93,7 @@ Route::middleware(['auth'])->group(function () {
 });
 use App\Http\Controllers\DepartmentController;
 
-Route::resource('departments', DepartmentController::class);
+Route::resource('departments', DepartmentController::class)->only([
+    'update'
+]);
+Route::get('departments', [DepartmentController::class, 'getDepartments'])->name('departments.index');

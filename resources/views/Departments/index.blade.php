@@ -21,15 +21,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($departments as $department)
-                            <tr>
-                                <td>{{ $department->name }}</td>
-                                <td style="text-align: center">
-                                    <a class="btn btn-primary" href="javascript:void(0);"
-                                        onclick="showEdit({{ $department->id }}, '{{ $department->name }}', {{ $department->head_of_department_id ?? 'null' }})">Edit</a>
-                                </td>
-                            </tr>
-                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -45,7 +36,7 @@
                     <h5 class="modal-title" id="editDepartmentModalLabel">Edit Department</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="editDepartmentForm" method="POST">
+                <form id="editDepartmentForm">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
@@ -63,9 +54,9 @@
                             </select>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer justify-content-center">
+                        <button type="submit" class="btn btn-primary">Save</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
                     </div>
                 </form>
             </div>
@@ -76,18 +67,82 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            $('#myTable').DataTable({
+            var table = $('#myTable').DataTable({
                 "pageLength": 25,
                 order: [
                     [0, 'asc']
+                ],
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "{{ route('departments.index') }}",
+                    "type": "GET"
+                },
+                "columns": [{
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row) {
+                            return ' <div style="text-align:center"><a class="btn btn-primary" href="javascript:void(0);" onclick="showEdit(' +
+                                data.id +
+                                ', \'' + data.name + '\', ' + data.head_of_department_id +
+                                ')">Edit</a></div>';
+                        }
+                    },
                 ]
+            });
+
+            $('#editDepartmentForm').on('submit', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var url = form.attr('action');
+
+                // Clear existing error messages
+                $('.text-danger').remove();
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        $('#editDepartmentModal').modal('hide');
+                        table.ajax.reload();
+                        toastr.options = {
+                            "progressBar": true,
+                            "closeButton": true,
+                        };
+                        toastr.success('Department updated successfully!', '', {
+                            timeOut: 3000
+                        });
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function(key, value) {
+                                $('#edit_' + key).after('<span class="text-danger">' + value[
+                                    0] + '</span>');
+                            });
+                        } else {
+                            // Handle other errors
+                            console.log(xhr.responseText);
+                        }
+                    }
+                });
             });
         });
 
         function showEdit(id, name, head_of_department_id) {
             $('#editDepartmentForm').attr('action', '/departments/' + id);
             $('#edit_name').val(name);
-            $('#edit_head_of_department_id').val(head_of_department_id);
+            if (head_of_department_id === 'null') {
+                $('#edit_head_of_department_id').val('');
+            } else {
+                $('#edit_head_of_department_id').val(head_of_department_id);
+            }
             $('#editDepartmentModal').modal('show');
         }
     </script>
