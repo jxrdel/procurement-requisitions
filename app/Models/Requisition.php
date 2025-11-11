@@ -36,6 +36,7 @@ class Requisition extends Model
         'denied_note',
         'sent_to_cb',
         'date_sent_cb',
+        'sent_to_ap_first_pass',
         'release_type',
         'request_category',
         'date_sent_request_mof',

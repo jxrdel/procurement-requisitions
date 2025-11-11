@@ -960,32 +960,35 @@
 
                                         </div>
 
-                                        <div class="row mt-5">
+                                        @if (!$this->requisition->is_first_pass)
+                                            <div class="row mt-5">
+                                                @can('edit-records')
+                                                    @if (!$vendor['sent_to_ap'])
+                                                        <div class="row mt-8">
+                                                            <button @disabled($this->isProcurement2ButtonDisabled($vendor))
+                                                                wire:confirm="Are you sure you want to send to accounts payable?"
+                                                                wire:target="sendToAP({{ $vendor['id'] }})"
+                                                                wire:loading.attr="disabled" type="button"
+                                                                wire:click="sendToAP({{ $vendor['id'] }})"
+                                                                class="btn btn-success waves-effect waves-light m-auto"
+                                                                style="width: 300px">
+                                                                <span class="tf-icons ri-mail-send-line me-1_5"></span>Send
+                                                                to
+                                                                Accounts
+                                                                Payable
 
-                                            @can('edit-records')
-                                                @if (!$vendor['sent_to_ap'])
-                                                    <div class="row mt-8">
-                                                        <button @disabled($this->isProcurement2ButtonDisabled($vendor))
-                                                            wire:confirm="Are you sure you want to send to accounts payable?"
-                                                            wire:target="sendToAP({{ $vendor['id'] }})"
-                                                            wire:loading.attr="disabled" type="button"
-                                                            wire:click="sendToAP({{ $vendor['id'] }})"
-                                                            class="btn btn-success waves-effect waves-light m-auto"
-                                                            style="width: 300px">
-                                                            <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to
-                                                            Accounts
-                                                            Payable
-
-                                                            <div wire:loading wire:target="sendToAP({{ $vendor['id'] }})"
-                                                                class="spinner-border spinner-border-lg text-white mx-2"
-                                                                role="status">
-                                                                <span class="visually-hidden">Loading...</span>
-                                                            </div>
-                                                        </button>
-                                                    </div>
-                                                @endif
-                                            @endcan
-                                        </div>
+                                                                <div wire:loading
+                                                                    wire:target="sendToAP({{ $vendor['id'] }})"
+                                                                    class="spinner-border spinner-border-lg text-white mx-2"
+                                                                    role="status">
+                                                                    <span class="visually-hidden">Loading...</span>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    @endif
+                                                @endcan
+                                            </div>
+                                        @endif
                                     @empty
                                         <div class="row mt-5">
 
@@ -1015,7 +1018,25 @@
                                         </div>
                                     @endforelse
 
-
+                                    @if ($this->requisition->is_first_pass && count($vendors) > 0 && !$this->requisition->sent_to_ap_first_pass)
+                                        <div class="row mt-8">
+                                            <button @disabled($this->isSendAllToAPButtonDisabled)
+                                                wire:confirm="Are you sure you want to send to accounts payable?"
+                                                wire:target="sendToAP({{ $vendors[0]['id'] }})"
+                                                wire:loading.attr="disabled" type="button"
+                                                wire:click="sendToAP({{ $vendors[0]['id'] }})"
+                                                class="btn btn-success waves-effect waves-light m-auto"
+                                                style="width: 300px">
+                                                <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to
+                                                Accounts Payable
+                                                <div wire:loading wire:target="sendToAP({{ $vendors[0]['id'] }})"
+                                                    class="spinner-border spinner-border-lg text-white mx-2"
+                                                    role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div x-transition x-show="isEditingProcurement2">
@@ -1379,7 +1400,6 @@
                                         <th>Cheque Number</th>
                                         <th>Cheque Amount </th>
                                         <th>Cheque Date</th>
-                                        <th>Date Processed</th>
                                         <th>Date Sent to Dispatch</th>
                                     </tr>
                                 </thead>
@@ -1390,8 +1410,6 @@
                                             <td>{{ $cheque->cheque_no }}</td>
                                             <td>${{ number_format($cheque->cheque_amount, 2) }}</td>
                                             <td>{{ \Carbon\Carbon::parse($cheque->date_of_cheque)->format('d/m/Y') }}
-                                            </td>
-                                            <td>{{ \Carbon\Carbon::parse($cheque->date_cheque_processed)->format('d/m/Y') }}
                                             </td>
                                             <td>{{ \Carbon\Carbon::parse($cheque->date_sent_dispatch)->format('d/m/Y') }}
                                             </td>

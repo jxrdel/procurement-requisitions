@@ -345,7 +345,7 @@ class ViewRequisition extends Component
             $this->requisition = $this->requisition->fresh();
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition: ' . $e->getMessage());
-            Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
+            // Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
             dd('Error editing requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
         }
     }
@@ -550,7 +550,7 @@ class ViewRequisition extends Component
     {
 
         $this->requisition->update([
-            'requisition_status' => 'To Be Sent to MoF',
+            'requisition_status' => 'Sent to Cost & Budgeting',
             'sent_to_cb' => true,
             'date_sent_cb' => Carbon::now(),
             'updated_by' => Auth::user()->username,
@@ -571,7 +571,7 @@ class ViewRequisition extends Component
         $users = User::costBudgeting()->get();
 
         foreach ($users as $user) {
-            Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
+            // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
             // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }
 
@@ -609,7 +609,11 @@ class ViewRequisition extends Component
             return true;
         }
 
-        $totalInvoiceAmount = collect($vendor['invoices'])->sum('invoice_amount');
+        if (!$this->requisition->is_first_pass) {
+            if (empty($vendor['invoices'])) {
+                return true;
+            }
+        }
 
         return
             empty(trim($vendor['purchase_order_no'])) ||
@@ -737,7 +741,7 @@ class ViewRequisition extends Component
             $this->dispatch('show-message', message: 'Requisition edited successfully');
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition: ' . $e->getMessage());
-            Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
+            // Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
             dd('Error editing requisition. Please contact the Ministry of Health Helpdesk at 217-4664 ext. 11000 or ext 11124', $e->getMessage());
         }
     }
@@ -766,6 +770,12 @@ class ViewRequisition extends Component
             'requisition_status' => 'Sent to Accounts Payable',
             'updated_by' => Auth::user()->username,
         ]);
+
+        if ($this->requisition->is_first_pass) {
+            $this->requisition->update([
+                'sent_to_ap_first_pass' => true,
+            ]);
+        }
 
         $this->requisition->statuslogs()->create([
             'details' => 'Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username,
@@ -1077,5 +1087,15 @@ class ViewRequisition extends Component
         foreach ($this->vendors as $key => $vendor) {
             $this->vendors[$key]['accordionView'] = $accordionView[$key];
         }
+    }
+
+    public function getIsSendAllToAPButtonDisabledProperty()
+    {
+        foreach ($this->vendors as $vendor) {
+            if ($this->isProcurement2ButtonDisabled($vendor)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

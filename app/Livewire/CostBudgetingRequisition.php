@@ -253,7 +253,7 @@ class CostBudgetingRequisition extends Component
 
         foreach ($this->vendors as $vendor) {
             if (!$vendor['date_sent_request_mof'] && !$vendor['request_no'] && !$vendor['release_no'] && !$vendor['release_date']) {
-                $statuses[] = 'To be sent to MoF';
+                $statuses[] = 'Sent to Cost & Budgeting';
             } elseif ($vendor['date_sent_request_mof'] && !$vendor['release_no'] && !$vendor['release_date']) {
                 $statuses[] = 'Awaiting Release';
             } elseif ($vendor['date_sent_request_mof'] && $vendor['release_no'] && $vendor['release_date']) {
@@ -269,7 +269,7 @@ class CostBudgetingRequisition extends Component
 
         // Define priority order
         $priority = [
-            'To be sent to MoF' => 1,
+            'Sent to Cost & Budgeting' => 1,
             'Awaiting Release' => 2,
             'To be sent to Procurement' => 3,
             'At Cost & Budgeting' => 4,
