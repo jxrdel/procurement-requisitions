@@ -191,6 +191,18 @@
                         </li>
                     @endcan
 
+                    @can('view-votes-page')
+                        <li @class([
+                            'menu-item',
+                            'active' => request()->routeIs('departments.index'),
+                        ])>
+                            <a href="{{ route('departments.index') }}" class="menu-link">
+                                <i style="margin-left: 2px" class="menu-icon fa-solid fa-building fs-5 px-1"></i>
+                                <div data-i18n="Basic">Departments</div>
+                            </a>
+                        </li>
+                    @endcan
+
                     @php
                         $requisitionRoute = null;
                         $isRequisitionActive = false;

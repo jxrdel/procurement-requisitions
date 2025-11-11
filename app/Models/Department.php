@@ -9,6 +9,7 @@ class Department extends Model
 {
     protected $fillable = [
         'name',
+        'head_of_department_id',
     ];
 
     public function headOfDepartment(): BelongsTo
