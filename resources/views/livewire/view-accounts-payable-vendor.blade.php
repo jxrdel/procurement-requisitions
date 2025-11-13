@@ -99,17 +99,19 @@
                                     <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
                                 </button>
                                 &nbsp;
-                                <button @disabled($this->isButtonDisabled)
-                                    wire:confirm="Are you sure you want to send this requisition to Vote Control?"
-                                    wire:loading.attr="disabled" wire:click="sendToVoteControl"
-                                    class="btn btn-success waves-effect waves-light" style="width:250px">
-                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Vote Control
+                                @if (!$this->ap_vendor->is_completed)
+                                    <button @disabled($this->isButtonDisabled)
+                                        wire:confirm="Are you sure you want to send this requisition to Vote Control?"
+                                        wire:loading.attr="disabled" wire:click="sendToVoteControl"
+                                        class="btn btn-success waves-effect waves-light" style="width:250px">
+                                        <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to Vote Control
 
-                                    <div wire:loading wire:target="sendToVoteControl"
-                                        class="spinner-border spinner-border-lg text-dark mx-2" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                </button>
+                                        <div wire:loading wire:target="sendToVoteControl"
+                                            class="spinner-border spinner-border-lg text-dark mx-2" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </button>
+                                @endif
                             @endcan
                         </div>
                     </div>

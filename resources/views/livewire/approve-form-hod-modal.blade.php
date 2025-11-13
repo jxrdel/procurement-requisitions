@@ -29,8 +29,8 @@
                                     id="officerSelect">
                                     <option value="" selected>Select Officer</option>
                                     @foreach ($reportingOfficers as $officer)
-                                        <option value="{{ $officer->id }}">{{ $officer->reporting_officer_role }} |
-                                            {{ $officer->name }}</option>
+                                        <option value="{{ $officer->id }}">{{ $officer->reporting_officer_role }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>

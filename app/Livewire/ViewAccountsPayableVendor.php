@@ -3,15 +3,16 @@
 namespace App\Livewire;
 
 use App\Mail\ErrorNotification;
-use App\Mail\NotifyVoteControl;
 use App\Models\APVendor;
 use App\Models\RequisitionVendor;
 use App\Models\User;
+use App\Notifications\NotifyVoteControl;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 
 class ViewAccountsPayableVendor extends Component
@@ -213,29 +214,37 @@ class ViewAccountsPayableVendor extends Component
             'date_completed' => now(),
         ]);
 
-        if ($this->vendor->voteControl) {
+        if (!$this->vendor->voteControl) {
+            $this->vendor->voteControl()->create([
+                'date_received' => Carbon::now(),
+            ]);
+        } else {
             $this->vendor->voteControl->update([
                 'date_received' => Carbon::now(),
                 'is_completed' => false,
-            ]);
-        } else {
-            $this->vendor->voteControl()->create([
-                'date_received' => Carbon::now(),
             ]);
         }
 
         //Send email to Vote Control
         if ($this->requisition->is_first_pass) {
             Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable');
+            $this->requisition->statuslogs()->create([
+                'status' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable',
+                'changed_by' => Auth::user()->name,
+            ]);
         } else {
             Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
+            $this->requisition->statuslogs()->create([
+                'status' => 'Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable',
+                'changed_by' => Auth::user()->name,
+            ]);
         }
 
         //Get Vote Control users
         $users = User::voteControl()->get();
 
         foreach ($users as $user) {
-            // Mail::to($user->email)->send(new NotifyVoteControl($this->vendor));
+            Notification::send($user, new NotifyVoteControl($this->vendor));
         }
 
         return redirect()->route('accounts_payable.index')->with('success', 'Sent to Vote Control successfully');

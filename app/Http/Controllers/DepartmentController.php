@@ -14,9 +14,12 @@ class DepartmentController extends Controller
     public function getDepartments(Request $request)
     {
         if ($request->ajax()) {
-            $data = Department::select(['id', 'name', 'head_of_department_id']);
+            $data = Department::with('headOfDepartment')->select('departments.*');
             return Datatables::of($data)
                 ->addIndexColumn()
+                ->addColumn('head_of_department', function ($row) {
+                    return $row->headOfDepartment->name ?? 'N/A';
+                })
                 ->addColumn('action', function($row){
                     $headOfDepartmentId = $row->head_of_department_id ?? 'null';
                     $btn = '<div style="text-align:center"><a href="javascript:void(0)" onclick="showEdit('.$row->id.', \''.$row->name.'\', '.$headOfDepartmentId.')" class="btn btn-primary btn-sm">Edit</a></div>';

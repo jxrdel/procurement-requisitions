@@ -3,9 +3,6 @@
 namespace App\Livewire;
 
 use App\Mail\ErrorNotification;
-use App\Mail\NotifyAccountsPayable;
-use App\Mail\NotifyCostBudgeting;
-use App\Mail\NotifyVoteControl;
 use App\Models\CBRequisition;
 use App\Models\Cheque;
 use App\Models\Department;
@@ -15,11 +12,13 @@ use App\Models\Status;
 use App\Models\User;
 use App\Models\VendorInvoice;
 use App\Models\Vote;
+use App\Notifications\NotifyAccountsPayable;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Layout;
@@ -755,7 +754,7 @@ class ViewRequisition extends Component
             'vendor_status' => 'Sent to Accounts Payable',
         ]);
 
-        if (!isset($vendor->ap)) {
+        if (!$vendor->ap) {
             $vendor->ap()->create([
                 'date_received' => Carbon::now(),
             ]);
@@ -777,10 +776,18 @@ class ViewRequisition extends Component
             ]);
         }
 
-        $this->requisition->statuslogs()->create([
-            'details' => 'Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username,
-            'created_by' => Auth::user()->username,
-        ]);
+        if ($this->requisition->is_first_pass) {
+            $this->requisition->statuslogs()->create([
+                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username . ' for commitment',
+                'created_by' => Auth::user()->username,
+            ]);
+        } else {
+            $this->requisition->statuslogs()->create([
+                'details' => 'Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username,
+                'created_by' => Auth::user()->username,
+            ]);
+        }
+
 
         //Send email to Accounts Payable
         Log::info('Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username);
@@ -788,10 +795,9 @@ class ViewRequisition extends Component
         //Get Accounts Payable users
         $users = User::accountsPayable()->get();
 
-        foreach ($users as $user) {
-            // Mail::to($user->email)->send(new NotifyAccountsPayable($vendor));
-            // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
-        }
+        // foreach ($users as $user) {
+        //     Notification::send($user, new NotifyAccountsPayable($vendor));
+        // }
 
         // return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Accounts Payable');
 
@@ -880,6 +886,7 @@ class ViewRequisition extends Component
             'date_sent_audit' => null,
             'date_received_from_audit' => null,
             'date_sent_chequeprocessing' => null,
+            'date_committed_vc' => null,
 
             // Cheque Processing
             'date_of_cheque' => null,
@@ -888,6 +895,7 @@ class ViewRequisition extends Component
             'date_sent_dispatch' => null,
 
             'accordionView' => 'hide',
+            'votes' => [],
         ];
     }
 

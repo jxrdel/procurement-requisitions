@@ -17,6 +17,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Head of Department</th>
                             <th style="text-align: center;width:20%">Actions</th>
                         </tr>
                     </thead>
@@ -83,15 +84,14 @@
                         name: 'name'
                     },
                     {
-                        data: null,
+                        data: 'head_of_department',
+                        name: 'headOfDepartment.name'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
                         orderable: false,
-                        searchable: false,
-                        render: function(data, type, row) {
-                            return ' <div style="text-align:center"><a class="btn btn-primary" href="javascript:void(0);" onclick="showEdit(' +
-                                data.id +
-                                ', \'' + data.name + '\', ' + data.head_of_department_id +
-                                ')">Edit</a></div>';
-                        }
+                        searchable: false
                     },
                 ]
             });
@@ -123,12 +123,10 @@
                         if (xhr.status === 422) {
                             var errors = xhr.responseJSON.errors;
                             $.each(errors, function(key, value) {
-                                $('#edit_' + key).after('<span class="text-danger">' + value[
-                                    0] + '</span>');
+                                $('#edit_' + key).after('<span class="text-danger">' +
+                                    value[
+                                        0] + '</span>');
                             });
-                        } else {
-                            // Handle other errors
-                            console.log(xhr.responseText);
                         }
                     }
                 });

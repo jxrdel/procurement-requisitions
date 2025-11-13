@@ -11,9 +11,11 @@
 
             <div class="d-flex align-items-center justify-content-between mb-5 position-relative">
                 {{-- Back button --}}
-                <a href="{{ route('requisitions.index') }}" class="btn btn-dark">
-                    <i class="ri-arrow-left-circle-line me-1"></i> Back
-                </a>
+                @can('view-requisitions')
+                    <a href="{{ route('requisitions.index') }}" class="btn btn-dark">
+                        <i class="ri-arrow-left-circle-line me-1"></i> Back
+                    </a>
+                @endcan
 
                 {{-- Centered requisition number --}}
                 <div class="position-absolute start-50 translate-middle-x text-center">
@@ -507,9 +509,9 @@
                                                 <div class="form-floating form-floating-outline">
                                                     <select wire:model="tender_type" class="form-select">
                                                         <option value="">Select Tender Type</option>
-                                                        <option value="Sole Source">Sole Source</option>
-                                                        <option value="Request for Quotes">Request for Quotes</option>
                                                         <option value="Open Tender">Open Tender</option>
+                                                        <option value="Sole Select">Sole Select</option>
+                                                        <option value="Selective Tender">Selective Tender</option>
                                                     </select>
                                                     <label>Tender Type</label>
                                                 </div>
