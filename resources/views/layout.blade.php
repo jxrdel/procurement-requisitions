@@ -61,17 +61,17 @@
         }
 
         .btn-check:checked+.btn-outline-primary {
-            background-color: #6f42c1 !important;
+            background-color: #006fba !important;
             /* purple */
             color: #fff !important;
             /* white text */
-            border-color: #6f42c1 !important;
+            border-color: #006fba !important;
         }
 
         /* Optional: hover effect on checked button */
         .btn-check:checked+.btn-outline-primary:hover {
-            background-color: #7f5bc7 !important;
-            border-color: #5a35a3 !important;
+            background-color: #0489e2 !important;
+            border-color: #006fba !important;
         }
     </style>
 </head>

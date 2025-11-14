@@ -8,7 +8,7 @@
 [data-bs-theme=light] {
   --bs-blue: #16b1ff;
   --bs-indigo: #666cff;
-  --bs-purple: #8c57ff;
+  --bs-purple: #006fba;
   --bs-pink: #e83e8c;
   --bs-red: #ff4c51;
   --bs-orange: #ffb400;
@@ -22,7 +22,7 @@
   --bs-gray-dark: rgba(46, 38, 61, 0.8);
   --bs-gray-25: rgba(46, 38, 61, 0.025);
   --bs-gray-50: rgba(46, 38, 61, 0.06);
-  --bs-primary: #8c57ff;
+  --bs-primary: #006fba;
   --bs-secondary: #8a8d93;
   --bs-success: #56ca00;
   --bs-info: #16b1ff;
@@ -31,7 +31,7 @@
   --bs-light: #dfdfe3;
   --bs-dark: #4b4b4b;
   --bs-gray: rgba(46, 38, 61, 0.5);
-  --bs-primary-rgb: 140, 87, 255;
+  --bs-primary-rgb: 0, 111, 186;
   --bs-secondary-rgb: 138, 141, 147;
   --bs-success-rgb: 86, 202, 0;
   --bs-info-rgb: 22, 177, 255;
@@ -40,7 +40,7 @@
   --bs-light-rgb: 223, 223, 227;
   --bs-dark-rgb: 75, 75, 75;
   --bs-gray-rgb: 46, 38, 61;
-  --bs-primary-text-emphasis: #382366;
+  --bs-primary-text-emphasis: #002c4a;
   --bs-secondary-text-emphasis: #37383b;
   --bs-success-text-emphasis: #225100;
   --bs-info-text-emphasis: #094766;
@@ -48,7 +48,7 @@
   --bs-danger-text-emphasis: #661e20;
   --bs-light-text-emphasis: rgba(46, 38, 61, 0.7);
   --bs-dark-text-emphasis: rgba(46, 38, 61, 0.7);
-  --bs-primary-bg-subtle: #e8ddff;
+  --bs-primary-bg-subtle: #cce6f5;
   --bs-secondary-bg-subtle: #e8e8e9;
   --bs-success-bg-subtle: #ddf4cc;
   --bs-info-bg-subtle: #d0efff;
@@ -56,7 +56,7 @@
   --bs-danger-bg-subtle: #ffdbdc;
   --bs-light-bg-subtle: rgba(245, 244, 245, 0.55);
   --bs-dark-bg-subtle: rgba(46, 38, 61, 0.4);
-  --bs-primary-border-subtle: #d1bcff;
+  --bs-primary-border-subtle: #99d2ed;
   --bs-secondary-border-subtle: #d0d1d4;
   --bs-success-border-subtle: #bbea99;
   --bs-info-border-subtle: #a2e0ff;
@@ -89,11 +89,11 @@
   --bs-tertiary-bg: rgba(46, 38, 61, 0.1);
   --bs-tertiary-bg-rgb: 46, 38, 61;
   --bs-heading-color: #433c50;
-  --bs-link-color: #8c57ff;
-  --bs-link-color-rgb: 140, 87, 255;
+  --bs-link-color: #006fba;
+  --bs-link-color-rgb: 0, 111, 186;
   --bs-link-decoration: none;
-  --bs-link-hover-color: #7e4ee6;
-  --bs-link-hover-color-rgb: 126, 78, 230;
+  --bs-link-hover-color: #005a95;
+  --bs-link-hover-color-rgb: 0, 90, 149;
   --bs-code-color: #e83e8c;
   --bs-highlight-color: #6d6777;
   --bs-highlight-bg: #fff0cc;
