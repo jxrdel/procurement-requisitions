@@ -28,6 +28,22 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
+        Gate::define('view-dashboard', function ($user) {
+            return in_array($user->department->name, [
+                'Office of the Deputy Permanent Secretary',
+                'Procurement Unit',
+            ]);
+        });
+
+        Gate::define('view-requisitions-index', function ($user) {
+            return in_array($user->department->name, [
+                'Office of the Permanent Secretary',
+                'Office of the Deputy Permanent Secretary',
+                'Office of the Chief Medical Officer',
+                'Procurement Unit',
+            ]);
+        });
+
         Gate::define('change-financial-year', function ($user) {
             return $user->role->name === 'Admin';
         });
@@ -40,12 +56,16 @@ class AppServiceProvider extends ServiceProvider
             return $user->role->name !== 'Viewer' && $user->role->name !== 'Requisition Form User';
         });
 
-        Gate::define('create-requisitions', function ($user, $form) {
+        Gate::define('edit-requisition', function ($user) {
+            return $user->department->name === 'Procurement Unit';
+        });
+
+        Gate::define('create-requisitions', function ($user) {
             return $user->department->name === 'Procurement Unit';
         });
 
         Gate::define('view-procurement-requisitions', function ($user) {
-            return $user->department->name === 'Procurement Unit' || ($user->role->name !== 'Requisition Form User');
+            return $user->department->name === 'Procurement Unit' || ($user->is_reporting_officer && ($user->reporting_officer_role === 'Permanent Secretary' || $user->reporting_officer_role === 'Deputy Permanent Secretary' || $user->reporting_officer_role === 'Chief Medical Officer'));
         });
 
         Gate::define('view-requisition', function ($user, $requisition) {

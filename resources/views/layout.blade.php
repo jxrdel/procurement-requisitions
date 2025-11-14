@@ -81,10 +81,11 @@
                 <ul class="menu-inner py-1">
                     <!-- Dashboards -->
 
+                    <li class="menu-header">
+                        <span class="menu-header-text">Menu</span>
+                    </li>
+
                     @can('view-procurement-requisitions')
-                        <li class="menu-header">
-                            <span class="menu-header-text">Menu</span>
-                        </li>
                         <li @class(['menu-item', 'active' => request()->routeIs('/')])>
                             <a href="{{ route('/') }}" class="menu-link">
                                 <i class="menu-icon tf-icons ri-home-smile-line"></i>
@@ -101,6 +102,47 @@
                                 <div data-i18n="Basic">Requisitions</div>
                             </a>
                         </li>
+                    @else
+                        @php
+                            $requisitionRoute = null;
+                            $isRequisitionActive = false;
+                            $headerText = null;
+
+                            if (Auth::user()->can('view-cost-budgeting-requisitions')) {
+                                $requisitionRoute = route('cost_and_budgeting.index');
+                                $isRequisitionActive = request()->routeIs('cost_and_budgeting.*');
+                                $headerText = 'Cost & Budgeting';
+                            } elseif (Auth::user()->can('view-accounts-payable-requisitions')) {
+                                $requisitionRoute = route('accounts_payable.index');
+                                $isRequisitionActive = request()->routeIs('accounts_payable.*');
+                                $headerText = 'Accounts Payable';
+                            } elseif (Auth::user()->can('view-vote-control-requisitions')) {
+                                $requisitionRoute = route('vote_control.index');
+                                $isRequisitionActive = request()->routeIs('vote_control.*');
+                                $headerText = 'Vote Control';
+                            } elseif (Auth::user()->can('view-check-room-requisitions')) {
+                                $requisitionRoute = route('check_room.index');
+                                $isRequisitionActive = request()->routeIs('check_room.*');
+                                $headerText = 'Check Staff';
+                            } elseif (Auth::user()->can('view-cheque-processing-requisitions')) {
+                                $requisitionRoute = route('cheque_processing.index');
+                                $isRequisitionActive = request()->routeIs('cheque_processing.*');
+                                $headerText = 'Cheque Processing';
+                            }
+                        @endphp
+
+                        @if (
+                            $requisitionRoute &&
+                                Auth::user()->role->name !== 'Super Admin' &&
+                                Auth::user()->role->name !== 'Admin' &&
+                                Auth::user()->department->name !== 'Procurement Unit')
+                            <li @class(['menu-item', 'active' => $isRequisitionActive])>
+                                <a href="{{ $requisitionRoute }}" class="menu-link">
+                                    <i class="menu-icon ri-file-edit-line"></i>
+                                    <div data-i18n="Basic">Requisitions</div>
+                                </a>
+                            </li>
+                        @endif
                     @endcan
 
                     <li @class([
@@ -113,12 +155,14 @@
                         </a>
                     </li>
 
-                    <li @class(['menu-item', 'active' => request()->routeIs('queue')])>
-                        <a href="{{ route('queue') }}" class="menu-link">
-                            <i class="menu-icon ri-list-ordered-2"></i>
-                            <div data-i18n="Basic">Queue</div>
-                        </a>
-                    </li>
+                    @can('view-queue-page')
+                        <li @class(['menu-item', 'active' => request()->routeIs('queue')])>
+                            <a href="{{ route('queue') }}" class="menu-link">
+                                <i class="menu-icon ri-list-ordered-2"></i>
+                                <div data-i18n="Basic">Queue</div>
+                            </a>
+                        </li>
+                    @endcan
 
                     @can('view-users-page')
                         <li @class(['menu-item', 'active' => request()->routeIs('users')])>
@@ -149,50 +193,6 @@
                             </a>
                         </li>
                     @endcan
-
-                    @php
-                        $requisitionRoute = null;
-                        $isRequisitionActive = false;
-                        $headerText = null;
-
-                        if (Auth::user()->can('view-cost-budgeting-requisitions')) {
-                            $requisitionRoute = route('cost_and_budgeting.index');
-                            $isRequisitionActive = request()->routeIs('cost_and_budgeting.*');
-                            $headerText = 'Cost & Budgeting';
-                        } elseif (Auth::user()->can('view-accounts-payable-requisitions')) {
-                            $requisitionRoute = route('accounts_payable.index');
-                            $isRequisitionActive = request()->routeIs('accounts_payable.*');
-                            $headerText = 'Accounts Payable';
-                        } elseif (Auth::user()->can('view-vote-control-requisitions')) {
-                            $requisitionRoute = route('vote_control.index');
-                            $isRequisitionActive = request()->routeIs('vote_control.*');
-                            $headerText = 'Vote Control';
-                        } elseif (Auth::user()->can('view-check-room-requisitions')) {
-                            $requisitionRoute = route('check_room.index');
-                            $isRequisitionActive = request()->routeIs('check_room.*');
-                            $headerText = 'Check Staff';
-                        } elseif (Auth::user()->can('view-cheque-processing-requisitions')) {
-                            $requisitionRoute = route('cheque_processing.index');
-                            $isRequisitionActive = request()->routeIs('cheque_processing.*');
-                            $headerText = 'Cheque Processing';
-                        }
-                    @endphp
-
-                    @if (
-                        $requisitionRoute &&
-                            Auth::user()->role->name !== 'Super Admin' &&
-                            Auth::user()->role->name !== 'Admin' &&
-                            Auth::user()->department->name !== 'Procurement Unit')
-                        <li class="menu-header mt-7">
-                            <span class="menu-header-text">{{ $headerText }}</span>
-                        </li>
-                        <li @class(['menu-item', 'active' => $isRequisitionActive])>
-                            <a href="{{ $requisitionRoute }}" class="menu-link">
-                                <i class="menu-icon ri-file-edit-line"></i>
-                                <div data-i18n="Basic">Requisitions</div>
-                            </a>
-                        </li>
-                    @endif
 
                     <li @class([
                         'menu-item mb-3',

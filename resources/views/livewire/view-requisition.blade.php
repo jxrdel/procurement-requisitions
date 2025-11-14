@@ -11,7 +11,7 @@
 
             <div class="d-flex align-items-center justify-content-between mb-5 position-relative">
                 {{-- Back button --}}
-                @can('view-requisitions')
+                @can('view-requisitions-index')
                     <a href="{{ route('requisitions.index') }}" class="btn btn-dark">
                         <i class="ri-arrow-left-circle-line me-1"></i> Back
                     </a>
@@ -114,7 +114,7 @@
 
                         <div id="procurementView1">
                             <form wire:submit.prevent="edit">
-                                @can('edit-records')
+                                @can('edit-requisition')
                                     <div class="row text-center">
                                         <div x-show="!isEditingProcurement1">
                                             <button type="button" @click="isEditingProcurement1 = ! isEditingProcurement1"
@@ -758,7 +758,7 @@
 
                             </form>
 
-                            @can('edit-records')
+                            @can('edit-requisition')
                                 @if (!$this->sent_to_cb)
                                     <div class="row mt-8" x-show="!isEditingProcurement1">
                                         <button @disabled($this->isSendCBButtonDisabled)
@@ -900,7 +900,7 @@
 
                         <div id="procurementView2">
                             <form wire:submit.prevent="editProcurement2">
-                                @can('edit-records')
+                                @can('edit-requisition')
                                     <div class="row text-center">
                                         <div x-show="!isEditingProcurement2">
                                             <button type="button"
@@ -964,7 +964,7 @@
 
                                         @if (!$this->requisition->is_first_pass)
                                             <div class="row mt-5">
-                                                @can('edit-records')
+                                                @can('edit-requisition')
                                                     @if (!$vendor['sent_to_ap'])
                                                         <div class="row mt-8">
                                                             <button @disabled($this->isProcurement2ButtonDisabled($vendor))
@@ -1019,26 +1019,27 @@
 
                                         </div>
                                     @endforelse
-
-                                    @if ($this->requisition->is_first_pass && count($vendors) > 0 && !$this->requisition->sent_to_ap_first_pass)
-                                        <div class="row mt-8">
-                                            <button @disabled($this->isSendAllToAPButtonDisabled)
-                                                wire:confirm="Are you sure you want to send to accounts payable?"
-                                                wire:target="sendToAP({{ $vendors[0]['id'] }})"
-                                                wire:loading.attr="disabled" type="button"
-                                                wire:click="sendToAP({{ $vendors[0]['id'] }})"
-                                                class="btn btn-success waves-effect waves-light m-auto"
-                                                style="width: 300px">
-                                                <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to
-                                                Accounts Payable
-                                                <div wire:loading wire:target="sendToAP({{ $vendors[0]['id'] }})"
-                                                    class="spinner-border spinner-border-lg text-white mx-2"
-                                                    role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    @endif
+                                    @can('edit-requisition')
+                                        @if ($this->requisition->is_first_pass && count($vendors) > 0 && !$this->requisition->sent_to_ap_first_pass)
+                                            <div class="row mt-8">
+                                                <button @disabled($this->isSendAllToAPButtonDisabled)
+                                                    wire:confirm="Are you sure you want to send to accounts payable?"
+                                                    wire:target="sendToAP({{ $vendors[0]['id'] }})"
+                                                    wire:loading.attr="disabled" type="button"
+                                                    wire:click="sendToAP({{ $vendors[0]['id'] }})"
+                                                    class="btn btn-success waves-effect waves-light m-auto"
+                                                    style="width: 300px">
+                                                    <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to
+                                                    Accounts Payable
+                                                    <div wire:loading wire:target="sendToAP({{ $vendors[0]['id'] }})"
+                                                        class="spinner-border spinner-border-lg text-white mx-2"
+                                                        role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        @endif
+                                    @endcan
                                 </div>
 
                                 <div x-transition x-show="isEditingProcurement2">
@@ -1450,7 +1451,7 @@
                 <h4 class="text-center fw-bold">Status Log</h4>
             </div>
 
-            @can('edit-records')
+            @can('edit-requisition')
                 <div class="row">
                     <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#addLogModal"
                         class="btn btn-primary waves-effect waves-light w-25 m-auto">
@@ -1497,7 +1498,7 @@
                     <h4 class="text-center fw-bold">File Uploads</h4>
                 </div>
 
-                @can('edit-records')
+                @can('edit-requisition')
                     <div class="row">
                         <div class="col" style="text-align: center;padding-bottom:10px">
                             @error('upload')
@@ -1530,7 +1531,7 @@
                                         {{-- <button type="button" class="btn btn-danger">
                                                 <i class="ri-delete-bin-2-line me-1"></i> Delete
                                             </button> --}}
-                                        @can('edit-records')
+                                        @can('edit-requisition')
                                             <a href="javascript:void(0)"
                                                 wire:confirm="Are you sure you want to delete this file?"
                                                 wire:click="deleteFile({{ $upload->id }})">

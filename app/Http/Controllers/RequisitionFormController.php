@@ -22,7 +22,7 @@ class RequisitionFormController extends Controller
         $user = Auth::user();
         $forms = RequisitionRequestForm::with(['items', 'requisition'])->select('requisition_request_forms.*');
 
-        if ($user->role->name !== 'Super Admin' && $user->department->name !== 'Office of the Permanent Secretary') {
+        if ($user->role->name !== 'Super Admin') {
             $forms->where('requesting_unit', $user->department_id);
         }
 
