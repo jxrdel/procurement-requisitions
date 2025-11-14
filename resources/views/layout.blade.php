@@ -59,6 +59,20 @@
         body #toast-container>div {
             opacity: 1;
         }
+
+        .btn-check:checked+.btn-outline-primary {
+            background-color: #6f42c1 !important;
+            /* purple */
+            color: #fff !important;
+            /* white text */
+            border-color: #6f42c1 !important;
+        }
+
+        /* Optional: hover effect on checked button */
+        .btn-check:checked+.btn-outline-primary:hover {
+            background-color: #7f5bc7 !important;
+            border-color: #5a35a3 !important;
+        }
     </style>
 </head>
 

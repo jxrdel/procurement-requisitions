@@ -234,7 +234,7 @@ class Controller
                 $query = $query->merge($forms);
 
                 $requisitions = CBRequisition::where('is_completed', false)->with('requisition')->get()->map(function ($item) {
-                    $status = $item->is_completed === true
+                    $status = $item->is_completed == true
                         ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
 
@@ -302,6 +302,232 @@ class Controller
                 $query = $query->merge($forms);
             } elseif ($departmentName === 'Procurement Unit') {
                 $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->get()->map(function ($item) {
+                    $status = $item->status === 'Completed'
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->reporting_officer_approval_date,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+            }
+        }
+
+        return DataTables::of($query->sortByDesc('date_received'))
+            ->addColumn('view', function ($row) use ($departmentName) {
+                $url = '';
+                if ($row['item_type'] === 'Requisition Form') {
+                    $url = route('requisition_forms.view', $row['id']);
+                } else {
+                    if ($departmentName === 'Cost & Budgeting') {
+                        $url = route('cost_and_budgeting.view', $row['id']);
+                    } else {
+                        $url = route('requisitions.view', $row['id']);
+                    }
+                }
+                return '<div style="text-align:center;"><a href="' . $url . '" class="btn btn-primary btn-sm">View</a></div>';
+            })
+            ->rawColumns(['status', 'view'])
+            ->make(true);
+    }
+
+    public function getInProgressQueue()
+    {
+        $user = Auth::user();
+        $departmentName = $user->department->name;
+        $query = collect();
+
+        if ($user->role->name === 'Super Admin') {
+            $forms = RequisitionRequestForm::where('status', '!=', 'Completed')->get()->map(function ($item) {
+                $status = $item->status === 'Completed'
+                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                return [
+                    'id' => $item->id,
+                    'item_type' => 'Requisition Form',
+                    'item_code' => $item->form_code,
+                    'requesting_unit' => $item->requestingUnit->name,
+                    'item' => $item->items->pluck('name')->implode(', '),
+                    'date_received' => $item->created_at,
+                    'status' => $status,
+                ];
+            });
+            $query = $query->merge($forms);
+
+            $requisitions = CBRequisition::where('is_completed', false)->with('requisition')->get()->map(function ($item) {
+                $status = $item->requisition->requisition_status === 'Completed'
+                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
+
+                return [
+                    'id' => $item->id,
+                    'item_type' => 'Requisition',
+                    'item_code' => $item->requisition->requisition_no,
+                    'requesting_unit' => $item->requisition->department->name,
+                    'item' => $item->requisition->item,
+                    'date_received' => $item->date_received,
+                    'status' => $status,
+                ];
+            });
+            $query = $query->merge($requisitions);
+        } else {
+            if ($departmentName === 'Cost & Budgeting') {
+                $forms = RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', false)->get()->map(function ($item) {
+                    $status = $item->completed_by_cab == true
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->date_sent_to_cab,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+
+                $requisitions = CBRequisition::where('is_completed', false)->with('requisition')->get()->map(function ($item) {
+                    $status = $item->is_completed == true
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition',
+                        'item_code' => $item->requisition->requisition_no,
+                        'requesting_unit' => $item->requisition->department->name,
+                        'item' => $item->requisition->item,
+                        'date_received' => $item->date_received,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($requisitions);
+            } elseif ($departmentName === 'Procurement Unit') {
+                $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', '!=', 'Completed')->get()->map(function ($item) {
+                    $status = $item->status === 'Completed'
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->reporting_officer_approval_date,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+            }
+        }
+
+        return DataTables::of($query->sortByDesc('date_received'))
+            ->addColumn('view', function ($row) use ($departmentName) {
+                $url = '';
+                if ($row['item_type'] === 'Requisition Form') {
+                    $url = route('requisition_forms.view', $row['id']);
+                } else {
+                    if ($departmentName === 'Cost & Budgeting') {
+                        $url = route('cost_and_budgeting.view', $row['id']);
+                    } else {
+                        $url = route('requisitions.view', $row['id']);
+                    }
+                }
+                return '<div style="text-align:center;"><a href="' . $url . '" class="btn btn-primary btn-sm">View</a></div>';
+            })
+            ->rawColumns(['status', 'view'])
+            ->make(true);
+    }
+
+    public function getCompletedQueue()
+    {
+        $user = Auth::user();
+        $departmentName = $user->department->name;
+        $query = collect();
+
+        if ($user->role->name === 'Super Admin') {
+            $forms = RequisitionRequestForm::where('status', 'Completed')->get()->map(function ($item) {
+                $status = $item->status === 'Completed'
+                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                return [
+                    'id' => $item->id,
+                    'item_type' => 'Requisition Form',
+                    'item_code' => $item->form_code,
+                    'requesting_unit' => $item->requestingUnit->name,
+                    'item' => $item->items->pluck('name')->implode(', '),
+                    'date_received' => $item->created_at,
+                    'status' => $status,
+                ];
+            });
+            $query = $query->merge($forms);
+
+            $requisitions = CBRequisition::where('is_completed', true)->with('requisition')->get()->map(function ($item) {
+                $status = $item->requisition->requisition_status === 'Completed'
+                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
+
+                return [
+                    'id' => $item->id,
+                    'item_type' => 'Requisition',
+                    'item_code' => $item->requisition->requisition_no,
+                    'requesting_unit' => $item->requisition->department->name,
+                    'item' => $item->requisition->item,
+                    'date_received' => $item->date_received,
+                    'status' => $status,
+                ];
+            });
+            $query = $query->merge($requisitions);
+        } else {
+            if ($departmentName === 'Cost & Budgeting') {
+                $forms = RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', true)->get()->map(function ($item) {
+                    $status = $item->completed_by_cab == true
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->date_sent_to_cab,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+
+                $requisitions = CBRequisition::where('is_completed', true)->with('requisition')->get()->map(function ($item) {
+                    $status = $item->is_completed == true
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition',
+                        'item_code' => $item->requisition->requisition_no,
+                        'requesting_unit' => $item->requisition->department->name,
+                        'item' => $item->requisition->item,
+                        'date_received' => $item->date_received,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($requisitions);
+            } elseif ($departmentName === 'Procurement Unit') {
+                $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', 'Completed')->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
                         ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';

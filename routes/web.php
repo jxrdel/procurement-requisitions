@@ -97,3 +97,5 @@ Route::resource('departments', DepartmentController::class)->only([
     'update'
 ]);
 Route::get('departments', [DepartmentController::class, 'getDepartments'])->name('departments.index');
+Route::get('/queue/in-progress', [Controller::class, 'getInProgressQueue'])->name('getInProgressQueue');
+Route::get('/queue/completed', [Controller::class, 'getCompletedQueue'])->name('getCompletedQueue');
