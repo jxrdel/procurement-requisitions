@@ -7,11 +7,13 @@ use App\Mail\NotifyCheckRoom;
 use App\Models\RequisitionVendor;
 use App\Models\User;
 use App\Models\VoteControlVendor;
+use App\Notifications\FundsCommitted;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 
 class ViewVoteControlVendor extends Component
@@ -57,6 +59,10 @@ class ViewVoteControlVendor extends Component
             if (($this->batch_no !== null || trim($this->batch_no) == '') && ($this->voucher_no !== null && trim($this->voucher_no) !== '')) {
                 $this->isEditing = false;
             }
+        }
+
+        if(!$this->requisition->is_first_pass && $this->vc_vendor->is_completed == "1") {
+            $this->isEditing = false;
         }
 
         if (Auth::user()->role->name === 'Viewer') {
@@ -175,16 +181,19 @@ class ViewVoteControlVendor extends Component
             ]);
         }
 
+        // Procurement officer for requisition
+        $procurement_user = $this->requisition->procurement_officer;
+        Notification::send($procurement_user, new FundsCommitted($this->requisition));
+
         $this->requisition->update([
             'requisition_status' => 'Sent to Procurement',
             'is_first_pass' => false,
         ]);
 
-        // foreach ($this->requisition_vendors as $vendorData) {
-        //     $vendor = RequisitionVendor::find($vendorData['id']);
-        //     // Mail::to($procurement_user->email)->send(new NotifyProcurement($vendor));
-        // }
-
+        $this->requisition->statusLogs()->create([
+            'details' => 'Funds committed by Vote Control and sent to Procurement by ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
         return redirect()->route('vote_control.index')->with('success', 'Sent to Procurement successfully');
     }
 
