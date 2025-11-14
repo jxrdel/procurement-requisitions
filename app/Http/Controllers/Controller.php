@@ -430,6 +430,57 @@ class Controller
                     ];
                 });
                 $query = $query->merge($forms);
+            } elseif ($departmentName === 'Office of the Permanent Secretary') {
+                $forms = RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
+                    $status = $item->status === 'Completed'
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->reporting_officer_approval_date,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+            } elseif ($departmentName === 'Office of the Deputy Permanent Secretary') {
+                $forms = RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
+                    $status = $item->status === 'Completed'
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->reporting_officer_approval_date,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+            } elseif ($departmentName === 'Office of the Chief Medical Officer') {
+                $forms = RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
+                    $status = $item->status === 'Completed'
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->reporting_officer_approval_date,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
             }
         }
 
@@ -528,6 +579,57 @@ class Controller
                 $query = $query->merge($requisitions);
             } elseif ($departmentName === 'Procurement Unit') {
                 $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', 'Completed')->get()->map(function ($item) {
+                    $status = $item->status === 'Completed'
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->reporting_officer_approval_date,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+            } elseif ($departmentName === 'Office of the Permanent Secretary') {
+                $forms = RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', true)->get()->map(function ($item) {
+                    $status = $item->status === 'Completed'
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->reporting_officer_approval_date,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+            } elseif ($departmentName === 'Office of the Deputy Permanent Secretary') {
+                $forms = RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', true)->get()->map(function ($item) {
+                    $status = $item->status === 'Completed'
+                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
+
+                    return [
+                        'id' => $item->id,
+                        'item_type' => 'Requisition Form',
+                        'item_code' => $item->form_code,
+                        'requesting_unit' => $item->requestingUnit->name,
+                        'item' => $item->items->pluck('name')->implode(', '),
+                        'date_received' => $item->reporting_officer_approval_date,
+                        'status' => $status,
+                    ];
+                });
+                $query = $query->merge($forms);
+            } elseif ($departmentName === 'Office of the Chief Medical Officer') {
+                $forms = RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', true)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
                         ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';

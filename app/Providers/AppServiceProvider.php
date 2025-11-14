@@ -105,7 +105,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-requisition-form', function ($user, $form) {
-            return $user->id == $form->contact_person_id || $user->id == $form->head_of_department_id || $user->is_reporting_officer || $user->department->name === 'Procurement Unit' || $user->department->name == 'Cost & Budgeting';
+            return $user->id == $form->contact_person_id || $user->id == $form->head_of_department_id || $user->is_reporting_officer || $user->department->name === 'Procurement Unit' || $user->department->name == 'Cost & Budgeting' || $user->department->name == $form->requestingUnit->name;
         });
 
         Gate::define('view-queue-page', function ($user) {

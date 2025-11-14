@@ -16,6 +16,7 @@ use App\Notifications\NotifyAccountsPayable;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -141,6 +142,11 @@ class ViewRequisition extends Component
         $this->staff = User::procurement()->get();
 
         $this->requisition = Requisition::find($id);
+
+        if (Gate::denies('view-requisition', $this->requisition)) {
+            abort(403, 'You do not have permission to view this requisition.');
+        }
+
         if (!$this->requisition) {
             return abort(404);
         }

@@ -111,7 +111,25 @@ class RequisitionController extends Controller
                 'departments.name as RequestingUnit',
                 'requisitions.requisition_status' // Add requisition_status to the select
             ])
-            ->where('requisitions.is_completed', true);
+            ->where('requisitions.is_completed', true)
+            ->selectRaw("
+                CAST(cost_budgeting_requisitions.is_completed AS INT) AS is_completed,
+                STRING_AGG(requisition_vendors.vendor_status, ', ') AS vendor_status, 
+                COUNT(requisition_vendors.id) AS vendor_count,
+                CAST(LEFT(requisitions.requisition_no, CHARINDEX('-', requisitions.requisition_no) - 1) AS INT) AS req_number,
+                CAST(SUBSTRING(requisitions.requisition_no, CHARINDEX('-', requisitions.requisition_no) + 1, 2) AS INT) AS year_start,
+                CAST(RIGHT(requisitions.requisition_no, 2) AS INT) AS year_end
+            ")
+            ->groupBy([
+                'requisitions.id',
+                'requisitions.requisition_no',
+                'requisitions.source_of_funds',
+                'requisitions.item',
+                'users.name',
+                'departments.name',
+                'requisitions.requisition_status',
+                'cost_budgeting_requisitions.is_completed'
+            ]);
 
 
         // Restrict for Viewers (not Procurement or Office of the Permanent Secretary)
