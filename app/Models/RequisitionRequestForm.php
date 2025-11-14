@@ -56,6 +56,7 @@ class RequisitionRequestForm extends Model
         'sent_to_dps',
         'sent_to_cmo',
         'cab_note',
+        'date_sent_to_cab',
     ];
 
     protected $casts = [
@@ -78,6 +79,7 @@ class RequisitionRequestForm extends Model
         'sent_to_ps' => 'boolean',
         'sent_to_dps' => 'boolean',
         'sent_to_cmo' => 'boolean',
+        'date_sent_to_cab' => 'datetime',
     ];
 
     protected static function booted(): void

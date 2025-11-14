@@ -245,6 +245,11 @@ class ViewRequisition extends Component
         // Iterate through vendors and find the least progressed stage
         foreach ($stages as $stage => $condition) {
             foreach ($vendors as $vendor) {
+
+                if ($this->requisition->requisition_status == 'Sent to Procurement') {
+                    $this->active_pane = 'procurement2';
+                    return;
+                }
                 if ($condition($vendor)) {
                     $this->active_pane = $stage;
                     return; // Stop as soon as the least progressed stage is found

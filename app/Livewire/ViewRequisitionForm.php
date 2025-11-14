@@ -614,6 +614,7 @@ class ViewRequisitionForm extends Component
     {
         $this->requisitionForm->status = RequestFormStatus::SENT_TO_COST_BUDGETING;
         $this->requisitionForm->sent_to_cab = true;
+        $this->requisitionForm->date_sent_to_cab = now();
         $this->requisitionForm->save();
         $costAndBudgetingUsers = User::costBudgeting()->get();
         // Notification::send($costAndBudgetingUsers, new RequestForCABApproval($this->requisitionForm));

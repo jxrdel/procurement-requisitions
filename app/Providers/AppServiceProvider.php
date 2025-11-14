@@ -88,8 +88,16 @@ class AppServiceProvider extends ServiceProvider
             return $user->id == $form->contact_person_id || $user->id == $form->head_of_department_id || $user->is_reporting_officer || $user->department->name === 'Procurement Unit' || $user->department->name == 'Cost & Budgeting';
         });
 
-        Gate::define('edit-requisition-form', function ($user, $form) {
-            return $user->id == $form->contact_person_id || $user->id == $form->head_of_department_id;
+        Gate::define('view-queue-page', function ($user) {
+            $allowedDepartments = [
+                'Office of the Chief Medical Officer',
+                'Office of the Deputy Permanent Secretary',
+                'Office of the Minister of Health',
+                'Office of the Permanent Secretary',
+                'Procurement Unit',
+                'Cost & Budgeting',
+            ];
+            return in_array($user->department->name, $allowedDepartments);
         });
     }
 }

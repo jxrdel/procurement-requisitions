@@ -167,6 +167,9 @@ class Controller
 
     public function queue()
     {
+        if (Gate::denies('view-queue-page')) {
+            abort(403);
+        }
         return view('queue');
     }
 
