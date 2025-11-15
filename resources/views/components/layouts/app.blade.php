@@ -96,7 +96,7 @@
         /* 1. Target the specific state: checked AND disabled */
         .form-check-input:checked[disabled] {
             /* Set background color to your desired primary color (assuming purple/blue) */
-            background-color: #9a87c2 !important;
+            background-color: #006fba !important;
 
             /* Force the checkmark (tick) SVG data URI to be used. */
             /* This is a standard white/light checkmark SVG data URI. */
@@ -111,6 +111,10 @@
             background-color: #e9ecef !important;
             opacity: 1 !important;
         }
+
+        .menu-link {
+            color: white !important;
+        }
     </style>
 
 </head>
@@ -123,9 +127,9 @@
 
             <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
                 <div class="app-brand demo">
-                    <i class="ri-file-edit-fill fs-3 text-primary"></i>
+                    <i class="ri-file-edit-fill fs-3 text-white"></i>
                     <a href="{{ route('/') }}" class="app-brand-link">
-                        <span class="app-brand-text demo menu-text fw-semibold ms-1">Requisitions</span>
+                        <span class="app-brand-text demo menu-text fw-semibold ms-1 text-white">Requisitions</span>
                     </a>
                 </div>
 

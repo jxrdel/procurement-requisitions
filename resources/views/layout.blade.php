@@ -73,6 +73,10 @@
             background-color: #0489e2 !important;
             border-color: #006fba !important;
         }
+
+        .menu-link {
+            color: white !important;
+        }
     </style>
 </head>
 
@@ -84,9 +88,9 @@
 
             <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
                 <div class="app-brand demo">
-                    <i class="ri-file-edit-fill fs-3 text-primary"></i>
+                    <i class="ri-file-edit-fill fs-3 text-white"></i>
                     <a href="{{ route('/') }}" class="app-brand-link">
-                        <span class="app-brand-text demo menu-text fw-semibold ms-1">Requisitions</span>
+                        <span class="app-brand-text demo menu-text fw-semibold ms-1 text-white">Requisitions</span>
                     </a>
                 </div>
 
