@@ -183,7 +183,7 @@ class Controller
         if ($user->role->name === 'Super Admin') {
             $forms = RequisitionRequestForm::all()->map(function ($item) {
                 $status = $item->status === 'Completed'
-                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                     : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                 return [
@@ -200,7 +200,7 @@ class Controller
 
             $requisitions = CBRequisition::with('requisition')->get()->map(function ($item) {
                 $status = $item->requisition->requisition_status === 'Completed'
-                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                     : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
 
                 return [
@@ -218,7 +218,7 @@ class Controller
             if ($departmentName === 'Cost & Budgeting') {
                 $forms = RequisitionRequestForm::where('sent_to_cab', true)->get()->map(function ($item) {
                     $status = $item->completed_by_cab === true
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -235,7 +235,7 @@ class Controller
 
                 $requisitions = CBRequisition::where('is_completed', false)->with('requisition')->get()->map(function ($item) {
                     $status = $item->is_completed == true
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
 
                     return [
@@ -252,7 +252,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Permanent Secretary') {
                 $forms = RequisitionRequestForm::where('sent_to_ps', true)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -269,7 +269,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Deputy Permanent Secretary') {
                 $forms = RequisitionRequestForm::where('sent_to_dps', true)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -286,7 +286,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Chief Medical Officer') {
                 $forms = RequisitionRequestForm::where('sent_to_cmo', true)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -303,7 +303,7 @@ class Controller
             } elseif ($departmentName === 'Procurement Unit') {
                 $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -347,7 +347,7 @@ class Controller
         if ($user->role->name === 'Super Admin') {
             $forms = RequisitionRequestForm::where('status', '!=', 'Completed')->get()->map(function ($item) {
                 $status = $item->status === 'Completed'
-                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                     : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                 return [
@@ -364,7 +364,7 @@ class Controller
 
             $requisitions = CBRequisition::where('is_completed', false)->with('requisition')->get()->map(function ($item) {
                 $status = $item->requisition->requisition_status === 'Completed'
-                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                     : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
 
                 return [
@@ -382,7 +382,7 @@ class Controller
             if ($departmentName === 'Cost & Budgeting') {
                 $forms = RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', false)->get()->map(function ($item) {
                     $status = $item->completed_by_cab == true
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -399,7 +399,7 @@ class Controller
 
                 $requisitions = CBRequisition::where('is_completed', false)->with('requisition')->get()->map(function ($item) {
                     $status = $item->is_completed == true
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
 
                     return [
@@ -416,7 +416,7 @@ class Controller
             } elseif ($departmentName === 'Procurement Unit') {
                 $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', '!=', 'Completed')->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -433,7 +433,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Permanent Secretary') {
                 $forms = RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -450,7 +450,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Deputy Permanent Secretary') {
                 $forms = RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -467,7 +467,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Chief Medical Officer') {
                 $forms = RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -511,7 +511,7 @@ class Controller
         if ($user->role->name === 'Super Admin') {
             $forms = RequisitionRequestForm::where('status', 'Completed')->get()->map(function ($item) {
                 $status = $item->status === 'Completed'
-                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                     : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                 return [
@@ -528,7 +528,7 @@ class Controller
 
             $requisitions = CBRequisition::where('is_completed', true)->with('requisition')->get()->map(function ($item) {
                 $status = $item->requisition->requisition_status === 'Completed'
-                    ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                    ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                     : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
 
                 return [
@@ -546,7 +546,7 @@ class Controller
             if ($departmentName === 'Cost & Budgeting') {
                 $forms = RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', true)->get()->map(function ($item) {
                     $status = $item->completed_by_cab == true
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -563,7 +563,7 @@ class Controller
 
                 $requisitions = CBRequisition::where('is_completed', true)->with('requisition')->get()->map(function ($item) {
                     $status = $item->is_completed == true
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->requisition->requisition_status . '</span></div>';
 
                     return [
@@ -580,7 +580,7 @@ class Controller
             } elseif ($departmentName === 'Procurement Unit') {
                 $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', 'Completed')->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -597,7 +597,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Permanent Secretary') {
                 $forms = RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', true)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -614,7 +614,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Deputy Permanent Secretary') {
                 $forms = RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', true)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [
@@ -631,7 +631,7 @@ class Controller
             } elseif ($departmentName === 'Office of the Chief Medical Officer') {
                 $forms = RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', true)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
-                        ? '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>'
+                        ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
 
                     return [

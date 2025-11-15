@@ -139,7 +139,7 @@
                     <!-- Dashboards -->
 
                     <li class="menu-header">
-                        <span class="menu-header-text">Menu</span>
+                        <span class="menu-header-text text-white">Menu</span>
                     </li>
 
                     @can('view-procurement-requisitions')
@@ -261,7 +261,7 @@
                         </a>
                     </li>
                     <li class="menu-header mt-7">
-                        <span class="menu-header-text">Help</span>
+                        <span class="menu-header-text text-white">Help</span>
                     </li>
                     <li @class(['menu-item mb-3', 'active' => request()->routeIs('help')])>
                         <a href="{{ route('help') }}" class="menu-link">

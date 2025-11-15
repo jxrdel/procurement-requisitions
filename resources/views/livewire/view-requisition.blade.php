@@ -23,7 +23,7 @@
                         <strong>{{ $this->requisition_no }}</strong>
                         @if ($this->requisition->is_completed)
                             <span class="badge rounded-pill bg-success fs-5"
-                                style="background-color: #47a102 !important;">
+                                style="background-color: #8bc34a !important;">
                                 Completed
                             </span>
                         @endif

@@ -35,7 +35,7 @@ class RequisitionFormController extends Controller
             })
             ->addColumn('status_badge', function ($row) {
                 $status = $row->status ?? 'Draft';
-                $bgColor = $status === 'Completed' ? '#28a745' : '#e09e03';
+                $bgColor = $status === 'Completed' ? '#8bc34a' : '#e09e03';
                 return '<div style="text-align:center;"><span style="background-color: ' . $bgColor . ' !important; color: white;" class="badge">' . $status . '</span></div>';
             })
             ->addColumn('requisition_status_badge', function ($row) {

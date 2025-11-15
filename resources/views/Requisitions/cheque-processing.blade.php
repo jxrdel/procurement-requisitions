@@ -95,7 +95,7 @@
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
                                     status + '</span></div>';
                             } else {
-                                return '<div style="text-align:center;"><span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span></div>';
+                                return '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>';
                             }
                         },
                         orderable: false,

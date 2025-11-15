@@ -306,7 +306,7 @@
                                     '<i class="fa-solid fa-asterisk"></i></a>';;
                             } else if (data === 'Completed') {
                                 statusHtml =
-                                    '<span style="background-color: #47a102 !important;" class="badge bg-success">Completed</span>';
+                                    '<span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span>';
                             } else {
                                 statusHtml =
                                     '<span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
