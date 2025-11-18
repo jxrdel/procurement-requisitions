@@ -110,18 +110,18 @@
                                 <div data-i18n="Basic">Dashboard</div>
                             </a>
                         </li>
+                    @endcan
+                    @can('view-requisitions-index')
+                        <li @class([
+                            'menu-item',
+                            'active' => request()->routeIs('requisitions.*'),
+                        ])>
+                            <a href="{{ route('requisitions.index') }}" class="menu-link">
+                                <i class="menu-icon ri-file-edit-line"></i>
+                                <div data-i18n="Basic">Requisitions</div>
+                            </a>
+                        </li>
                     @else
-                        @can('view-requisitions-index')
-                            <li @class([
-                                'menu-item',
-                                'active' => request()->routeIs('requisitions.*'),
-                            ])>
-                                <a href="{{ route('requisitions.index') }}" class="menu-link">
-                                    <i class="menu-icon ri-file-edit-line"></i>
-                                    <div data-i18n="Basic">Requisitions</div>
-                                </a>
-                            </li>
-                        @endcan
                         @php
                             $requisitionRoute = null;
                             $isRequisitionActive = false;

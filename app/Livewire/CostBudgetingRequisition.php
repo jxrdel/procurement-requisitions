@@ -201,7 +201,8 @@ class CostBudgetingRequisition extends Component
     public function getIsButtonDisabledProperty()
     {
         foreach ($this->vendors as $vendor) {
-            if ($vendor['date_sent_request_mof'] === null || $vendor['request_no'] === null || $vendor['release_no'] === null || $vendor['release_date'] === null) {
+            // check for null AND empty string
+            if ($vendor['date_sent_request_mof'] === null || $vendor['request_no'] === null || $vendor['release_no'] === null || $vendor['release_date'] === null || $vendor['date_sent_request_mof'] === '' || $vendor['request_no'] === '' || $vendor['release_no'] === '' || $vendor['release_date'] === '') {
                 return true;
             }
         }
@@ -240,7 +241,7 @@ class CostBudgetingRequisition extends Component
             // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
         }
 
-        return redirect()->route('cost_and_budgeting.index')->with('success', 'Sent to procurement successfully');
+        return redirect()->route('queue')->with('success', 'Sent to procurement successfully');
     }
 
     public function getStatus()

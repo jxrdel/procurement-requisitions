@@ -213,6 +213,14 @@ class CreateRequisition extends Component
                 'created_by' => Auth::user()->username,
             ]);
 
+            if ($this->assigned_to) {
+                $newrequisition->update(['sent_to_assigned_officer' => true]);
+                $officer = User::find($this->assigned_to);
+                if ($officer) {
+                    \Illuminate\Support\Facades\Notification::send($officer, new \App\Notifications\AssignedToRequisition($newrequisition));
+                }
+            }
+
             if (count($this->vendors) > 0) {
                 foreach ($this->vendors as $vendor) {
                     $newrequisition->vendors()->create([

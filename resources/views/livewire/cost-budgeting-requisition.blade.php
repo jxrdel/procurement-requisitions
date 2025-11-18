@@ -3,7 +3,7 @@
         <div class="card-body">
 
             <div class="d-sm-flex align-items-center justify-content-between mb-5">
-                <a href="{{ route('cost_and_budgeting.index') }}" class="btn btn-primary">
+                <a href="{{ route('queue') }}" class="btn btn-primary">
                     <i class="ri-arrow-left-circle-line me-1"></i> Back
                 </a>
                 <h1 class="h3 mb-0 text-gray-800" style="flex: 1; text-align: center;">
@@ -157,7 +157,7 @@
                                                 <label for="voteSelect{{ $index }}" class="form-label">Change
                                                     of Vote Number</label>
                                                 <select id="voteSelect{{ $index }}"
-                                                    class="form-select vote-select" multiple>
+                                                    class="form-select vote-select" multiple style="width: 100%">
                                                     @foreach ($votes as $vote)
                                                         <option value="{{ $vote->id }}"
                                                             {{ in_array($vote->id, $vendor['selected_votes']) ? 'selected' : '' }}>

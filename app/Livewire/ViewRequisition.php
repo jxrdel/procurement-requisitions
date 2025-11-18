@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\VendorInvoice;
 use App\Models\Vote;
 use App\Notifications\NotifyAccountsPayable;
+use App\Notifications\NotifyCostBudgeting;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -320,6 +321,14 @@ class ViewRequisition extends Component
                 'updated_by' => Auth::user()->username,
             ]);
 
+            if ($this->assigned_to && !$this->requisition->sent_to_assigned_officer) {
+                $this->requisition->update(['sent_to_assigned_officer' => true]);
+                $officer = User::find($this->assigned_to);
+                if ($officer) {
+                    Notification::send($officer, new \App\Notifications\AssignedToRequisition($this->requisition));
+                }
+            }
+
             if (!$this->requisition->cost_budgeting_requisition) {
                 $this->setRequisitionStatus();
             }
@@ -581,7 +590,7 @@ class ViewRequisition extends Component
         $users = User::costBudgeting()->get();
 
         foreach ($users as $user) {
-            Notification::send($user, new NotifyAccountsPayable($this->requisition));
+            // Notification::send($user, new NotifyCostBudgeting($this->requisition));
             // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
             // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }

@@ -23,6 +23,7 @@ class Requisition extends Model
         'site_visit',
         'site_visit_date',
         'tender_type',
+        'sent_to_assigned_officer',
         'is_first_pass',
         'tender_issue_date',
         'tender_deadline_date',
