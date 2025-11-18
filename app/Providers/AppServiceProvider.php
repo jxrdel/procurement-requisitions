@@ -40,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
                 'Office of the Permanent Secretary',
                 'Office of the Deputy Permanent Secretary',
                 'Office of the Chief Medical Officer',
+                'Cost & Budgeting',
                 'Procurement Unit',
             ]);
         });
@@ -64,12 +65,16 @@ class AppServiceProvider extends ServiceProvider
             return $user->department->name === 'Procurement Unit';
         });
 
+        Gate::define('send-form-to-hod', function ($user, $form) {
+            return $user->department->name == $form->requestingUnit->name;
+        });
+
         Gate::define('view-procurement-requisitions', function ($user) {
             return $user->department->name === 'Procurement Unit' || ($user->is_reporting_officer && ($user->reporting_officer_role === 'Permanent Secretary' || $user->reporting_officer_role === 'Deputy Permanent Secretary' || $user->reporting_officer_role === 'Chief Medical Officer'));
         });
 
         Gate::define('view-requisition', function ($user, $requisition) {
-            return $user->department->name === 'Procurement Unit' || ($user->role->name === 'Viewer') || $user->department->id == $requisition->requesting_unit;
+            return $user->department->name === 'Procurement Unit' || $user->department->name === 'Cost & Budgeting' || ($user->role->name === 'Viewer') || $user->department->id == $requisition->requesting_unit;
         });
 
         Gate::define('view-accounts-payable-requisitions', function ($user) {

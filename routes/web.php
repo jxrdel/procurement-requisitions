@@ -86,11 +86,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/votes', [Controller::class, 'votes'])->name('votes');
     Route::get('/getvotes', [Controller::class, 'getVotes'])->name('getvotes');
 
-    Route::get('/queue', [Controller::class, 'queue'])->name('queue');
+    Route::get('/mytasks', [Controller::class, 'queue'])->name('queue');
     Route::get('/getqueue', [Controller::class, 'getQueue'])->name('getqueue');
 
     Route::get('/help', [Controller::class, 'help'])->name('help');
 });
+
 use App\Http\Controllers\DepartmentController;
 
 Route::resource('departments', DepartmentController::class)->only([

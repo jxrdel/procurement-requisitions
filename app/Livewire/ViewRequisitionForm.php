@@ -92,6 +92,9 @@ class ViewRequisitionForm extends Component
     #[Computed]
     public function sendToHodDisabled()
     {
+        if (Gate::denies('send-form-to-hod', $this->requisitionForm)) {
+            return true;
+        }
         return !$this->availability_of_funds || !$this->verified_by_accounts || empty($this->selected_votes) || !$this->requisitionForm->completed_by_cab;
     }
 
@@ -617,7 +620,7 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->date_sent_to_cab = now();
         $this->requisitionForm->save();
         $costAndBudgetingUsers = User::costBudgeting()->get();
-        // Notification::send($costAndBudgetingUsers, new RequestForCABApproval($this->requisitionForm));
+        Notification::send($costAndBudgetingUsers, new RequestForCABApproval($this->requisitionForm));
         $this->dispatch('show-message', message: 'Form sent to Cost and Budgeting for Funding Availability.');
 
         $this->requisitionForm->logs()->create([

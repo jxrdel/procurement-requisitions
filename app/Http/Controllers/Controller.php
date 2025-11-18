@@ -20,7 +20,7 @@ class Controller
         if (Auth::user()->role->name !== 'Super Admin' && Auth::user()->department->name !== 'Office of the Permanent Secretary' && Auth::user()->department->name !== 'Procurement Unit') {
             //Redirect users to their department dashboards
             if (Auth::user()->department->name === 'Cost & Budgeting') {
-                return redirect()->route('cost_and_budgeting.index');
+                return redirect()->route('queue');
             } elseif (Auth::user()->department->name === 'Vote Control') {
                 return redirect()->route('vote_control.index');
             } elseif (Auth::user()->department->name === 'Check Staff') {

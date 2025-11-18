@@ -110,17 +110,18 @@
                                 <div data-i18n="Basic">Dashboard</div>
                             </a>
                         </li>
-
-                        <li @class([
-                            'menu-item',
-                            'active' => request()->routeIs('requisitions.*'),
-                        ])>
-                            <a href="{{ route('requisitions.index') }}" class="menu-link">
-                                <i class="menu-icon ri-file-edit-line"></i>
-                                <div data-i18n="Basic">Requisitions</div>
-                            </a>
-                        </li>
                     @else
+                        @can('view-requisitions-index')
+                            <li @class([
+                                'menu-item',
+                                'active' => request()->routeIs('requisitions.*'),
+                            ])>
+                                <a href="{{ route('requisitions.index') }}" class="menu-link">
+                                    <i class="menu-icon ri-file-edit-line"></i>
+                                    <div data-i18n="Basic">Requisitions</div>
+                                </a>
+                            </li>
+                        @endcan
                         @php
                             $requisitionRoute = null;
                             $isRequisitionActive = false;
@@ -153,6 +154,8 @@
                             $requisitionRoute &&
                                 Auth::user()->role->name !== 'Super Admin' &&
                                 Auth::user()->role->name !== 'Admin' &&
+                                Auth::user()->role->name !== 'Admin' &&
+                                Auth::user()->department->name !== 'Cost & Budgeting' &&
                                 Auth::user()->department->name !== 'Procurement Unit')
                             <li @class(['menu-item', 'active' => $isRequisitionActive])>
                                 <a href="{{ $requisitionRoute }}" class="menu-link">
@@ -177,7 +180,7 @@
                         <li @class(['menu-item', 'active' => request()->routeIs('queue')])>
                             <a href="{{ route('queue') }}" class="menu-link">
                                 <i class="menu-icon ri-list-ordered-2"></i>
-                                <div data-i18n="Basic">Queue</div>
+                                <div data-i18n="Basic">My Tasks</div>
                             </a>
                         </li>
                     @endcan
@@ -254,8 +257,8 @@
                         <ul class="navbar-nav flex-row align-items-center ms-auto">
                             <!-- Place this tag where you want the button to render. -->
                             <li class="nav-item lh-1 me-4">
-                                <a class="github-button" href="#" data-icon="octicon-star" data-size="large"
-                                    data-show-count="true"
+                                <a class="github-button text-white" href="#" data-icon="octicon-star"
+                                    data-size="large" data-show-count="true"
                                     aria-label="Star themeselection/materio-bootstrap-html-admin-template-free on GitHub">{{ Auth::user()->name }}</a>
                             </li>
 
@@ -263,7 +266,7 @@
                             <li class="nav-item navbar-dropdown dropdown me-5">
                                 <a class="nav-link dropdown-toggle hide-arrow p-0 position-relative"
                                     href="javascript:void(0);" data-bs-toggle="dropdown">
-                                    <i class="ri-notification-3-line ri-24px"></i>
+                                    <i class="ri-notification-3-line ri-24px text-white"></i>
                                     @php
                                         $unreadCount = Auth::user()->unreadNotifications->count();
                                     @endphp
@@ -343,10 +346,10 @@
                                     data-bs-toggle="dropdown">
                                     <div class="avatar avatar-online">
                                         @if (Auth::user()->role->name == 'Super Admin')
-                                            <img src="{{ asset('assets/img/avatars/vader.png') }}" alt
+                                            <img src="{{ asset('assets/img/avatars/whitevader.png') }}" alt
                                                 class="w-px-40 h-auto rounded-circle" />
                                         @else
-                                            <i class="fa-regular fa-circle-user fs-2"></i>
+                                            <i class="fa-regular fa-circle-user text-white fs-2"></i>
                                         @endif
                                     </div>
                                 </a>

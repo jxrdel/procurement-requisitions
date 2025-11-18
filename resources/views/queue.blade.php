@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-    <title>Queue | PRA</title>
+    <title>My Tasks | PRA</title>
 @endsection
 
 @section('content')
@@ -10,7 +10,7 @@
 
             <div class="d-sm-flex align-items-center justify-content-between mb-7">
                 <h1 class="h3 mb-0 text-gray-800" style="margin: auto"><strong><i class="fa-solid fa-list-ol"></i> &nbsp;
-                        Queue</strong></h1>
+                        My Tasks</strong></h1>
             </div>
 
             <div class="row mb-4">

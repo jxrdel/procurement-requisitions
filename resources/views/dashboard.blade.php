@@ -21,7 +21,7 @@
 @section('content')
     @livewire('view-status-modal')
     <div class="d-sm-flex align-items-center justify-content-between mb-7">
-        <h1 class="h3 mb-0 text-gray-800" style="margin: auto"><strong><i class="fa-solid fa-gauge-high"></i> &nbsp;
+        <h1 class="h3 mb-0 text-white" style="margin: auto"><strong><i class="fa-solid fa-gauge-high"></i> &nbsp;
                 Dashboard</strong></h1>
     </div>
 

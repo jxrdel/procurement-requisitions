@@ -13,7 +13,7 @@ class RequisitionController extends Controller
 {
     public function index()
     {
-        if (Gate::denies('view-procurement-requisitions')) {
+        if (Gate::denies('view-requisitions-index')) {
             abort(403);
         }
         return view('requisitions.index');
