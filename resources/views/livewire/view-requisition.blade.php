@@ -681,49 +681,65 @@
                                     </div>
 
                                     {{-- Vendors Section --}}
-                                    <div class="row mt-2" x-show="ps_approval == 'Approved'" x-transition>
+                                    <div class="row mt-2" x-show="ps_approval == 'Approved'" x-transition
+                                        x-data="{ vendors: $wire.entangle('vendors') }">
                                         <h4 class="text-center fw-bold">Vendors</h4>
-                                        @forelse ($vendors as $index => $vendor)
+
+                                        <template x-if="vendors.length === 0">
+                                            <p class="text-center">Click the button below to add a vendor</p>
+                                        </template>
+
+                                        <template x-for="(vendor, index) in vendors" :key="index">
                                             <div class="row mx-auto mt-2">
                                                 <div class="col">
                                                     <div class="form-floating form-floating-outline">
-                                                        <input autocomplete="off"
-                                                            wire:model="vendors.{{ $index }}.vendor_name"
+                                                        <input autocomplete="off" x-model="vendor.vendor_name"
                                                             type="text"
-                                                            class="form-control @error('vendors.' . $index . '.vendor_name')is-invalid @enderror" />
+                                                            :class="{
+                                                                'is-invalid': $wire.errors['vendors.' +
+                                                                    index + '.vendor_name']
+                                                            }"
+                                                            class="form-control" />
                                                         <label>Vendor Name</label>
                                                     </div>
-                                                    @error('vendors.' . $index . '.vendor_name')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
+                                                    <template
+                                                        x-if="$wire.errors['vendors.' + index + '.vendor_name']">
+                                                        <div class="text-danger"
+                                                            x-text="$wire.errors['vendors.' + index + '.vendor_name']">
+                                                        </div>
+                                                    </template>
                                                 </div>
                                                 <div class="col">
                                                     <div class="form-floating form-floating-outline">
-                                                        <input autocomplete="off"
-                                                            wire:model="vendors.{{ $index }}.amount"
+                                                        <input autocomplete="off" x-model="vendor.amount"
                                                             type="number" step="0.01"
-                                                            class="form-control @error('vendors.' . $index . '.amount')is-invalid @enderror" />
+                                                            :class="{
+                                                                'is-invalid': $wire.errors['vendors.' +
+                                                                    index + '.amount']
+                                                            }"
+                                                            class="form-control" />
                                                         <label>Amount</label>
                                                     </div>
-                                                    @error('vendors.' . $index . '.amount')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
+                                                    <template x-if="$wire.errors['vendors.' + index + '.amount']">
+                                                        <div class="text-danger"
+                                                            x-text="$wire.errors['vendors.' + index + '.amount']"></div>
+                                                    </template>
                                                 </div>
                                                 <div class="col-1">
-                                                    <button type="button"
-                                                        wire:click="removeVendor({{ $index }})"
+                                                    <button type="button" @click="vendors.splice(index, 1)"
                                                         class="btn rounded-pill btn-icon btn-danger mx-auto mt-2">
                                                         <span class="tf-icons ri-delete-bin-2-line"></span>
                                                     </button>
                                                 </div>
                                             </div>
-                                        @empty
-                                            <p class="text-center">Click the button below to add a vendor</p>
-                                        @endforelse
-                                        <button type="button" x-on:click="$wire.addVendor"
+                                        </template>
+                                        @if (!$requisition->sent_to_cb)
+                                        <button type="button"
+                                            @click="vendors.push({ vendor_name: '', amount: '' })"
                                             class="btn rounded-pill btn-icon btn-primary mx-auto mt-2">
                                             <span class="tf-icons ri-add-line ri-22px"></span>
                                         </button>
+                                        @endif
                                     </div>
 
                                     {{-- Reason for Denial --}}

@@ -73,7 +73,7 @@ class ViewRequisition extends Component
     public $uploads;
     public $upload;
     public $vendors = [];
-    public $deleted_vendors = [];
+    public $originalVendorIds = [];
 
     //Cost & Budgeting
 
@@ -130,8 +130,8 @@ class ViewRequisition extends Component
         $this->invoice_count_buttons = [];
 
         // Populate invoiceCounts dynamically
-        foreach ($this->vendors as $vendor) {
-            $this->invoice_count_buttons[$vendor['id']] = VendorInvoice::where('vendor_id', $vendor['id'])->count();
+        foreach ($this->requisition->vendors as $vendor) {
+            $this->invoice_count_buttons[$vendor->id] = VendorInvoice::where('vendor_id', $vendor->id)->count();
         }
         $this->logs = $this->requisition->statuslogs;
         $this->uploads = $this->requisition->file_uploads()->get();
@@ -196,6 +196,8 @@ class ViewRequisition extends Component
             ->with('votes')
             ->get()
             ->toArray();
+
+        $this->originalVendorIds = collect($this->vendors)->pluck('id')->filter()->all();
 
         foreach ($this->vendors as $key => $vendor) {
             $this->vendors[$key]['accordionView'] = 'show';
@@ -342,8 +344,11 @@ class ViewRequisition extends Component
                 $this->setRequisitionStatus();
             }
 
-            foreach ($this->deleted_vendors as $id) {
-                $this->requisition->vendors()->where('id', $id)->delete();
+            $currentVendorIds = collect($this->vendors)->pluck('id')->filter()->all();
+            $vendorIdsToDelete = array_diff($this->originalVendorIds, $currentVendorIds);
+
+            if (!empty($vendorIdsToDelete)) {
+                $this->requisition->vendors()->whereIn('id', $vendorIdsToDelete)->delete();
             }
 
             foreach ($this->vendors as $index => $vendor) {
@@ -371,6 +376,7 @@ class ViewRequisition extends Component
             $this->resetValidation();
             $this->dispatch('show-message', message: 'Requisition edited successfully');
             $this->requisition = $this->requisition->fresh();
+            $this->originalVendorIds = collect($this->vendors)->pluck('id')->filter()->all();
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition: ' . $e->getMessage());
             // Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
