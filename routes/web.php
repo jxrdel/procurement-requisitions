@@ -87,6 +87,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getvotes', [Controller::class, 'getVotes'])->name('getvotes');
 
     Route::get('/mytasks', [Controller::class, 'queue'])->name('queue');
+    Route::get('/mytasks/requisition/{id}', ViewRequisition::class)->name('queue.requisition.view');
+    Route::get('/mytasks/form/{id}', ViewRequisitionForm::class)->name('queue.form.view');
     Route::get('/getqueue', [Controller::class, 'getQueue'])->name('getqueue');
 
     Route::get('/help', [Controller::class, 'help'])->name('help');

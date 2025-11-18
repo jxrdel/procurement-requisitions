@@ -213,7 +213,7 @@
                     </li>
 
                     @can('view-queue-page')
-                        <li @class(['menu-item', 'active' => request()->routeIs('queue')])>
+                        <li @class(['menu-item', 'active' => request()->routeIs('queue.*')])>
                             <a href="{{ route('queue') }}" class="menu-link">
                                 <i class="menu-icon ri-list-ordered-2"></i>
                                 <div data-i18n="Basic">My Tasks</div>

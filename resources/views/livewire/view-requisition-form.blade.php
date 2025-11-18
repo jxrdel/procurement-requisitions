@@ -18,15 +18,9 @@
 
                     {{-- Left Column: Back Button --}}
                     <div class="col text-start">
-                        @if ($requisitionForm->requestingUnit->name == Auth::user()->department->name)
-                            <a href="{{ route('requisition_forms.index') }}" class="btn btn-primary">
-                                <i class="ri-arrow-left-circle-line me-1"></i> Back
-                            </a>
-                        @else
-                            <a href="{{ route('queue') }}" class="btn btn-primary">
-                                <i class="ri-arrow-left-circle-line me-1"></i> Back
-                            </a>
-                        @endif
+                        <a href="{{ $backUrl }}" class="btn btn-primary">
+                            <i class="ri-arrow-left-circle-line me-1"></i> Back
+                        </a>
                     </div>
 
                     {{-- Center Column: Heading --}}

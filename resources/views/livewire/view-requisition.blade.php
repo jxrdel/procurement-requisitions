@@ -12,7 +12,7 @@
             <div class="d-flex align-items-center justify-content-between mb-5 position-relative">
                 {{-- Back button --}}
                 @can('view-requisitions-index')
-                    <a href="{{ route('requisitions.index') }}" class="btn btn-dark">
+                    <a href="{{ $backUrl }}" class="btn btn-dark">
                         <i class="ri-arrow-left-circle-line me-1"></i> Back
                     </a>
                 @endcan
@@ -145,7 +145,7 @@
                                             <label><strong>File Number / Form:</strong> {{ $this->file_no }}</label>
                                         </div>
                                         <div class="col">
-                                            <label><strong>Item:</strong> {{ $this->item }}</label>
+                                            <label><strong>Item(s):</strong> {{ $this->item }}</label>
                                         </div>
                                     </div>
 
@@ -289,7 +289,7 @@
 
                                     {{-- 🔹 Row 11: Vendors & Amounts --}}
                                     @if ($this->ps_approval == 'Approved')
-                                        @foreach ($this->vendors as $index => $vendor)
+                                        @foreach ($this->requisition->vendors as $index => $vendor)
                                             <div class="row mt-6">
                                                 <div class="col">
                                                     <label><strong>Vendor #{{ $index + 1 }}:</strong>
@@ -390,7 +390,7 @@
                                                     class="form-control @error('item')is-invalid @enderror"
                                                     id="floatingInput" placeholder="ex. SSL Certificate"
                                                     aria-describedby="floatingInputHelp" />
-                                                <label for="floatingInput">Item</label>
+                                                <label for="floatingInput">Item(s)</label>
                                             </div>
                                             @error('item')
                                                 <div class="text-danger"> {{ $message }} </div>
@@ -786,7 +786,7 @@
 
 
 
-                            @forelse ($vendors as $vendor)
+                            @forelse ($requisition->vendors as $vendor)
                                 <div class="divider">
                                     <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
                                 </div>
@@ -915,7 +915,7 @@
                                 <div x-transition x-show="!isEditingProcurement2">
 
 
-                                    @forelse ($vendors as $vendor)
+                                    @forelse ($requisition->vendors as $vendor)
                                         <div class="row mt-5">
                                             <div class="divider">
                                                 <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}
@@ -1043,7 +1043,7 @@
                                 </div>
 
                                 <div x-transition x-show="isEditingProcurement2">
-                                    @foreach ($this->vendors as $index => $vendor)
+                                    @foreach ($this->requisition->vendors as $index => $vendor)
                                         <div class="accordion mt-8" id="accordion{{ $index }}"
                                             style="margin-top: 15px">
                                             <div class="accordion-item">
@@ -1180,7 +1180,7 @@
 
                         <div>
 
-                            @forelse ($vendors as $vendor)
+                            @forelse ($requisition->vendors as $vendor)
                                 <div class="row mt-2">
                                     <div class="divider">
                                         <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
@@ -1238,7 +1238,7 @@
 
                         <div>
 
-                            @forelse ($vendors as $vendor)
+                            @forelse ($requisition->vendors as $vendor)
                                 <div class="row mt-2">
                                     <div class="divider">
                                         <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
@@ -1303,7 +1303,7 @@
 
                         <div>
 
-                            @forelse ($vendors as $vendor)
+                            @forelse ($requisition->vendors as $vendor)
                                 <div class="row">
                                     <div class="divider">
                                         <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>

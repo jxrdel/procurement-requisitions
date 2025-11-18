@@ -28,12 +28,14 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Route;
 
 class ViewRequisitionForm extends Component
 {
     use WithFileUploads;
 
     public RequisitionRequestForm $requisitionForm;
+    public $backUrl;
 
     #[Title('View Requisition Form | PRA')]
 
@@ -112,6 +114,11 @@ class ViewRequisitionForm extends Component
             abort(403, 'You do not have permission to view this requisition form.');
         }
 
+        if (Route::currentRouteName() == 'queue.form.view') {
+            $this->backUrl = route('queue');
+        } else {
+            $this->backUrl = route('requisition_forms.index');
+        }
 
         $this->units = Department::orderBy('name')->get();
         $this->users = User::orderBy('name')->get();

@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Layout;
@@ -121,6 +122,8 @@ class ViewRequisition extends Component
     public $logs;
     public $votes;
 
+    public $backUrl;
+
 
     public function render()
     {
@@ -150,6 +153,12 @@ class ViewRequisition extends Component
 
         if (!$this->requisition) {
             return abort(404);
+        }
+
+        if (Route::currentRouteName() == 'queue.requisition.view') {
+            $this->backUrl = route('queue');
+        } else {
+            $this->backUrl = route('requisitions.index');
         }
         $this->requisition_status = $this->requisition->requisition_status;
         $this->requisition_no = $this->requisition->requisition_no;

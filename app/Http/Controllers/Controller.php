@@ -324,12 +324,12 @@ class Controller
             ->addColumn('view', function ($row) use ($departmentName) {
                 $url = '';
                 if ($row['item_type'] === 'Requisition Form') {
-                    $url = route('requisition_forms.view', $row['id']);
+                    $url = route('queue.form.view', $row['id']);
                 } else {
                     if ($departmentName === 'Cost & Budgeting') {
                         $url = route('cost_and_budgeting.view', $row['id']);
                     } else {
-                        $url = route('requisitions.view', $row['id']);
+                        $url = route('queue.requisition.view', $row['id']);
                     }
                 }
                 return '<div style="text-align:center;"><a href="' . $url . '" class="btn btn-primary btn-sm">View</a></div>';
@@ -488,12 +488,12 @@ class Controller
             ->addColumn('view', function ($row) use ($departmentName) {
                 $url = '';
                 if ($row['item_type'] === 'Requisition Form') {
-                    $url = route('requisition_forms.view', $row['id']);
+                    $url = route('queue.form.view', $row['id']);
                 } else {
                     if ($departmentName === 'Cost & Budgeting') {
                         $url = route('cost_and_budgeting.view', $row['id']);
                     } else {
-                        $url = route('requisitions.view', $row['id']);
+                        $url = route('queue.requisition.view', $row['id']);
                     }
                 }
                 return '<div style="text-align:center;"><a href="' . $url . '" class="btn btn-primary btn-sm">View</a></div>';
@@ -652,12 +652,12 @@ class Controller
             ->addColumn('view', function ($row) use ($departmentName) {
                 $url = '';
                 if ($row['item_type'] === 'Requisition Form') {
-                    $url = route('requisition_forms.view', $row['id']);
+                    $url = route('queue.form.view', $row['id']);
                 } else {
                     if ($departmentName === 'Cost & Budgeting') {
                         $url = route('cost_and_budgeting.view', $row['id']);
                     } else {
-                        $url = route('requisitions.view', $row['id']);
+                        $url = route('queue.requisition.view', $row['id']);
                     }
                 }
                 return '<div style="text-align:center;"><a href="' . $url . '" class="btn btn-primary btn-sm">View</a></div>';

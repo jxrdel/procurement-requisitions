@@ -26,7 +26,7 @@ class LoginForm extends Component
         //Donald : 25
         //Crystal CAB: 8
 
-        $user = User::find(8);
+        $user = User::find(1);
 
         Auth::login($user);
         return redirect()->intended('/'); // Fallback to dashboard if no intended page
