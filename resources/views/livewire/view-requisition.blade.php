@@ -711,6 +711,13 @@
                                                 </div>
                                                 <div class="col">
                                                     <div class="form-floating form-floating-outline">
+                                                        <input autocomplete="off" x-model="vendor.vendor_items"
+                                                            type="text" class="form-control" />
+                                                        <label>Item(s)</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-floating form-floating-outline">
                                                         <input autocomplete="off" x-model="vendor.amount"
                                                             type="number" step="0.01"
                                                             :class="{
@@ -735,7 +742,7 @@
                                         </template>
                                         @if (!$requisition->sent_to_cb)
                                         <button type="button"
-                                            @click="vendors.push({ vendor_name: '', amount: '' })"
+                                            @click="vendors.push({ vendor_name: '', vendor_items: '', amount: '' })"
                                             class="btn rounded-pill btn-icon btn-primary mx-auto mt-2">
                                             <span class="tf-icons ri-add-line ri-22px"></span>
                                         </button>

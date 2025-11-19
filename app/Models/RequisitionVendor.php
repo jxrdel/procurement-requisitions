@@ -10,6 +10,7 @@ class RequisitionVendor extends Model
 
     protected $fillable = [
         'vendor_name',
+        'vendor_items',
         'amount',
 
         //Procurement

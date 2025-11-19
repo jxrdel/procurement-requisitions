@@ -181,6 +181,11 @@
                             <a href="{{ route('queue') }}" class="menu-link">
                                 <i class="menu-icon ri-list-ordered-2"></i>
                                 <div data-i18n="Basic">My Tasks</div>
+                                @if (Auth::user()->in_progress_queue_count > 0 && Auth::user()->role->name != 'Super Admin')
+                                    <span class="badge bg-danger rounded-pill ms-auto">
+                                        {{ Auth::user()->in_progress_queue_count }}
+                                    </span>
+                                @endif
                             </a>
                         </li>
                     @endcan

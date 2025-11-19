@@ -33,6 +33,41 @@ class User extends Authenticatable
         'is_reporting_officer' => 'boolean',
     ];
 
+    protected $appends = ['in_progress_queue_count'];
+
+    public function getInProgressQueueCountAttribute()
+    {
+        $departmentName = $this->department->name;
+        $query = 0;
+
+        if ($this->role->name === 'Super Admin') {
+            $forms = \App\Models\RequisitionRequestForm::where('status', '!=', 'Completed')->count();
+            $requisitions = \App\Models\CBRequisition::where('is_completed', false)->count();
+            return $forms + $requisitions;
+        } else {
+            if ($departmentName === 'Cost & Budgeting') {
+                $forms = \App\Models\RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', false)->count();
+                $requisitions = \App\Models\CBRequisition::where('is_completed', false)->count();
+                $query = $forms + $requisitions;
+            } elseif ($departmentName === 'Procurement Unit') {
+                $forms = \App\Models\RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', '!=', 'Completed')->count();
+                $query = $forms;
+            } elseif ($departmentName === 'Office of the Permanent Secretary') {
+                $forms = \App\Models\RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', false)->count();
+                $query = $forms;
+            } elseif ($departmentName === 'Office of the Deputy Permanent Secretary') {
+                $forms = \App\Models\RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', false)->count();
+                $query = $forms;
+            } elseif ($departmentName === 'Office of the Chief Medical Officer') {
+                $forms = \App\Models\RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', false)->count();
+                $query = $forms;
+            }
+        }
+
+        return $query;
+    }
+
+
     public function scopeProcurement($query)
     {
         return $query->whereHas('department', function ($q) {

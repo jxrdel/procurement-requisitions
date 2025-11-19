@@ -64,6 +64,8 @@ class CreateRequisition extends Component
     public $logs = [];
     public $votes;
     public $vendors = [];
+    public $originalVendorIds = [];
+
 
     public function mount(RequisitionRequestForm $form)
     {
@@ -85,6 +87,9 @@ class CreateRequisition extends Component
         $this->item = $form->items->pluck('name')->implode(', ');
         $this->date_received_procurement = $form->reporting_officer_approval_date->format('Y-m-d');
         $this->source_of_funds = $form->votes->first()->number;
+
+        $this->originalVendorIds = [];
+        $this->ps_approval_date = null;
     }
 
 
@@ -183,6 +188,8 @@ class CreateRequisition extends Component
                 $this->assigned_to = null;
             }
 
+            $totalAmount = collect($this->vendors)->sum('amount');
+
             $newrequisition = Requisition::create([
                 'requisition_status' => $this->requisition_status,
                 'requisition_no' => $this->requisition_no,
@@ -207,8 +214,7 @@ class CreateRequisition extends Component
                 'date_sent_dps' => $this->date_sent_dps,
                 'ps_approval' => $this->ps_approval,
                 'ps_approval_date' => $this->ps_approval_date,
-                'vendor_name' => $this->vendor_name,
-                'amount' => $this->amount,
+                'amount' => $totalAmount,
                 'denied_note' => $this->denied_note,
                 'created_by' => Auth::user()->username,
             ]);
@@ -225,6 +231,7 @@ class CreateRequisition extends Component
                 foreach ($this->vendors as $vendor) {
                     $newrequisition->vendors()->create([
                         'vendor_name' => $vendor['vendor_name'],
+                        'vendor_items' => $vendor['vendor_items'],
                         'amount' => $vendor['amount'],
                     ]);
                 }
@@ -290,6 +297,7 @@ class CreateRequisition extends Component
                 'date_assigned' => $this->date_assigned,
                 'date_sent_dps' => $this->date_sent_dps,
                 'ps_approval' => $this->ps_approval,
+                'ps_approval_date' => $this->ps_approval_date,
                 'date_received_procurement' => $this->date_received_procurement,
                 'site_visit' => $this->site_visit,
                 'site_visit_date' => $this->site_visit_date,
@@ -297,8 +305,6 @@ class CreateRequisition extends Component
                 'tender_deadline_date' => $this->tender_deadline_date,
                 'evaluation_start_date' => $this->evaluation_start_date,
                 'evaluation_end_date' => $this->evaluation_end_date,
-                // 'sent_to_cb' => $this->sent_to_cb,
-                // 'date_sent_cb' => $this->date_sent_cb,
                 'vendors' => $this->vendors,
             ],
             [
@@ -307,7 +313,6 @@ class CreateRequisition extends Component
                 'file_no' => 'nullable',
                 'item' => 'required',
                 'site_visit' => 'boolean',
-                //Site visit date is required if site visit is true
                 'site_visit_date' => 'nullable|date|date_format:Y-m-d|required_if:site_visit,true',
                 'tender_issue_date' => 'nullable|date|date_format:Y-m-d',
                 'tender_deadline_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:tender_issue_date',
@@ -317,9 +322,10 @@ class CreateRequisition extends Component
                 'date_assigned' => 'nullable|date|before_or_equal:today|date_format:Y-m-d',
                 'date_received_procurement' => 'required|date|before_or_equal:today|date_format:Y-m-d',
                 'date_sent_dps' => 'nullable|date|before_or_equal:today|date_format:Y-m-d',
+                'ps_approval_date' => 'nullable|date|before_or_equal:today|date_format:Y-m-d|required_if:ps_approval,Approved',
                 'vendors.*.vendor_name' => 'required',
+                'vendors.*.vendor_items' => 'nullable|string',
                 'vendors.*.amount' => 'required|numeric',
-                // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
             ],
             [
                 'vendors.*.vendor_name.required' => 'Vendor name is required',
@@ -338,10 +344,9 @@ class CreateRequisition extends Component
                     $validator->errors()->add('date_sent_dps', 'Date sent to DPS cannot be null if PS Approval is set to ' . $this->ps_approval);
                 }
 
-                // Ensure 'date_sent_cb' is not null if 'sent_to_cb' is "Yes"
-                // if ($this->sent_to_cb === 'Yes' && $this->date_sent_cb === null) {
-                //     $validator->errors()->add('date_sent_cb', 'Date sent to DFA cannot be null if sent to DFA is "Yes".');
-                // }
+                if ($this->ps_approval === 'Approved' && $this->ps_approval_date === null) {
+                    $validator->errors()->add('ps_approval_date', 'PS Approval Date cannot be null if PS Approval is "Approved".');
+                }
             });
 
         if ($reqvalidator->fails()) {
@@ -375,15 +380,5 @@ class CreateRequisition extends Component
         } else {
             $this->dispatch('preserveScroll');
         }
-    }
-
-    public function addVendor()
-    {
-        $this->vendors[] = ['name' => '', 'amount' => ''];
-    }
-
-    public function removeVendor($index)
-    {
-        unset($this->vendors[$index]);
     }
 }

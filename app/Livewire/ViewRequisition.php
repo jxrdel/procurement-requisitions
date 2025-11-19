@@ -355,11 +355,13 @@ class ViewRequisition extends Component
                 if (isset($vendor['id'])) {
                     $this->requisition->vendors()->where('id', $vendor['id'])->update([
                         'vendor_name' => $vendor['vendor_name'],
+                        'vendor_items' => $vendor['vendor_items'],
                         'amount' => $vendor['amount'],
                     ]);
                 } else {
                     $newvendor = $this->requisition->vendors()->create([
                         'vendor_name' => $vendor['vendor_name'],
+                        'vendor_items' => $vendor['vendor_items'],
                         'amount' => $vendor['amount'],
                     ]);
                     $this->vendors[$index]['id'] = $newvendor->id;
@@ -415,6 +417,7 @@ class ViewRequisition extends Component
                 'ps_approval_date' => 'nullable|date|before_or_equal:today',
                 // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
                 'vendors.*.vendor_name' => 'required',
+                'vendors.*.vendor_items' => 'nullable|string',
                 'vendors.*.amount' => 'required|numeric',
             ],
             [
