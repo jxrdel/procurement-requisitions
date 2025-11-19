@@ -34,7 +34,7 @@ class RequisitionCompleted extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -46,11 +46,11 @@ class RequisitionCompleted extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Requisition Completed | Procurement Requisition Application')
-                    ->markdown('emails.requisition-completed', [
-                        'requisition' => $this->requisition,
-                        'url' => route('requisitions.view', $this->requisition->id),
-                    ]);
+            ->subject('Requisition Completed | Procurement Requisition Application')
+            ->markdown('emails.requisition-completed', [
+                'requisition' => $this->requisition,
+                'url' => route('requisitions.view', $this->requisition->id),
+            ]);
     }
 
     /**

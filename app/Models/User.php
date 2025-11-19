@@ -33,7 +33,7 @@ class User extends Authenticatable
         'is_reporting_officer' => 'boolean',
     ];
 
-    protected $appends = ['in_progress_queue_count'];
+    // protected $appends = ['in_progress_queue_count'];
 
     public function getInProgressQueueCountAttribute()
     {

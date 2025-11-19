@@ -27,7 +27,7 @@ class RequestForHODApproval extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -53,7 +53,7 @@ class RequestForHODApproval extends Notification
     {
         return [
             "title" => "Requisition Form Sent for Approval",
-            "message" => "A new Requisition Form #{$this->form->form_code} has been sent to you for approval.",
+            "message" => "A new Requisition Form #{$this->form->form_code} has been sent to you for approval. Minute: {$this->form->contact_person_note}",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

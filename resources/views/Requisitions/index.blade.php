@@ -136,14 +136,6 @@
                         render: function(data, type, row) {
                             var deleteButton = '';
 
-                            if (userCanDelete) {
-                                deleteButton =
-                                    '<a class="btn btn-danger" href="javascript:void(0);" onclick="showDelete(' +
-                                    data
-                                    .id + ')">' +
-                                    '<i class="ri-delete-bin-2-line"></i></a>';
-                            }
-
                             return '<div style="text-align:center;">' +
                                 '<a class="btn btn-primary" href="/requisitions/view/' + data.id +
                                 '">View</a> ' +

@@ -355,7 +355,7 @@ class ViewRequisitionForm extends Component
 
         $hod = $this->requisitionForm->headOfDepartment;
         if ($hod) {
-            // Notification::send($hod, new RequestForHODApproval($this->requisitionForm));
+            Notification::send($hod, new RequestForHODApproval($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
@@ -415,7 +415,7 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->save();
 
         if ($reportingOfficer) {
-            // Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
+            Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
@@ -438,7 +438,7 @@ class ViewRequisitionForm extends Component
 
         $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
         if ($procurementHOD) {
-            // Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
+            Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
@@ -463,7 +463,7 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        // Notification::send($this->requisitionForm->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
+        Notification::send($this->requisitionForm->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
 
 
         $this->dispatch('show-message', message: 'Requisition form approved successfully.');
@@ -481,7 +481,7 @@ class ViewRequisitionForm extends Component
             $this->requisitionForm->hod_approval = false;
             $this->requisitionForm->hod_reason_for_denial = $this->declineReason;
             //Reset approval flags
-            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByHOD($this->requisitionForm));
+            Notification::send($this->requisitionForm->contactPerson, new DeclinedByHOD($this->requisitionForm));
         }
 
         if (Auth::user()->id == $this->requisitionForm->reporting_officer_id && Auth::user()->is_reporting_officer) {
@@ -497,14 +497,14 @@ class ViewRequisitionForm extends Component
             $this->requisitionForm->reporting_officer_approval = false;
             $this->requisitionForm->reporting_officer_reason_for_denial = $this->declineReason;
             //Reset approval flags
-            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
+            Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
         }
 
         if (Auth::user()->department->name == 'Procurement Unit') {
             $this->requisitionForm->status = RequestFormStatus::DENIED_BY_PROCUREMENT;
             $this->requisitionForm->procurement_approval = false;
             $this->requisitionForm->procurement_reason_for_denial = $this->declineReason;
-            // Notification::send($this->requisitionForm->contactPerson, new DeclinedByProcurement($this->requisitionForm));
+            Notification::send($this->requisitionForm->contactPerson, new DeclinedByProcurement($this->requisitionForm));
         }
 
         $this->requisitionForm->save();
@@ -528,7 +528,7 @@ class ViewRequisitionForm extends Component
         // Get user where the name is Marryann Basdeo
         $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
         if ($procurementHOD) {
-            // Notification::send($procurementHOD, new RequestForProcurementApproval($this->requisitionForm));
+            Notification::send($procurementHOD, new RequestForProcurementApproval($this->requisitionForm));
         }
 
         $this->requisitionForm->logs()->create([
@@ -589,37 +589,6 @@ class ViewRequisitionForm extends Component
         return view('livewire.view-requisition-form');
     }
 
-    public function forwardForm()
-    {
-        $this->validate([
-            'forwardedOfficer' => 'required|exists:users,id',
-            'forwarding_minute' => 'required|string',
-        ]);
-
-        $reportingOfficer = User::find($this->forwardedOfficer);
-
-        if ($reportingOfficer->reporting_officer_role == 'Permanent Secretary') {
-            $this->requisitionForm->status = RequestFormStatus::SENT_TO_PS;
-        } elseif ($reportingOfficer->reporting_officer_role == 'Deputy Permanent Secretary') {
-            $this->requisitionForm->status = RequestFormStatus::SENT_TO_DPS;
-        } elseif ($reportingOfficer->reporting_officer_role == 'Chief Medical Officer') {
-            $this->requisitionForm->status = RequestFormStatus::SENT_TO_CMO;
-        }
-
-        $this->requisitionForm->forwarding_minute = $this->forwarding_minute;
-        $this->requisitionForm->save();
-
-        $this->requisitionForm->logs()->create([
-            'details' => 'Requisition form forwarded to ' . $reportingOfficer->name . ' by ' . Auth::user()->name,
-            'created_by' => Auth::user()->username,
-        ]);
-
-        // Notification::send($reportingOfficer, new ForwardForm($this->requisitionForm, Auth::user(), $this->forwarding_minute));
-
-        $this->dispatch('show-message', message: 'Form forwarded successfully.');
-        $this->dispatch('close-forward-form-modal');
-    }
-
     public function sendToCAB()
     {
         $this->requisitionForm->status = RequestFormStatus::SENT_TO_COST_BUDGETING;
@@ -653,7 +622,7 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        // Notification::send($this->requisitionForm->contactPerson, new ApprovedByCAB($this->requisitionForm));
+        Notification::send($this->requisitionForm->contactPerson, new ApprovedByCAB($this->requisitionForm));
 
         return redirect()->route('queue')->with('success', 'Requisition form approved by Cost & Budgeting.');
     }

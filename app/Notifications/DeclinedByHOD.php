@@ -27,7 +27,7 @@ class DeclinedByHOD extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -53,7 +53,7 @@ class DeclinedByHOD extends Notification
     {
         return [
             "title" => "Requisition Form Denied by HOD",
-            "message" => "A Requisition Form #{$this->form->form_code} has been denied by the Head of Department.",
+            "message" => "A Requisition Form #{$this->form->form_code} has been denied by the Head of Department. Reason: {$this->form->hod_reason_for_denial}",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

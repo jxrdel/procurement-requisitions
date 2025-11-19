@@ -34,7 +34,7 @@ class RequestForFurtherApproval extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -63,7 +63,7 @@ class RequestForFurtherApproval extends Notification
     {
         return [
             'title' => 'Request for Further Non-Objection',
-            'message' => 'A requisition form #'.$this->requisitionForm->form_code.' has been forwarded to you by '.$this->user->name.' for your further approval. Message: '.$this->message,
+            'message' => 'A requisition form #' . $this->requisitionForm->form_code . ' has been forwarded to you by ' . $this->user->name . ' for your further approval. Message: ' . $this->message,
             'url' => route('requisition_forms.view', $this->requisitionForm->id),
         ];
     }

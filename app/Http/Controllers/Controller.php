@@ -132,15 +132,12 @@ class Controller
 
     public function getUsers()
     {
-        // Eager load the department relationship
-        $users = User::with('department')->select('users.*'); // Select base table columns
+        $users = User::with('department')->select('users.*');
 
         return DataTables::of($users)
             ->addColumn('department_name', function ($user) {
-                // Access the name via the relationship, provide 'N/A' if null
-                return $user->department->name ?? 'N/A';
+                return $user->department?->name ?? 'N/A';
             })
-            // Add filterColumn for searching the department name
             ->filterColumn('department_name', function (Builder $query, $keyword) {
                 $query->whereHas('department', function (Builder $q) use ($keyword) {
                     $q->where('name', 'like', "%{$keyword}%");
@@ -148,6 +145,7 @@ class Controller
             })
             ->make(true);
     }
+
 
     public function help()
     {

@@ -35,7 +35,7 @@ class NotifyChequeProcessing extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -50,13 +50,13 @@ class NotifyChequeProcessing extends Notification implements ShouldQueue
         $date_sent = Carbon::parse($this->vendor->ap->date_received)->format('F jS, Y');
 
         return (new MailMessage)
-                    ->subject('Incoming Invoices | Procurement Requisition Application')
-                    ->markdown('emails.sent-to-cheque-processing', [
-                        'vendor' => $this->vendor,
-                        'requisition' => $requisition,
-                        'date_sent' => $date_sent,
-                        'url' => route('cheque_processing.view', $this->vendor->chequeProcessing->id),
-                    ]);
+            ->subject('Incoming Invoices | Procurement Requisition Application')
+            ->markdown('emails.sent-to-cheque-processing', [
+                'vendor' => $this->vendor,
+                'requisition' => $requisition,
+                'date_sent' => $date_sent,
+                'url' => route('cheque_processing.view', $this->vendor->chequeProcessing->id),
+            ]);
     }
 
     /**

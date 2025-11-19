@@ -29,7 +29,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Departnemt</th>
+                            <th>Department</th>
                             <th style="text-align: center;width:20%">Actions</th>
                         </tr>
                     </thead>

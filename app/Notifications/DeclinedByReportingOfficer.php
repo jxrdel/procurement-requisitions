@@ -27,7 +27,7 @@ class DeclinedByReportingOfficer extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -66,7 +66,7 @@ class DeclinedByReportingOfficer extends Notification
     {
         return [
             "title" => "Requisition Form Denied by Reporting Officer",
-            "message" => "A Requisition Form #{$this->form->form_code} has been denied by the " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ".",
+            "message" => "A Requisition Form #{$this->form->form_code} has been denied by the " . ($this->form->reportingOfficer->reporting_officer_role ?? 'Reporting Officer') . ". Reason: {$this->form->reporting_officer_reason_for_denial}",
             "url" => route("requisition_forms.view", ["id" => $this->form->id])
         ];
     }

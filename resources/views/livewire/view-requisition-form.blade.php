@@ -480,7 +480,7 @@
                                 Value</label>
                             <div class="col-md-8">
                                 <input autocomplete="off" wire:model="estimated_value" type="number" step="0.01"
-                                    x-bind:disabled="!isEditing"
+                                    x-bind:disabled="!isEditing || {{ $requisitionForm->sent_to_cab ? 'true' : 'false' }}"
                                     class="form-control @error('estimated_value')is-invalid @enderror"
                                     id="estimated_value_input" placeholder="Estimated Value"
                                     aria-describedby="estimated_value_help" />
@@ -685,7 +685,7 @@
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO)
-                    <div class="row mt-8" x-show="!isEditing">
+                    <div class="row mt-8">
                         <div class="text-center m-auto">
                             <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
                                 data-bs-target="#sendToHodModal" @disabled($this->sendToHodDisabled)>
