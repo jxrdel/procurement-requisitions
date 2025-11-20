@@ -7,6 +7,7 @@ use App\Models\Requisition;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
 use App\Models\Vote;
+use App\RequestFormStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -429,7 +430,7 @@ class Controller
                 });
                 $query = $query->merge($forms);
             } elseif ($departmentName === 'Office of the Permanent Secretary') {
-                $forms = RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
+                $forms = RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', false)->where('status', '!=', RequestFormStatus::DENIED_BY_PS)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
                         ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
@@ -440,13 +441,13 @@ class Controller
                         'item_code' => $item->form_code,
                         'requesting_unit' => $item->requestingUnit->name,
                         'item' => $item->items->pluck('name')->implode(', '),
-                        'date_received' => $item->reporting_officer_approval_date,
+                        'date_received' => $item->hod_approval_date,
                         'status' => $status,
                     ];
                 });
                 $query = $query->merge($forms);
             } elseif ($departmentName === 'Office of the Deputy Permanent Secretary') {
-                $forms = RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
+                $forms = RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', false)->where('status', '!=', RequestFormStatus::DENIED_BY_DPS)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
                         ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
@@ -457,13 +458,13 @@ class Controller
                         'item_code' => $item->form_code,
                         'requesting_unit' => $item->requestingUnit->name,
                         'item' => $item->items->pluck('name')->implode(', '),
-                        'date_received' => $item->reporting_officer_approval_date,
+                        'date_received' => $item->hod_approval_date,
                         'status' => $status,
                     ];
                 });
                 $query = $query->merge($forms);
             } elseif ($departmentName === 'Office of the Chief Medical Officer') {
-                $forms = RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', false)->get()->map(function ($item) {
+                $forms = RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', false)->where('status', '!=', RequestFormStatus::DENIED_BY_CMO)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
                         ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
@@ -474,7 +475,7 @@ class Controller
                         'item_code' => $item->form_code,
                         'requesting_unit' => $item->requestingUnit->name,
                         'item' => $item->items->pluck('name')->implode(', '),
-                        'date_received' => $item->reporting_officer_approval_date,
+                        'date_received' => $item->hod_approval_date,
                         'status' => $status,
                     ];
                 });

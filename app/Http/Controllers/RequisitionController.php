@@ -51,7 +51,7 @@ class RequisitionController extends Controller
             ]);
 
         // Restrict for Viewers (not Procurement or Office of the Permanent Secretary)
-        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
+        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary' && Auth::user()->department->name !== 'Office of the Deputy Permanent Secretary') {
             $requisitions->where('departments.name', Auth::user()->department->name);
         }
 
@@ -133,7 +133,7 @@ class RequisitionController extends Controller
 
 
         // Restrict for Viewers (not Procurement or Office of the Permanent Secretary)
-        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
+        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
             $requisitions->where('departments.name', Auth::user()->department->name);
         }
 
@@ -188,7 +188,7 @@ class RequisitionController extends Controller
             ]);
 
         // Restrict for Viewers (not Procurement or Office of the Permanent Secretary)
-        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
+        if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name !== 'Procurement Unit' && Auth::user()->department->name !== 'Office of the Permanent Secretary' && Auth::user()->department->name !== 'Office of the Permanent Secretary') {
             $requisitions->where('departments.name', Auth::user()->department->name);
         }
 

@@ -69,6 +69,10 @@ class AppServiceProvider extends ServiceProvider
             return $user->department->name == $form->requestingUnit->name;
         });
 
+        Gate::define('edit-requisition-form', function ($user, $form) {
+            return $user->department->name === $form->requestingUnit->name;
+        });
+
         Gate::define('view-procurement-requisitions', function ($user) {
             return $user->department->name === 'Procurement Unit' || ($user->is_reporting_officer && ($user->reporting_officer_role === 'Permanent Secretary' || $user->reporting_officer_role === 'Deputy Permanent Secretary' || $user->reporting_officer_role === 'Chief Medical Officer'));
         });

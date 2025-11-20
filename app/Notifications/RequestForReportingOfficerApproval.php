@@ -40,7 +40,7 @@ class RequestForReportingOfficerApproval extends Notification
             ->markdown('emails.request-for-reporting-officer-approval', [
                 "recipient" => $notifiable->name,
                 "form" => $this->form,
-                "url" => route("requisition_forms.view", ["id" => $this->form->id])
+                "url" => route("queue.form.view", ["id" => $this->form->id])
             ]);
     }
 
@@ -54,7 +54,7 @@ class RequestForReportingOfficerApproval extends Notification
         return [
             "title" => "Requisition Form Sent for Approval",
             "message" => "A new Requisition Form #{$this->form->form_code} has been sent to you for approval from {$this->form->requestingUnit->name}. Minute: {$this->form->hod_note}",
-            "url" => route("requisition_forms.view", ["id" => $this->form->id])
+            "url" => route("queue.form.view", ["id" => $this->form->id])
         ];
     }
 }

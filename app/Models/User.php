@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\RequestFormStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -53,13 +55,13 @@ class User extends Authenticatable
                 $forms = \App\Models\RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', '!=', 'Completed')->count();
                 $query = $forms;
             } elseif ($departmentName === 'Office of the Permanent Secretary') {
-                $forms = \App\Models\RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', false)->count();
+                $forms = \App\Models\RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', false)->where('status', '!=', RequestFormStatus::DENIED_BY_PS)->count();
                 $query = $forms;
             } elseif ($departmentName === 'Office of the Deputy Permanent Secretary') {
-                $forms = \App\Models\RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', false)->count();
+                $forms = \App\Models\RequisitionRequestForm::where('sent_to_dps', true)->where('reporting_officer_approval', false)->where('status', '!=', RequestFormStatus::DENIED_BY_DPS)->count();
                 $query = $forms;
             } elseif ($departmentName === 'Office of the Chief Medical Officer') {
-                $forms = \App\Models\RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', false)->count();
+                $forms = \App\Models\RequisitionRequestForm::where('sent_to_cmo', true)->where('reporting_officer_approval', false)->where('status', '!=', RequestFormStatus::DENIED_BY_CMO)->count();
                 $query = $forms;
             }
         }
