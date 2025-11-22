@@ -56,7 +56,7 @@ class NotifyCostBudgeting extends Notification
             ->subject($subject)
             ->markdown('emails.sent-to-cost-budgeting', [
                 'requisition' => $this->requisition,
-                'url' => route('cost_and_budgeting.view', $this->requisition->cost_budgeting_requisition->id),
+                'url' => route('queue.requisition.view', $this->requisition->cost_budgeting_requisition->id),
             ]);
     }
 
@@ -71,7 +71,7 @@ class NotifyCostBudgeting extends Notification
         return [
             'title' => 'Incoming Requisition',
             'message' => 'Requisition #' . $this->requisition->requisition_no . ' has been sent to Cost & Budgeting.',
-            'url' => route('cost_and_budgeting.view', $this->requisition->cost_budgeting_requisition->id),
+            'url' => route('queue.requisition.view', $this->requisition->cost_budgeting_requisition->id),
         ];
     }
 }

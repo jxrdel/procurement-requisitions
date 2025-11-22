@@ -18,11 +18,12 @@
                 <div class="col text-end">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
 
-                        <input type="radio" class="btn-check" name="btnradio" id="btn-all" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="btn-all">All</label>
-
-                        <input type="radio" class="btn-check" name="btnradio" id="btn-in-progress" autocomplete="off">
+                        <input type="radio" class="btn-check" name="btnradio" id="btn-in-progress" autocomplete="off"
+                            checked>
                         <label class="btn btn-outline-primary" for="btn-in-progress">In Progress</label>
+
+                        <input type="radio" class="btn-check" name="btnradio" id="btn-all" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="btn-all">All</label>
 
                         <input type="radio" class="btn-check" name="btnradio" id="btn-completed" autocomplete="off">
                         <label class="btn btn-outline-primary" for="btn-completed">Completed</label>
@@ -61,7 +62,7 @@
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "{{ route('getvotecontrol_vendors') }}",
+                    "url": "{{ route('getinprogressvotecontrol_requisitions') }}",
                     "type": "GET"
                 },
                 "columns": [{
@@ -86,9 +87,7 @@
                         render: function(data, type, row) {
                             var status = row.VendorStatus ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
-                            if (status === 'Sent to Vote Control') {
-                                return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Accounts Payable</span></div>';
-                            } else if (data === false || data == 0) {
+                            if (data === false || data == 0) {
                                 return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
                                     status + '</span></div>';
                             } else {

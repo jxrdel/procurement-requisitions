@@ -25,31 +25,31 @@
                 <div x-show="isEditing">
                     <form wire:submit.prevent="edit">
                         @foreach ($requisition_vendors as $index => $vendorData)
-                                                        <div class="row mt-7">
-                                                            <div class="col-md-6">
-                                                                <div class="row">
-                                                                    <div class="col-4">
-                                                                        <label
-                                                                            class="form-label text-black"><strong>{{ $vendorData['vendor_name'] }}:</strong></label>
-                                                                    </div>
-                                                                    <div class="col-8">
-                                                                        <div class="form-floating form-floating-outline">
-                                                                            <input autocomplete="off"
-                                                                                wire:model="requisition_vendors.{{ $index }}.date_committed_vc"
-                                                                                type="date"
-                                                                                class="form-control @error('requisition_vendors.' . $index . '.date_committed_vc')is-invalid @enderror"
-                                                                                id="date_committed_vc_{{ $index }}"
-                                                                                aria-describedby="dateCommittedVcHelp" />
-                                                                            <label for="date_committed_vc_{{ $index }}">Date
-                                                                                Committed</label>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                @error('requisition_vendors.' . $index . '.date_committed_vc')
-                                                                    <div class="text-danger"> {{ $message }} </div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
+                            <div class="row mt-7">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <label
+                                                class="form-label text-black"><strong>{{ $vendorData['vendor_name'] }}:</strong></label>
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="form-floating form-floating-outline">
+                                                <input autocomplete="off"
+                                                    wire:model="requisition_vendors.{{ $index }}.date_committed_vc"
+                                                    type="date"
+                                                    class="form-control @error('requisition_vendors.' . $index . '.date_committed_vc')is-invalid @enderror"
+                                                    id="date_committed_vc_{{ $index }}"
+                                                    aria-describedby="dateCommittedVcHelp" />
+                                                <label for="date_committed_vc_{{ $index }}">Date
+                                                    Committed</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @error('requisition_vendors.' . $index . '.date_committed_vc')
+                                        <div class="text-danger"> {{ $message }} </div>
+                                    @enderror
+                                </div>
+                            </div>
                         @endforeach
 
                         <div class="row d-flex justify-content-center text-center mt-6">
@@ -144,8 +144,14 @@
                                 </div>
 
                                 <div class="col">
-                                    <label><strong>Vote Number:</strong>
-                                        {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
+                                    <label><strong>Vote Number(s):</strong>
+                                        @forelse ($vendor['votes'] as $vote)
+                                            <span class="badge bg-label-primary">{{ $vote['number'] }}</span>
+                                        @empty
+                                            <span
+                                                class="badge bg-label-secondary">{{ $requisition->source_of_funds }}</span>
+                                        @endforelse
+                                    </label>
                                 </div>
                             </div>
 
@@ -190,8 +196,13 @@
                         </div>
 
                         <div class="col mx-5">
-                            <label><strong>Vote Number:</strong>
-                                {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
+                            <label><strong>Vote Number(s):</strong>
+                                @forelse ($vendor['votes'] as $vote)
+                                    <span class="badge bg-label-primary">{{ $vote['number'] }}</span>
+                                @empty
+                                    <span class="badge bg-label-secondary">{{ $requisition->source_of_funds }}</span>
+                                @endforelse
+                            </label>
                         </div>
                     </div>
 

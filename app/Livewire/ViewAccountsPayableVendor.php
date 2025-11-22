@@ -91,8 +91,8 @@ class ViewAccountsPayableVendor extends Component
 
                     $this->validate(
                         [
-                            'requisition_vendors.' . $index . '.date_received_ap' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                            'requisition_vendors.' . $index . '.date_sent_vc' => 'nullable|date|after_or_equal:requisition_vendors.' . $index . '.date_received_ap',
+                            'requisition_vendors.' . $index . '.date_received_ap' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->requisition->date_sent_dps,
+                            'requisition_vendors.' . $index . '.date_sent_vc' => 'nullable|date|date_format:Y-m-d|after_or_equal:requisition_vendors.' . $index . '.date_received_ap',
                         ],
                         [
                             'requisition_vendors.' . $index . '.date_received_ap.after_or_equal' => 'Please check date',
@@ -125,10 +125,10 @@ class ViewAccountsPayableVendor extends Component
 
                 $this->validate(
                     [
-                        'date_received_ap' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                        'date_sent_vc' => 'nullable|date|after_or_equal:' . $this->date_received_ap,
-                        'date_received_ap_invoices' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                        'date_sent_vc_invoices' => 'nullable|date|after_or_equal:' . $this->date_received_ap_invoices,
+                        'date_received_ap' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->requisition->date_sent_dps,
+                        'date_sent_vc' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->date_received_ap,
+                        'date_received_ap_invoices' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->requisition->date_sent_dps,
+                        'date_sent_vc_invoices' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->date_received_ap_invoices,
                     ],
                     [
                         'date_received_ap.after_or_equal' => 'Please check date',
@@ -214,7 +214,7 @@ class ViewAccountsPayableVendor extends Component
             'date_completed' => now(),
         ]);
 
-        if (!$this->vendor->voteControl) {
+        if ($this->vendor->voteControl == null) {
             $this->vendor->voteControl()->create([
                 'date_received' => Carbon::now(),
             ]);
@@ -224,19 +224,20 @@ class ViewAccountsPayableVendor extends Component
                 'is_completed' => false,
             ]);
         }
+        $this->vendor->load('voteControl');
 
         //Send email to Vote Control
         if ($this->requisition->is_first_pass) {
             Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable');
             $this->requisition->statuslogs()->create([
-                'status' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable',
-                'changed_by' => Auth::user()->name,
+                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable',
+                'created_by' => Auth::user()->name,
             ]);
         } else {
             Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
             $this->requisition->statuslogs()->create([
-                'status' => 'Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable',
-                'changed_by' => Auth::user()->name,
+                'details' => 'Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable',
+                'created_by' => Auth::user()->name,
             ]);
         }
 

@@ -65,4 +65,12 @@ class NotificationController extends Controller
 
         return view('Notifications.view', compact('notification')); // Pass the variable here
     }
+
+    public function markAllAsRead()
+    {
+        $user = Auth::user();
+        $user->unreadNotifications->markAsRead();
+
+        return redirect()->back()->with('success', 'All notifications marked as read.');
+    }
 }

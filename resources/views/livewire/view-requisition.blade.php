@@ -702,8 +702,7 @@
                                                             class="form-control" />
                                                         <label>Vendor Name</label>
                                                     </div>
-                                                    <template
-                                                        x-if="$wire.errors['vendors.' + index + '.vendor_name']">
+                                                    <template x-if="$wire.errors['vendors.' + index + '.vendor_name']">
                                                         <div class="text-danger"
                                                             x-text="$wire.errors['vendors.' + index + '.vendor_name']">
                                                         </div>
@@ -729,7 +728,8 @@
                                                     </div>
                                                     <template x-if="$wire.errors['vendors.' + index + '.amount']">
                                                         <div class="text-danger"
-                                                            x-text="$wire.errors['vendors.' + index + '.amount']"></div>
+                                                            x-text="$wire.errors['vendors.' + index + '.amount']">
+                                                        </div>
                                                     </template>
                                                 </div>
                                                 <div class="col-1">
@@ -741,11 +741,11 @@
                                             </div>
                                         </template>
                                         @if (!$requisition->sent_to_cb)
-                                        <button type="button"
-                                            @click="vendors.push({ vendor_name: '', vendor_items: '', amount: '' })"
-                                            class="btn rounded-pill btn-icon btn-primary mx-auto mt-2">
-                                            <span class="tf-icons ri-add-line ri-22px"></span>
-                                        </button>
+                                            <button type="button"
+                                                @click="vendors.push({ vendor_name: '', vendor_items: '', amount: '' })"
+                                                class="btn rounded-pill btn-icon btn-primary mx-auto mt-2">
+                                                <span class="tf-icons ri-add-line ri-22px"></span>
+                                            </button>
                                         @endif
                                     </div>
 
@@ -978,8 +978,10 @@
                                                 </div>
 
                                                 <div class="col mx-5">
-                                                    <label><strong>Date Sent to AP:</strong>
-                                                        {{ $this->getFormattedDate($vendor['date_sent_ap']) }}</label>
+                                                    @if (!$requisition->is_first_pass)
+                                                        <label><strong>Date Sent to AP:</strong>
+                                                            {{ $this->getFormattedDate($vendor['date_sent_ap']) }}</label>
+                                                    @endif
                                                 </div>
                                             </div>
 
@@ -1043,18 +1045,19 @@
                                         </div>
                                     @endforelse
                                     @can('edit-requisition')
-                                        @if ($this->requisition->is_first_pass && count($vendors) > 0 && !$this->requisition->sent_to_ap_first_pass)
+                                        @if ($this->requisition->is_first_pass && count($vendors) > 0 && !$this->requisition->sent_to_vc_first_pass)
                                             <div class="row mt-8">
-                                                <button @disabled($this->isSendAllToAPButtonDisabled)
-                                                    wire:confirm="Are you sure you want to send to accounts payable?"
-                                                    wire:target="sendToAP({{ $vendors[0]['id'] }})"
+                                                <button @disabled($this->isSendAllToVoteControlButtonDisabled)
+                                                    wire:confirm="Are you sure you want to send to vote control?"
+                                                    wire:target="sendToVoteControl({{ $vendors[0]['id'] }})"
                                                     wire:loading.attr="disabled" type="button"
-                                                    wire:click="sendToAP({{ $vendors[0]['id'] }})"
+                                                    wire:click="sendToVoteControl({{ $vendors[0]['id'] }})"
                                                     class="btn btn-success waves-effect waves-light m-auto"
                                                     style="width: 300px">
                                                     <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to
-                                                    Accounts Payable
-                                                    <div wire:loading wire:target="sendToAP({{ $vendors[0]['id'] }})"
+                                                    Vote Control
+                                                    <div wire:loading
+                                                        wire:target="sendToVoteControl({{ $vendors[0]['id'] }})"
                                                         class="spinner-border spinner-border-lg text-white mx-2"
                                                         role="status">
                                                         <span class="visually-hidden">Loading...</span>
@@ -1083,7 +1086,7 @@
                                                     </button>
                                                 </h2>
                                                 <div id="collapse{{ $index }}"
-                                                    class="accordion-collapse collapse {{ $vendor['accordionView'] }}"
+                                                    class="accordion-collapse {{ $vendor['accordionView'] }}"
                                                     data-bs-parent="#accordion{{ $index }}">
                                                     <div class="accordion-body">
                                                         <div class="row mt-8">
@@ -1141,19 +1144,22 @@
 
 
                                                             <div class="col-md-6">
-                                                                <div class="form-floating form-floating-outline">
-                                                                    <input autocomplete="off"
-                                                                        wire:model="vendors.{{ $index }}.date_sent_ap"
-                                                                        type="date"
-                                                                        class="form-control @error('vendors.' . $index . '.date_sent_ap')is-invalid @enderror"
-                                                                        id="floatingInput"
-                                                                        aria-describedby="floatingInputHelp" />
-                                                                    <label for="floatingInput">Date Sent to
-                                                                        AP</label>
-                                                                </div>
-                                                                @error('vendors.' . $index . '.date_sent_ap')
-                                                                    <div class="text-danger"> {{ $message }} </div>
-                                                                @enderror
+                                                                @if (!$this->requisition->is_first_pass)
+                                                                    <div class="form-floating form-floating-outline">
+                                                                        <input autocomplete="off"
+                                                                            wire:model="vendors.{{ $index }}.date_sent_ap"
+                                                                            type="date"
+                                                                            class="form-control @error('vendors.' . $index . '.date_sent_ap')is-invalid @enderror"
+                                                                            id="floatingInput"
+                                                                            aria-describedby="floatingInputHelp" />
+                                                                        <label for="floatingInput">Date Sent to
+                                                                            AP</label>
+                                                                    </div>
+                                                                    @error('vendors.' . $index . '.date_sent_ap')
+                                                                        <div class="text-danger"> {{ $message }}
+                                                                        </div>
+                                                                    @enderror
+                                                                @endif
                                                             </div>
                                                         </div>
 

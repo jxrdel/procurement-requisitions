@@ -110,8 +110,14 @@
                             </div>
 
                             <div class="col">
-                                <label><strong>Vote Number:</strong>
-                                    {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
+                                <label><strong>Vote Number(s):</strong>
+                                    @forelse ($vendor['votes'] as $vote)
+                                        <span class="badge bg-label-primary">{{ $vote['number'] }}</span>
+                                    @empty
+                                        <span
+                                            class="badge bg-label-secondary">{{ $requisition->source_of_funds }}</span>
+                                    @endforelse
+                                </label>
                             </div>
 
                         </div>
@@ -168,8 +174,14 @@
                     </div>
 
                     <div class="col mx-5">
-                        <label><strong>Vote Number:</strong>
-                            {{ $this->vendor->change_of_vote_no ?? $this->requisition->source_of_funds }}</label>
+
+                        <label><strong>Vote Number(s):</strong>
+                            @forelse ($vendor['votes'] as $vote)
+                                <span class="badge bg-label-primary">{{ $vote['number'] }}</span>
+                            @empty
+                                <span class="badge bg-label-secondary">{{ $requisition->source_of_funds }}</span>
+                            @endforelse
+                        </label>
                     </div>
                 </div>
 

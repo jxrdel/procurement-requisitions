@@ -18,11 +18,12 @@
                 <div class="col text-end">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
 
-                        <input type="radio" class="btn-check" name="btnradio" id="btn-all" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="btn-all">All</label>
-
-                        <input type="radio" class="btn-check" name="btnradio" id="btn-in-progress" autocomplete="off">
+                        <input type="radio" class="btn-check" name="btnradio" id="btn-in-progress" autocomplete="off"
+                            checked>
                         <label class="btn btn-outline-primary" for="btn-in-progress">In Progress</label>
+
+                        <input type="radio" class="btn-check" name="btnradio" id="btn-all" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="btn-all">All</label>
 
                         <input type="radio" class="btn-check" name="btnradio" id="btn-completed" autocomplete="off">
                         <label class="btn btn-outline-primary" for="btn-completed">Completed</label>
@@ -61,7 +62,7 @@
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "{{ route('getchequeprocessing_vendors') }}",
+                    "url": "{{ route('getinprogresschequeprocessing_vendors') }}",
                     "type": "GET"
                 },
                 "columns": [{
@@ -86,9 +87,7 @@
                         render: function(data, type, row) {
                             var status = row.VendorStatus ||
                                 'In Progress'; // Fallback in case `requisition_status` is empty
-                            if (status === 'Sent to Cheque Processing') {
-                                return '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">Received from Check Staff</span></div>';
-                            } else if (status === 'Incomplete') {
+                            if (status === 'Incomplete') {
                                 return '<div style="text-align:center;"><span style="background-color: #e00303 !important;" class="badge bg-danger">' +
                                     status + '</span></div>';
                             } else if (data === false || data == 0) {

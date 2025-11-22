@@ -14,6 +14,7 @@ use App\Models\VendorInvoice;
 use App\Models\Vote;
 use App\Notifications\NotifyAccountsPayable;
 use App\Notifications\NotifyCostBudgeting;
+use App\Notifications\NotifyVoteControl;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -268,6 +269,10 @@ class ViewRequisition extends Component
                     $this->active_pane = 'procurement2';
                     return;
                 }
+                if ($this->requisition->requisition_status == 'Sent to Vote Control for Commitment') {
+                    $this->active_pane = 'votecontrol';
+                    return;
+                }
                 if ($condition($vendor)) {
                     $this->active_pane = $stage;
                     return; // Stop as soon as the least progressed stage is found
@@ -379,6 +384,12 @@ class ViewRequisition extends Component
             $this->dispatch('show-message', message: 'Requisition edited successfully');
             $this->requisition = $this->requisition->fresh();
             $this->originalVendorIds = collect($this->vendors)->pluck('id')->filter()->all();
+            $this->vendors = $this->requisition->vendors()
+                ->with('invoices')
+                ->with('ap')
+                ->with('votes')
+                ->get()
+                ->toArray();
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition: ' . $e->getMessage());
             // Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
@@ -608,9 +619,9 @@ class ViewRequisition extends Component
         $users = User::costBudgeting()->get();
 
         foreach ($users as $user) {
-            // Notification::send($user, new NotifyCostBudgeting($this->requisition));
+            Notification::send($user, new NotifyCostBudgeting($this->requisition));
             // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
-            // Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
+            Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
@@ -643,12 +654,10 @@ class ViewRequisition extends Component
 
     public function isProcurement2ButtonDisabled($vendor)
     {
-        if ($vendor['vendor_status'] === '') {
-            return true;
-        }
 
         if (!$this->requisition->is_first_pass) {
-            if (empty($vendor['invoices'])) {
+
+            if (count($vendor['invoices']) < 1) {
                 return true;
             }
         }
@@ -656,7 +665,7 @@ class ViewRequisition extends Component
         return
             empty(trim($vendor['purchase_order_no'])) ||
             empty($vendor['eta']) ||
-            empty($vendor['date_sent_ap']);
+            empty($vendor['date_sent_commit']);
     }
 
 
@@ -768,7 +777,7 @@ class ViewRequisition extends Component
             }
 
             $this->requisition->statuslogs()->create([
-                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username,
+                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name,
                 'created_by' => Auth::user()->username,
             ]);
 
@@ -827,22 +836,61 @@ class ViewRequisition extends Component
             ]);
         }
 
-
+        $vendor->load('ap');
         //Send email to Accounts Payable
         Log::info('Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username);
 
         //Get Accounts Payable users
         $users = User::accountsPayable()->get();
 
-        // foreach ($users as $user) {
-        //     Notification::send($user, new NotifyAccountsPayable($vendor));
-        // }
-
-        // return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Accounts Payable');
+        foreach ($users as $user) {
+            Notification::send($user, new NotifyAccountsPayable($vendor));
+        }
 
         $this->refreshVendors();
 
         $this->dispatch('show-message', message: 'Sent to AP successfully');
+    }
+
+    public function sendToVoteControl($vendorID)
+    {
+        $vendor = RequisitionVendor::find($vendorID);
+        $vendor->update([
+            'vendor_status' => 'Sent to Vote Control for Commitment',
+        ]);
+
+        $this->requisition->update([
+            'sent_to_vc_first_pass' => true,
+            'requisition_status' => 'Sent to Vote Control for Commitment',
+        ]);
+
+        if ($vendor->voteControl == null) {
+            $vendor->voteControl()->create([
+                'date_received' => Carbon::now(),
+            ]);
+        } else {
+            $vendor->voteControl->update([
+                'date_received' => Carbon::now(),
+                'is_completed' => false,
+            ]);
+        }
+        $vendor->load('voteControl');
+
+        //Send email to Vote Control
+        Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Procurement');
+        $this->requisition->statuslogs()->create([
+            'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Procurement',
+            'created_by' => Auth::user()->name,
+        ]);
+
+        //Get Vote Control users
+        $users = User::voteControl()->get();
+
+        foreach ($users as $user) {
+            Notification::send($user, new NotifyVoteControl($vendor));
+        }
+
+        $this->dispatch('show-message', message: 'Sent to Vote Control successfully');
     }
 
     //Accounts
@@ -1136,7 +1184,7 @@ class ViewRequisition extends Component
         }
     }
 
-    public function getIsSendAllToAPButtonDisabledProperty()
+    public function getIsSendAllToVoteControlButtonDisabledProperty()
     {
         foreach ($this->vendors as $vendor) {
             if ($this->isProcurement2ButtonDisabled($vendor)) {

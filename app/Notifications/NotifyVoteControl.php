@@ -49,8 +49,12 @@ class NotifyVoteControl extends Notification
         $requisition = $this->vendor->requisition;
         $date_sent = Carbon::parse($this->vendor->voteControl->date_received)->format('F jS, Y');
 
+        $subject = $requisition->is_first_pass ?
+            'Request for Commitment of Funds | Procurement Requisition Application' :
+            'Incoming Invoices | Procurement Requisition Application';
+
         return (new MailMessage)
-            ->subject('Incoming Invoices | Procurement Requisition Application')
+            ->subject($subject)
             ->markdown('emails.sent-to-vote-control', [
                 'vendor' => $this->vendor,
                 'requisition' => $requisition,
@@ -67,9 +71,17 @@ class NotifyVoteControl extends Notification
      */
     public function toArray($notifiable)
     {
+        $title = $this->vendor->requisition->is_first_pass ?
+            'Request for Commitment of Funds' :
+            'Incoming Invoices';
+
+        $message = $this->vendor->requisition->is_first_pass ?
+            'A request for commitment of funds for Requisition ' . $this->vendor->requisition->requisition_no . ' has been sent to Vote Control.' :
+            'Invoice(s) for Requisition ' . $this->vendor->requisition->requisition_no . ' have been sent to Vote Control.';
+
         return [
-            'title' => 'Incoming Invoices',
-            'message' => 'Invoices for Requisition ' . $this->vendor->requisition->requisition_no . ' have been sent to Vote Control.',
+            'title' => $title,
+            'message' => $message,
             'url' => route('vote_control.view', $this->vendor->voteControl->id),
         ];
     }

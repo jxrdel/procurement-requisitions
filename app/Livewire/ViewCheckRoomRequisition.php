@@ -2,12 +2,13 @@
 
 namespace App\Livewire;
 
-use App\Mail\NotifyChequeProcessing;
 use App\Models\CheckRoomRequisition;
 use App\Models\User;
+use App\Notifications\NotifyChequeProcessing;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 
 class ViewCheckRoomRequisition extends Component
@@ -232,7 +233,7 @@ class ViewCheckRoomRequisition extends Component
         //Get Cheque Processing Staff
         $chequeProcessingStaff = User::chequeProcessing()->get();
         foreach ($chequeProcessingStaff as $staff) {
-            Mail::to($staff->email)->queue(new NotifyChequeProcessing($this->requisition));
+            Notification::send($staff, new NotifyChequeProcessing($this->requisition));
         }
 
         return redirect()->route('check_room.index')->with('success', 'Requisition sent to Cheque Processing successfully');

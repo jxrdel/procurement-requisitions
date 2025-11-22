@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 
 class CostBudgetingRequisition extends Component
@@ -116,8 +117,8 @@ class CostBudgetingRequisition extends Component
 
         $this->validate(
             [
-                'vendors.*.date_sent_request_mof' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                'vendors.*.release_date' => 'nullable|date|after:vendors.*.date_sent_request_mof',
+                'vendors.*.date_sent_request_mof' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->requisition->date_sent_dps,
+                'vendors.*.release_date' => 'nullable|date|date_format:Y-m-d|after:vendors.*.date_sent_request_mof',
 
             ],
             [
@@ -214,7 +215,7 @@ class CostBudgetingRequisition extends Component
     {
 
         $this->requisition->update([
-            'requisition_status' => 'Received from Cost & Budgeting',
+            'requisition_status' => 'Sent to Procurement',
             'is_completed_cb' => true,
         ]);
 
@@ -232,14 +233,14 @@ class CostBudgetingRequisition extends Component
         Log::info('Cost & Budgeting Requisition #' . $this->requisition->requisition_no . ' was sent to Procurement by ' . Auth::user()->username);
 
         //Send email to assigned procurement officer
-        $user = $this->requisition->procurement_officer;
-        if ($user) {
-            // Mail::to($user->email)->cc('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
-            // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
-        } else {
-            // Mail::to('maryann.basdeo@health.gov.tt')->queue(new CostBudgetingCompleted($this->requisition));
-            // Log::info('Email sent to ' . $user->email . ' for Requisition #' . $this->requisition->requisition_no . ' by ' . Auth::user()->username);
-        }
+        $assigned_to = $this->requisition->procurement_officer;
+        $maryann = User::where('name', 'Maryann Basdeo')->first();
+
+        $recipients = collect([$assigned_to, $maryann])
+            ->filter()
+            ->unique('id');
+
+        Notification::send($recipients, new \App\Notifications\CostBudgetingCompleted($this->requisition));
 
         return redirect()->route('queue')->with('success', 'Sent to procurement successfully');
     }

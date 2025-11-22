@@ -126,7 +126,7 @@
                                         <input autocomplete="off" wire:model="date_received_ap_invoices" type="date"
                                             class="form-control @error('date_received_ap_invoices')is-invalid @enderror"
                                             id="floatingInput" aria-describedby="floatingInputHelp" />
-                                        <label for="floatingInput">Date Received From Procurement For Invoices</label>
+                                        <label for="floatingInput">Date Received From Procurement</label>
                                     </div>
                                     @error('date_received_ap_invoices')
                                         <div class="text-danger"> {{ $message }} </div>
@@ -139,7 +139,7 @@
                                             class="form-control @error('date_sent_vc_invoices')is-invalid @enderror"
                                             id="floatingInput" placeholder="Voucher Number"
                                             aria-describedby="floatingInputHelp" />
-                                        <label for="floatingInput">Date Sent to Vote Control For Invoices</label>
+                                        <label for="floatingInput">Date Sent to Vote Control</label>
                                     </div>
                                     @error('date_sent_vc_invoices')
                                         <div class="text-danger"> {{ $message }} </div>
@@ -162,26 +162,15 @@
                 </div>
 
                 <div x-show="!isEditing">
-                    <div class="row mt-8">
-                        <div class="col mx-5">
-                            <label><strong>Date Received From Procurement For Commitment:</strong>
-                                {{ $this->getFormattedDate($this->date_received_ap) }}</label>
-                        </div>
-
-                        <div class="col mx-5">
-                            <label><strong>Date Sent to Vote Control For Commitment:</strong>
-                                {{ $this->getFormattedDate($this->date_sent_vc) }}</label>
-                        </div>
-                    </div>
 
                     <div class="row mt-8">
                         <div class="col mx-5">
-                            <label><strong>Date Received From Procurement For Invoices :</strong>
+                            <label><strong>Date Received From Procurement :</strong>
                                 {{ $this->getFormattedDate($vendor['date_received_ap_invoices']) }}</label>
                         </div>
 
                         <div class="col mx-5">
-                            <label><strong>Date Sent to Vote Control For Invoices:</strong>
+                            <label><strong>Date Sent to Vote Control:</strong>
                                 {{ $this->getFormattedDate($vendor['date_sent_vc_invoices']) }}</label>
                         </div>
                     </div>

@@ -18,11 +18,12 @@
                 <div class="col text-end">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
 
-                        <input type="radio" class="btn-check" name="btnradio" id="btn-all" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="btn-all">All</label>
-
-                        <input type="radio" class="btn-check" name="btnradio" id="btn-in-progress" autocomplete="off">
+                        <input type="radio" class="btn-check" name="btnradio" id="btn-in-progress" autocomplete="off"
+                            checked>
                         <label class="btn btn-outline-primary" for="btn-in-progress">In Progress</label>
+
+                        <input type="radio" class="btn-check" name="btnradio" id="btn-all" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="btn-all">All</label>
 
                         <input type="radio" class="btn-check" name="btnradio" id="btn-completed" autocomplete="off">
                         <label class="btn btn-outline-primary" for="btn-completed">Completed</label>
@@ -61,7 +62,7 @@
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "{{ route('getaccountspayable_vendors') }}",
+                    "url": "{{ route('getinprogressaccountspayable_vendors') }}",
                     "type": "GET"
                 },
                 "columns": [{

@@ -3,15 +3,17 @@
 namespace App\Livewire;
 
 use App\Mail\ErrorNotification;
-use App\Mail\NotifyChequeProcessing;
 use App\Models\CheckStaffVendor;
 use App\Models\User;
+use App\Notifications\NotifyChequeProcessing;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
+use Mockery\Matcher\Not;
 
 class ViewCheckStaffVendor extends Component
 {
@@ -110,10 +112,10 @@ class ViewCheckStaffVendor extends Component
 
         $this->validate(
             [
-                'date_received_from_vc' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
-                'date_sent_audit' => 'nullable|date|after_or_equal:date_received_from_vc',
-                'date_received_from_audit' => 'nullable|date|after_or_equal:date_sent_audit',
-                'date_sent_chequeprocessing' => 'nullable|date|after_or_equal:date_received_from_audit',
+                'date_received_from_vc' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->requisition->date_sent_dps,
+                'date_sent_audit' => 'nullable|date|date_format:Y-m-d|after_or_equal:date_received_from_vc',
+                'date_received_from_audit' => 'nullable|date|date_format:Y-m-d|after_or_equal:date_sent_audit',
+                'date_sent_chequeprocessing' => 'nullable|date|date_format:Y-m-d|after_or_equal:date_received_from_audit',
             ],
             [
                 'date_received_from_vc.after_or_equal' => 'Please check date.',
@@ -197,11 +199,14 @@ class ViewCheckStaffVendor extends Component
         ]);
 
         Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Cheque Processing by ' . Auth::user()->name . ' from Check Staff');
-
+        $this->requisition->statuslogs()->create([
+            'details' => 'Vendor ' . $this->vendor->vendor_name . ' sent to Cheque Processing from Check Staff by ' . Auth::user()->name,
+            'created_by' => Auth::user()->name,
+        ]);
         //Get Cheque Processing Staff
         $chequeProcessingStaff = User::chequeProcessing()->get();
         foreach ($chequeProcessingStaff as $staff) {
-            // Mail::to($staff->email)->send(new NotifyChequeProcessing($this->vendor));
+            Notification::send($staff, new NotifyChequeProcessing($this->vendor));
         }
 
         return redirect()->route('check_room.index')->with('success', 'Requisition sent to Cheque Processing successfully');

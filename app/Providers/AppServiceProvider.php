@@ -110,7 +110,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-log', function ($user, $log) {
-            return $user->department->name === $log->user->department->name;
+            // return $user->department->name === $log->user->department->name;
         });
 
         Gate::define('view-requisition-form', function ($user, $form) {

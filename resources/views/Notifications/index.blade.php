@@ -14,6 +14,12 @@
                 </h1>
             </div>
 
+            <div class="text-center mb-3">
+                <a href="{{ route('notifications.markAllAsRead') }}" class="btn btn-primary"><i
+                        class="fa-solid fa-check me-2"></i>
+                    Mark All as Read</a>
+            </div>
+
             <div class="row mt-5">
                 <table id="notificationsTable" class="table table-hover table-bordered">
                     <thead>

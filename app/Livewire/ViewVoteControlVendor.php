@@ -3,11 +3,11 @@
 namespace App\Livewire;
 
 use App\Mail\ErrorNotification;
-use App\Mail\NotifyCheckRoom;
 use App\Models\RequisitionVendor;
 use App\Models\User;
 use App\Models\VoteControlVendor;
 use App\Notifications\FundsCommitted;
+use App\Notifications\NotifyCheckRoom;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -61,7 +61,7 @@ class ViewVoteControlVendor extends Component
             }
         }
 
-        if(!$this->requisition->is_first_pass && $this->vc_vendor->is_completed == "1") {
+        if (!$this->requisition->is_first_pass && $this->vc_vendor->is_completed == "1") {
             $this->isEditing = false;
         }
 
@@ -183,7 +183,13 @@ class ViewVoteControlVendor extends Component
 
         // Procurement officer for requisition
         $procurement_user = $this->requisition->procurement_officer;
-        Notification::send($procurement_user, new FundsCommitted($this->requisition));
+        $maryann = User::where('name', 'Maryann Basdeo')->first();
+
+        $recipients = collect([$procurement_user, $maryann])
+            ->filter()
+            ->unique('id');
+
+        Notification::send($recipients, new FundsCommitted($this->requisition));
 
         $this->requisition->update([
             'requisition_status' => 'Sent to Procurement',
@@ -212,12 +218,16 @@ class ViewVoteControlVendor extends Component
             'date_received' => Carbon::now(),
         ]);
 
+        $this->requisition->statusLogs()->create([
+            'details' => 'Vendor ' . $this->vendor->vendor_name . ' sent to Check Staff by ' . Auth::user()->name . ' from Vote Control',
+            'created_by' => Auth::user()->username,
+        ]);
         Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Check Staff by ' . Auth::user()->name . ' from Vote Control');
 
         //Get Emails of Check Staff
         $checkStaff = User::checkStaff()->get();
         foreach ($checkStaff as $staff) {
-            // Mail::to($staff->email)->queue(new NotifyCheckRoom($this->vendor));
+            Notification::send($staff, new NotifyCheckRoom($this->vendor));
         }
 
         return redirect()->route('vote_control.index')->with('success', 'Sent to Check Staff successfully');

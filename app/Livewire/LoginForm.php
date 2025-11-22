@@ -25,13 +25,15 @@ class LoginForm extends Component
     {
         //Donald : 25
         //Crystal CAB: 8
-        //Cindy Vote Control: 24
         //Candise Accounts Payable: 11
+        //Cindy Vote Control: 24
+        //Cheryl Check Staff: 12
+        // Rohini Cheque Processing: 15
 
-        // $user = User::find(4);
+        $user = User::find(15);
 
-        // Auth::login($user);
-        // return redirect()->intended('/'); // Fallback to dashboard if no intended page
+        Auth::login($user);
+        return redirect()->intended('/'); // Fallback to dashboard if no intended page
 
         try {
 

@@ -2,13 +2,14 @@
 
 namespace App\Livewire;
 
-use App\Mail\RequisitionCompleted;
 use App\Models\Cheque;
 use App\Models\ChequeProcessingVendor;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 
 class ViewChequeProcessingVendor extends Component
@@ -137,7 +138,7 @@ class ViewChequeProcessingVendor extends Component
 
         $this->validate(
             [
-                'cheques.*.date_cheque_processed' => 'nullable|date|after_or_equal:' . $this->requisition->date_received_procurement,
+                'cheques.*.date_cheque_processed' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->requisition->ps_approval_date,
                 'cheques.*.cheque_no' => [
                     'regex:/^[A-Za-z]{1}[0-9]{8}$/', // Check if cheque number is in the format A12345678
                     'nullable',
@@ -148,8 +149,8 @@ class ViewChequeProcessingVendor extends Component
                     }
                 ],
                 'cheques.*.cheque_amount' => 'required|numeric',
-                'cheques.*.date_of_cheque' => 'nullable|date|after_or_equal:' . $this->requisition->date_received_procurement,
-                'cheques.*.date_sent_dispatch' => 'nullable|date|after_or_equal:date_of_cheque',
+                'cheques.*.date_of_cheque' => 'nullable|date|date_format:Y-m-d|after_or_equal:' . $this->requisition->ps_approval_date,
+                'cheques.*.date_sent_dispatch' => 'nullable|date|date_format:Y-m-d|after_or_equal:date_of_cheque',
             ],
             [
                 'cheques.*.cheque_no.regex' => 'Cheque number must be in the format A12345678',
@@ -246,12 +247,23 @@ class ViewChequeProcessingVendor extends Component
                 'date_completed' => now(),
             ]);
 
+            $this->requisition->statuslogs()->create([
+                'details' => 'Requisition marked as Completed by ' . Auth::user()->name . ' from Cheque Processing',
+                'created_by' => Auth::user()->name,
+            ]);
+
             $assigned_to = $this->requisition->procurement_officer;
-            if ($assigned_to) {
-                Mail::to($assigned_to->email)->cc('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
-            } else {
-                Mail::to('maryann.basdeo@health.gov.tt')->send(new RequisitionCompleted($this->requisition));
-            }
+            $maryann = User::where('name', 'Maryann Basdeo')->first();
+            $contactPerson = $this->requisition->requisitionForm?->contactPerson;
+            $hod = $this->requisition->requisitionForm?->headOfDepartment;
+
+            $recipients = collect([$assigned_to, $maryann, $contactPerson, $hod])
+                // Remove nulls (e.g., if maryann isn't found or contactPerson is null)
+                ->filter()
+                // Remove duplicates based on User ID (fixes the Maryann/Officer overlap)
+                ->unique('id');
+
+            Notification::send($recipients, new \App\Notifications\RequisitionCompleted($this->requisition));
         }
         return redirect()->route('cheque_processing.index')->with('success', 'Completed successfully');
     }

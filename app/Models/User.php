@@ -110,7 +110,7 @@ class User extends Authenticatable
     public function scopeCheckStaff($query)
     {
         return $query->whereHas('department', function ($q) {
-            $q->where('name', 'Check Dispatch'); // Assumes 'Check Staff' maps to 'Check Dispatch'
+            $q->where('name', 'Check Staff'); // Assumes 'Check Staff' maps to 'Check Dispatch'
         })->where('is_active', true);
     }
 

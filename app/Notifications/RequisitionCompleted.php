@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
-class RequisitionCompleted extends Notification implements ShouldQueue
+class RequisitionCompleted extends Notification
 {
     use Queueable;
 
@@ -46,7 +46,7 @@ class RequisitionCompleted extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Requisition Completed | Procurement Requisition Application')
+            ->subject('Requisition Completed | PRA')
             ->markdown('emails.requisition-completed', [
                 'requisition' => $this->requisition,
                 'url' => route('requisitions.view', $this->requisition->id),

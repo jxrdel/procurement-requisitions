@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
-class CostBudgetingCompleted extends Notification implements ShouldQueue
+class CostBudgetingCompleted extends Notification
 {
     use Queueable;
 
@@ -46,7 +46,7 @@ class CostBudgetingCompleted extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Requisition Completed by Cost & Budgeting')
+            ->subject('Requisition Completed by Cost & Budgeting | PRA')
             ->markdown('emails.cost-budgeting-completed', [
                 'requisition' => $this->requisition,
                 'url' => route('requisitions.view', $this->requisition->id),
