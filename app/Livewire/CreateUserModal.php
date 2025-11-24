@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 
 class CreateUserModal extends Component
@@ -51,7 +52,7 @@ class CreateUserModal extends Component
         ]);
 
         if ($this->sendEmail) {
-            Mail::to($this->email)->send(new NewUserEmail($newuser));
+            Notification::send($newuser, new \App\Notifications\UserCreatedNotification($newuser));
         }
 
         $this->reset();
