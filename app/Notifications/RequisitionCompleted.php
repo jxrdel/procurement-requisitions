@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
-class RequisitionCompleted extends Notification
+class RequisitionCompleted extends Notification implements ShouldQueue
 {
     use Queueable;
 

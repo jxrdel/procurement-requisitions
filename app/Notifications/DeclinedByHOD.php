@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class DeclinedByHOD extends Notification
+class DeclinedByHOD extends Notification implements ShouldQueue
 {
     use Queueable;
 

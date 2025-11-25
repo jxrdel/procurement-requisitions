@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notification;
 use App\Models\RequisitionRequestForm;
 use App\Models\User;
 
-class RequestForFurtherApproval extends Notification
+class RequestForFurtherApproval extends Notification implements ShouldQueue
 {
     use Queueable;
 
