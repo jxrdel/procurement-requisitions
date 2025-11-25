@@ -20,16 +20,16 @@ class DepartmentController extends Controller
                 ->addColumn('head_of_department', function ($row) {
                     return $row->headOfDepartment->name ?? 'N/A';
                 })
-                ->addColumn('action', function($row){
+                ->addColumn('action', function ($row) {
                     $headOfDepartmentId = $row->head_of_department_id ?? 'null';
-                    $btn = '<div style="text-align:center"><a href="javascript:void(0)" onclick="showEdit('.$row->id.', \''.$row->name.'\', '.$headOfDepartmentId.')" class="btn btn-primary btn-sm">Edit</a></div>';
+                    $btn = '<div style="text-align:center"><a href="javascript:void(0)" onclick="showEdit(' . $row->id . ', \'' . $row->name . '\', ' . $headOfDepartmentId . ')" class="btn btn-primary btn-sm">Edit</a></div>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
 
-        $users = User::all();
+        $users = User::orderBy('name')->get();
         return view('departments.index', compact('users'));
     }
 
