@@ -35,7 +35,7 @@ class NotifyCheckRoom extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['mail', 'database'];
     }
 
     /**

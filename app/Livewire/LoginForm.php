@@ -30,10 +30,10 @@ class LoginForm extends Component
         //Cheryl Check Staff: 12
         // Rohini Cheque Processing: 15
 
-        $user = User::find(15);
+        // $user = User::find(15);
 
-        Auth::login($user);
-        return redirect()->intended('/'); // Fallback to dashboard if no intended page
+        // Auth::login($user);
+        // return redirect()->intended('/'); // Fallback to dashboard if no intended page
 
         try {
 

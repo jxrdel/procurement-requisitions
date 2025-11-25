@@ -29,8 +29,7 @@
                         <div class="form-floating form-floating-outline">
                             <input required wire:model="password" type="password" id="password"
                                 class="form-control @error('password')is-invalid @enderror" name="password"
-                                placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                aria-describedby="password" />
+                                placeholder="Enter your windows password" aria-describedby="password" />
                             <label for="password">Password</label>
                         </div>
                         <span wire:ignore class="input-group-text cursor-pointer"><i

@@ -35,7 +35,7 @@ class NotifyChequeProcessing extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['mail', 'database'];
     }
 
     /**

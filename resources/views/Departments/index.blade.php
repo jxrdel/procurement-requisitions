@@ -74,7 +74,7 @@
                     [0, 'asc']
                 ],
                 "processing": true,
-                "serverSide": true,
+                "serverSide": false,
                 "ajax": {
                     "url": "{{ route('departments.index') }}",
                     "type": "GET"
