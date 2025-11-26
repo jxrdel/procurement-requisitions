@@ -43,6 +43,17 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
+    <style>
+        body {
+            background-color: #f8f8f8 !important;
+            /* Very light grey */
+        }
+
+        .authentication-wrapper {
+            background-color: transparent;
+            /* Ensure the content wrapper doesn't obscure the background image */
+        }
+    </style>
 </head>
 
 <body>
@@ -51,6 +62,8 @@
     <div class="position-relative">
         <div class="authentication-wrapper authentication-basic">
             <div class="authentication-inner py-6 mx-4">
+                <img src="{{ asset('mohlogo.png') }}" alt="PRA Logo" class="d-block mx-auto mb-4"
+                    style="width: 400px;margin-top:-100px;" />
                 <!-- Login -->
                 {{ $slot }}
                 <!-- /Login -->
