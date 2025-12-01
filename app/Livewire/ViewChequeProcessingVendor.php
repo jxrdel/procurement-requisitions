@@ -249,7 +249,7 @@ class ViewChequeProcessingVendor extends Component
 
             $this->requisition->statuslogs()->create([
                 'details' => 'Requisition marked as Completed by ' . Auth::user()->name . ' from Cheque Processing',
-                'created_by' => Auth::user()->name,
+                'created_by' => Auth::user()->username,
             ]);
 
             $assigned_to = $this->requisition->procurement_officer;

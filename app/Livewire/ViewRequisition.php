@@ -880,7 +880,7 @@ class ViewRequisition extends Component
         Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Procurement');
         $this->requisition->statuslogs()->create([
             'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Procurement',
-            'created_by' => Auth::user()->name,
+            'created_by' => Auth::user()->username,
         ]);
 
         //Get Vote Control users

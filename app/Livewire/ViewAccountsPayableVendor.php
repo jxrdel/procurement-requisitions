@@ -231,13 +231,13 @@ class ViewAccountsPayableVendor extends Component
             Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable');
             $this->requisition->statuslogs()->create([
                 'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable',
-                'created_by' => Auth::user()->name,
+                'created_by' => Auth::user()->username,
             ]);
         } else {
             Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
             $this->requisition->statuslogs()->create([
                 'details' => 'Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable',
-                'created_by' => Auth::user()->name,
+                'created_by' => Auth::user()->username,
             ]);
         }
 

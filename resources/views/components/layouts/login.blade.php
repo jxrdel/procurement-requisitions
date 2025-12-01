@@ -63,7 +63,7 @@
         <div class="authentication-wrapper authentication-basic">
             <div class="authentication-inner py-6 mx-4">
                 <img src="{{ asset('mohlogo.png') }}" alt="PRA Logo" class="d-block mx-auto mb-4"
-                    style="width: 400px;margin-top:-100px;" />
+                    style="width: 400px;margin-top:-50px;" />
                 <!-- Login -->
                 {{ $slot }}
                 <!-- /Login -->

@@ -201,7 +201,7 @@ class ViewCheckStaffVendor extends Component
         Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Cheque Processing by ' . Auth::user()->name . ' from Check Staff');
         $this->requisition->statuslogs()->create([
             'details' => 'Vendor ' . $this->vendor->vendor_name . ' sent to Cheque Processing from Check Staff by ' . Auth::user()->name,
-            'created_by' => Auth::user()->name,
+            'created_by' => Auth::user()->username,
         ]);
         //Get Cheque Processing Staff
         $chequeProcessingStaff = User::chequeProcessing()->get();

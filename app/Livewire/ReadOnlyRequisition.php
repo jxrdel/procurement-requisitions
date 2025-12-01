@@ -89,7 +89,9 @@ class ReadOnlyRequisition extends Component
         $this->date_completed = $this->requisition->date_completed;
 
         $this->vendors = $this->requisition->vendors()
-            ->with('invoices')->get()->toArray();
+            ->with('invoices', 'votes')
+            ->get()
+            ->toArray();
 
         $this->total = $this->requisition->vendors()->sum('amount');
         //Cost & Budgeting
@@ -129,12 +131,15 @@ class ReadOnlyRequisition extends Component
         }
     }
 
-
-
     public function getFormattedDate($date)
     {
         if ($date !== null) {
             return Carbon::parse($date)->format('F jS, Y');
         }
+    }
+
+    public function getTotalAmountProperty()
+    {
+        return collect($this->requisition->vendors)->sum('amount');
     }
 }

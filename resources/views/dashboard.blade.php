@@ -33,10 +33,10 @@
 
             <div class="col">
                 <a href="{{ route('requisitions.index') }}">
-                    <div class="card bg-primary text-white hover-scale">
+                    <div class="card bg-white text-dark hover-scale">
                         <div class="card-body">
-                            <h5 class="card-title text-white text-center">Total Requisitions</h5>
-                            <h4 class="card-text text-center mt-2 text-white">{{ $allRequisitionsCount }}</h4>
+                            <h5 class="card-title text-primary text-center">Total Requisitions</h5>
+                            <h4 class="card-text text-center mt-2 text-primary">{{ $allRequisitionsCount }}</h4>
                         </div>
                     </div>
                 </a>

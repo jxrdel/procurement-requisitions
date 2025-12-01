@@ -63,15 +63,18 @@
     <div wire:ignore.self class="tab-content">
         <div @class(['tab-pane fade', 'show active' => $this->panes === '1']) id="navs-justified-procurement-1" role="tabpanel">
 
+
             <div>
 
                 {{-- 🔹 Row 1: Requisition Number & Requesting Unit --}}
                 <div class="row mt-8">
                     <div class="col-md-6">
-                        <label><strong>Requisition Number:</strong> {{ $this->requisition_no }}</label>
+                        <label><strong>Requisition Number:</strong>
+                            {{ $this->requisition_no }}</label>
                     </div>
                     <div class="col-md-6">
-                        <label><strong>Requesting Unit:</strong> {{ $this->requisition->department->name }}</label>
+                        <label><strong>Requesting Unit:</strong>
+                            {{ $this->requisition->department->name }}</label>
                     </div>
                 </div>
 
@@ -81,14 +84,15 @@
                         <label><strong>File Number / Form:</strong> {{ $this->file_no }}</label>
                     </div>
                     <div class="col">
-                        <label><strong>Item:</strong> {{ $this->item }}</label>
+                        <label><strong>Item(s):</strong> {{ $this->item }}</label>
                     </div>
                 </div>
 
                 {{-- 🔹 Row 3: Source of Funds & Date Received by Procurement --}}
                 <div class="row mt-6">
                     <div class="col-md-6">
-                        <label><strong>Source of Funds:</strong> {{ $this->source_of_funds }}</label>
+                        <label><strong>Source of Funds:</strong>
+                            {{ $this->source_of_funds }}</label>
                     </div>
                     <div class="col-md-6">
                         <label><strong>Date Received by Procurement:</strong>
@@ -104,7 +108,7 @@
                     </div>
                     <div class="col">
                         <label><strong>Date Assigned to Officer:</strong>
-                            {{ $this->getFormattedDate($this->date_assigned) }}</label>
+                            {{ $this->getFormattedDate($this->requisition->date_assigned) }}</label>
                     </div>
                 </div>
 
@@ -133,7 +137,16 @@
                     </div>
                 </div>
 
-                {{-- 🔹 Row 8: Note to PS & Note to PS Date --}}
+                {{-- 🔹 Row 7.5: Tender Type --}}
+                <div class="row mt-4 align-items-center">
+                    <div class="col-md-6">
+                        <label><strong>Tender Type:</strong>
+                            {{ $this->requisition->tender_type }}
+                        </label>
+                    </div>
+                </div>
+
+                {{-- 🔹 Row 7: Site Visit & Site Visit Date --}}
                 <div class="row mt-4 align-items-center">
                     <div class="col-md-6">
                         <label><strong>Note to PS:</strong>
@@ -150,7 +163,7 @@
                     </div>
                 </div>
 
-                {{-- 🔹 Row 9: Tender Issue & Deadline Dates --}}
+                {{-- 🔹 Row 8: Tender Issue & Deadline Dates --}}
                 <div class="row mt-6">
                     <div class="col">
                         <label><strong>Tender/RFQ Issue Date:</strong>
@@ -162,7 +175,7 @@
                     </div>
                 </div>
 
-                {{-- 🔹 Row 10: Evaluation Start & End Dates --}}
+                {{-- 🔹 Row 9: Evaluation Start & End Dates --}}
                 <div class="row mt-6">
                     <div class="col">
                         <label><strong>Evaluation Start Date:</strong>
@@ -174,7 +187,7 @@
                     </div>
                 </div>
 
-                {{-- 🔹 Row 11: Date sent to DPS & PS Approval --}}
+                {{-- 🔹 Row 10: Date sent to DPS & PS Approval --}}
                 <div class="row mt-6">
                     <div class="col">
                         <label><strong>Date sent to DPS:</strong>
@@ -191,45 +204,40 @@
                     </div>
                 </div>
 
+                {{-- 🔹 Row 10.5: PS Approval Date --}}
                 @if ($this->ps_approval == 'Approved')
+                    <div class="row mt-6">
+                        <div class="col-md-6">
+                            <label><strong>PS Approval Date:</strong>
+                                {{ $this->getFormattedDate($this->requisition->ps_approval_date) }}</label>
+                        </div>
+                    </div>
+                @endif
 
+                {{-- 🔹 Row 11: Vendors & Amounts --}}
+                @if ($this->ps_approval == 'Approved')
                     @foreach ($this->requisition->vendors as $index => $vendor)
-                        <div class="row mt-7">
-
-                            <div class="col mx-5">
+                        <div class="row mt-6">
+                            <div class="col">
                                 <label><strong>Vendor #{{ $index + 1 }}:</strong>
-                                    {{ $vendor->vendor_name }}</label>
+                                    {{ $vendor['vendor_name'] }}</label>
                             </div>
-
-                            <div class="col mx-5">
-                                <label><strong>Amount:</strong> {{ $vendor->amount }}</label>
+                            <div class="col">
+                                <label><strong>Amount:</strong>
+                                    ${{ number_format($vendor['amount'], 2) }}</label>
                             </div>
-
                         </div>
                     @endforeach
 
-                    @if (count($this->requisition->vendors) > 0)
-                        <div class="row mt-7">
-
-                            <div class="col mx-5">
-                                <label><strong>Total:</strong> ${{ $this->total }}</label>
+                    @if (count($vendors) > 0)
+                        <div class="row mt-6">
+                            <div class="col">
+                                <label><strong>Total Amount:</strong>
+                                    ${{ number_format($this->totalAmount, 2) }}</label>
                             </div>
                         </div>
                     @endif
                 @endif
-
-                @if ($this->ps_approval == 'Approval Denied')
-                    <div class="row mt-7">
-
-                        <div class="col mx-5">
-                            <label><strong>Reason for Denial:</strong>
-                                {{ $this->denied_note }}</label>
-                        </div>
-
-                    </div>
-                @endif
-
-
 
             </div>
 
@@ -287,7 +295,10 @@
 
                         <div class="col mx-5">
                             <label><strong>Change of Vote Number:</strong>
-                                {{ $vendor['change_of_vote_no'] }}</label>
+                                @foreach ($vendor['votes'] as $vote)
+                                    <span class="badge bg-label-primary">{{ $vote['number'] }}</span>
+                                @endforeach
+                            </label>
                         </div>
                     </div>
                 @endforeach
@@ -351,25 +362,12 @@
                         <div class="row mt-8">
 
                             <div class="col mx-5">
-                                <label><strong>Date Received From Procurement For Commitment :</strong>
-                                    {{ $this->getFormattedDate($vendor['date_received_ap']) }}</label>
-                            </div>
-
-                            <div class="col mx-5">
-                                <label><strong>Date Sent to Vote Control For Commitment:</strong>
-                                    {{ $this->getFormattedDate($vendor['date_sent_vc']) }}</label>
-                            </div>
-                        </div>
-
-                        <div class="row mt-8">
-
-                            <div class="col mx-5">
-                                <label><strong>Date Received From Procurement For Invoices :</strong>
+                                <label><strong>Date Received From Procurement :</strong>
                                     {{ $this->getFormattedDate($vendor['date_received_ap_invoices']) }}</label>
                             </div>
 
                             <div class="col mx-5">
-                                <label><strong>Date Sent to Vote Control For Invoices:</strong>
+                                <label><strong>Date Sent to Vote Control:</strong>
                                     {{ $this->getFormattedDate($vendor['date_sent_vc_invoices']) }}</label>
                             </div>
                         </div>

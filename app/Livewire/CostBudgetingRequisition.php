@@ -325,4 +325,9 @@ class CostBudgetingRequisition extends Component
             $this->vendors[$key]['selected_votes'] = $this->requisition->vendors()->find($vendor['id'])->votes()->pluck('vote_id')->toArray();
         }
     }
+
+    public function getTotalAmountProperty()
+    {
+        return collect($this->requisition->vendors)->sum('amount');
+    }
 }
