@@ -574,6 +574,11 @@ class ViewRequisitionForm extends Component
     {
         $file = $this->requisitionForm->uploads()->find($fileId);
         if ($file) {
+            //Add log
+            $this->requisitionForm->logs()->create([
+                'details' => 'File "' . $file->file_name . '" deleted by ' . Auth::user()->name,
+                'created_by' => Auth::user()->username ?? null,
+            ]);
             // Delete the file from storage
             Storage::disk('public')->delete($file->file_path);
             // Delete the database record
