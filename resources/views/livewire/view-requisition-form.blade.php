@@ -962,7 +962,7 @@
                             </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
-                            @forelse($requisitionForm->logs as $log)
+                            @forelse($this->sortedLogs as $log)
                                 <tr>
                                     <td>{{ $log->details }}</td>
                                     <td>{{ $log->created_at->format('d/m/Y H:i:s') }}</td>

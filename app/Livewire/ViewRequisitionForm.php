@@ -100,6 +100,12 @@ class ViewRequisitionForm extends Component
         return !$this->availability_of_funds || !$this->verified_by_accounts || empty($this->selected_votes) || !$this->requisitionForm->completed_by_cab;
     }
 
+    #[Computed]
+    public function sortedLogs()
+    {
+        return $this->requisitionForm->logs()->latest()->get();
+    }
+
     //HOD Approval/Denial Modal
     public $selectedOfficer;
     public $reportingOfficers;
@@ -152,11 +158,11 @@ class ViewRequisitionForm extends Component
 
         $this->reportingOfficers = User::reportingOfficers()
             ->whereNotIn('id', array_unique($excludedOfficerIds))
-            ->orderBy('name')
+            ->orderByDesc('reporting_officer_role')
             ->get();
 
         if ($this->requisitionForm->status === RequestFormStatus::SENT_TO_HOD) {
-            $this->reportingOfficers = User::reportingOfficers()->orderBy('name')->get();
+            $this->reportingOfficers = User::reportingOfficers()->orderByDesc('reporting_officer_role')->get();
         }
 
         $this->forwardingOfficers = User::reportingOfficers()->where('id', '!=', Auth::id())->orderBy('name')->get();
