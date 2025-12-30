@@ -10,6 +10,8 @@ use App\Models\Vote;
 use App\Notifications\RequestForCABApproval;
 use App\RequestFormStatus;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -93,9 +95,9 @@ class CreateRequisitionRequestForm extends Component
             'justification' => 'required|string',
             'location_of_delivery' => 'nullable|string|max:255',
             'date_required_by' => 'nullable|date|after:date|date_format:Y-m-d',
-            'estimated_value' => 'required|numeric|min:0',
+            'estimated_value' => 'required|numeric|min:0|max:99999999.99',
             'items' => 'array|min:1',
-            'uploadedFiles.*' => 'file|max:10240',
+            'uploadedFiles.*' => 'file|max:100240',
         ];
 
         try {
@@ -109,44 +111,60 @@ class CreateRequisitionRequestForm extends Component
             throw $e;
         }
 
-        $form = RequisitionRequestForm::create([
-            'requesting_unit' => $this->requesting_unit,
-            'head_of_department_id' => $this->head_of_department,
-            'contact_person_id' => $this->contact_person_id,
-            'date' => $this->date,
-            'category' => $this->category,
-            'contact_info' => $this->contact_info,
-            'location_of_delivery' => $this->location_of_delivery,
-            'justification' => $this->justification,
-            'date_required_by' => $this->date_required_by,
-            'estimated_value' => $this->estimated_value,
-            'status' => RequestFormStatus::CREATED,
-            'created_by' => Auth::user()->username ?? null,
-        ]);
+        try {
+            DB::transaction(function () {
 
-        foreach ($this->items as $item) {
-            $form->items()->create($item);
-        }
-
-        if (!empty($this->uploadedFiles)) {
-            foreach ($this->uploadedFiles as $upload) {
-                $filename = $upload->getClientOriginalName();
-                $uploadPath = $upload->store('file_uploads', 'public');
-                $form->uploads()->create([
-                    'file_name' => $filename,
-                    'file_path' => $uploadPath,
-                    'uploaded_by' => Auth::user()->name ?? null,
+                $form = RequisitionRequestForm::create([
+                    'requesting_unit' => $this->requesting_unit,
+                    'head_of_department_id' => $this->head_of_department,
+                    'contact_person_id' => $this->contact_person_id,
+                    'date' => $this->date,
+                    'category' => $this->category,
+                    'contact_info' => $this->contact_info,
+                    'location_of_delivery' => $this->location_of_delivery,
+                    'justification' => $this->justification,
+                    'date_required_by' => $this->date_required_by,
+                    'estimated_value' => $this->estimated_value,
+                    'status' => RequestFormStatus::CREATED,
+                    'created_by' => Auth::user()->username ?? null,
                 ]);
-            }
+
+                foreach ($this->items as $item) {
+                    $form->items()->create($item);
+                }
+
+                if (!empty($this->uploadedFiles)) {
+                    foreach ($this->uploadedFiles as $upload) {
+                        $uploadPath = $upload->store('file_uploads', 'public');
+
+                        $form->uploads()->create([
+                            'file_name' => $upload->getClientOriginalName(),
+                            'file_path' => $uploadPath,
+                            'uploaded_by' => Auth::user()->name ?? null,
+                        ]);
+                    }
+                }
+
+                // Create log entry
+                $form->logs()->create([
+                    'details' => 'Form Created by ' . (Auth::user()->name),
+                    'created_by' => Auth::user()->username ?? null,
+                ]);
+
+                return redirect()
+                    ->route('requisition_forms.view', ['id' => $form->id])
+                    ->with('success', 'Requisition form created successfully.');
+            });
+        } catch (\Throwable $e) {
+
+            Log::error('Failed to create requisition form', [
+                'error' => $e->getMessage(),
+                'user' => Auth::user()->username ?? null,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            $this->dispatch('show-error', message: 'An error occurred while creating the form. Please contact ICT Helpdesk at ext 11000.');
         }
-
-        //Create log entry
-        $form->logs()->create([
-            'details' => 'Form Created by ' . (Auth::user()->name),
-            'created_by' => Auth::user()->username ?? null,
-        ]);
-
-        return redirect()->route('requisition_forms.view', ['id' => $form->id])->with('success', 'Requisition form created successfully.');
     }
 
     public function uploadFiles()
@@ -175,7 +193,7 @@ class CreateRequisitionRequestForm extends Component
             'item_name' => 'required|string|max:255',
             'qty_in_stock' => 'required|integer|min:0',
             'qty_requesting' => 'required|integer|min:1',
-            'unit_of_measure' => 'nullable|string|max:50',
+            'unit_of_measure' => 'required|string|max:50',
             'size' => 'nullable|string|max:50',
             'colour' => 'nullable|string|max:50',
             'brand_model' => 'nullable|string|max:255',

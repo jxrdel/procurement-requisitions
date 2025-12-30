@@ -53,7 +53,8 @@
                                 </button>
                             @endcan
                         @elseif($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD)
-                            @if (Auth::user()->id == $requisitionForm->head_of_department_id)
+                            @if (Auth::user()->id == $requisitionForm->head_of_department_id ||
+                                    $requisitionForm->requestingUnit->head_of_department_id == Auth::user()->id)
                                 {{-- Approve and Decline Buttons for HOD --}}
                                 <button wire:loading.attr="disabled" data-bs-toggle="modal"
                                     data-bs-target="#approveRequisitionFormHOD" type="button"
@@ -401,7 +402,8 @@
                 <div class="row mt-6">
                     <div class="col-md-6">
                         <div class="mb-3 row">
-                            <label for="category_input" class="col-md-4 col-form-label">Category</label>
+                            <label for="category_input" class="col-md-4 col-form-label">Category <span
+                                    class="text-danger">*</span></label>
                             <div class="col-md-8">
                                 <select x-bind:disabled="!isEditing" required wire:model="category"
                                     class="form-select @error('category')is-invalid @enderror" id="category_label"
@@ -477,7 +479,7 @@
                     <div class="col-md-6">
                         <div class="mb-3 row">
                             <label for="estimated_value_input" class="col-md-4 col-form-label">Estimated
-                                Value</label>
+                                Value (TTD)<span class="text-danger">*</span></label>
                             <div class="col-md-8">
                                 <input autocomplete="off" wire:model="estimated_value" type="number" step="0.01"
                                     x-bind:disabled="!isEditing || {{ $requisitionForm->sent_to_cab ? 'true' : 'false' }}"
@@ -529,7 +531,7 @@
                                     <th>Colour</th>
                                     <th>Brand/Model</th>
                                     <th>Other</th>
-                                    <th class="text-center">Actions</th>
+                                    <th class="text-center" style="width: 130px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="table-border-bottom-0">
@@ -545,11 +547,12 @@
                                         <td>{{ $item['other'] }}</td>
                                         <td>
                                             <button type="button" x-bind:disabled="!isEditing"
-                                                class="btn btn-dark mx-auto me-1"
+                                                class="btn btn-icon btn-outline-primary waves-effect me-1"
                                                 wire:click="displayEditModal({{ $key }})"><i
                                                     class="fa-solid fa-pen-to-square"></i></button>
 
-                                            <button type="button" class="btn btn-sm btn-danger"
+                                            <button type="button"
+                                                class="btn btn-icon btn-outline-danger waves-effect"
                                                 wire:click="removeItem({{ $key }})"
                                                 :disabled="items.length <= 1 || !isEditing"
                                                 title="Cannot delete the last item">
@@ -998,6 +1001,7 @@
                 {{-- Only show Save button when editing is enabled --}}
                 @if (
                     !$requisitionForm->date_sent_to_hod ||
+                        $requisitionForm->status === \App\RequestFormStatus::APPROVED_BY_COST_BUDGETING ||
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_HOD ||
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||

@@ -21,7 +21,9 @@ use App\Notifications\RequestForProcurementApproval;
 use App\Notifications\RequestForReportingOfficerApproval;
 use App\RequestFormStatus;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -170,7 +172,6 @@ class ViewRequisitionForm extends Component
 
     public function save()
     {
-
         // Build validation rules for items dynamically
         $rules = [
             'requesting_unit' => 'required|exists:departments,id',
@@ -181,10 +182,8 @@ class ViewRequisitionForm extends Component
             'justification' => 'required|string',
             'location_of_delivery' => 'nullable|string|max:255',
             'date_required_by' => 'nullable|date|after_or_equal:date|date_format:Y-m-d',
-            'estimated_value' => 'nullable|numeric|min:0',
+            'estimated_value' => 'nullable|numeric|min:0|max:99999999.99',
             'items' => 'required|array|min:1',
-            // 'uploads' => 'array|min:1',
-            // 'uploads.*' => 'file|max:10240',
         ];
 
         foreach ($this->items as $index => $item) {
@@ -209,35 +208,56 @@ class ViewRequisitionForm extends Component
             throw $e;
         }
 
-        $data = [
-            'requesting_unit' => $this->requesting_unit,
-            'head_of_department_id' => $this->head_of_department,
-            'contact_person_id' => $this->contact_person_id,
-            'date' => $this->date,
-            'category' => $this->category,
-            'contact_info' => $this->contact_info,
-            'justification' => $this->justification,
-            'location_of_delivery' => $this->location_of_delivery,
-            'date_required_by' => $this->date_required_by,
-            'estimated_value' => $this->estimated_value,
-            'availability_of_funds' => $this->availability_of_funds,
-            'verified_by_accounts' => $this->verified_by_accounts,
-            'vote_no' => $this->vote_no,
-        ];
+        try {
+            DB::transaction(function () {
 
-        $this->requisitionForm->update($data);
-        $this->requisitionForm->items()->delete();
-        $this->requisitionForm->items()->createMany($this->items);
-        $this->requisitionForm->votes()->sync($this->selected_votes);
+                $data = [
+                    'requesting_unit' => $this->requesting_unit,
+                    'head_of_department_id' => $this->head_of_department,
+                    'contact_person_id' => $this->contact_person_id,
+                    'date' => $this->date,
+                    'category' => $this->category,
+                    'contact_info' => $this->contact_info,
+                    'justification' => $this->justification,
+                    'location_of_delivery' => $this->location_of_delivery,
+                    'date_required_by' => $this->date_required_by,
+                    'estimated_value' => $this->estimated_value,
+                    'availability_of_funds' => $this->availability_of_funds,
+                    'verified_by_accounts' => $this->verified_by_accounts,
+                    'vote_no' => $this->vote_no,
+                ];
 
-        $this->requisitionForm->logs()->create([
-            'details' => 'Requisition form edited by ' . Auth::user()->name,
-            'created_by' => Auth::user()->username,
-        ]);
+                $this->requisitionForm->update($data);
 
-        $this->dispatch('show-message', message: 'Form updated successfully.');
-        $this->isEditing = false;
+                $this->requisitionForm->items()->delete();
+                $this->requisitionForm->items()->createMany($this->items);
+
+                $this->requisitionForm->votes()->sync($this->selected_votes);
+
+                $this->requisitionForm->logs()->create([
+                    'details' => 'Requisition form edited by ' . Auth::user()->name,
+                    'created_by' => Auth::user()->username ?? null,
+                ]);
+            });
+
+            $this->dispatch('show-message', message: 'Form updated successfully.');
+            $this->isEditing = false;
+        } catch (\Throwable $e) {
+
+            Log::error('Failed to update requisition form', [
+                'error' => $e->getMessage(),
+                'user' => Auth::user()->username ?? null,
+                'form_id' => $this->requisitionForm->id ?? null,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            $this->dispatch(
+                'show-error',
+                message: 'An error occurred while updating the form. Please contact ICT Helpdesk at ext 11000.'
+            );
+        }
     }
+
 
     public function displayEditModal($key)
     {
@@ -548,7 +568,7 @@ class ViewRequisitionForm extends Component
     public function uploadFiles()
     {
         $this->validate([
-            'uploads.*' => 'file|max:5120',
+            'uploads.*' => 'file|max:100240',
         ], [
             'uploads.*.max' => 'Each file must not exceed 5MB in size.',
         ]);
@@ -611,7 +631,7 @@ class ViewRequisitionForm extends Component
         $this->dispatch('show-message', message: 'Form sent to Cost and Budgeting for Funding Availability.');
 
         $this->requisitionForm->logs()->create([
-            'details' => 'Form sent to Cost and Budgeting for Funding Availability',
+            'details' => 'Form sent to Cost and Budgeting for Funding Availability by ' . Auth::user()->name,
             'created_by' => Auth::user()->username ?? null,
         ]);
     }
