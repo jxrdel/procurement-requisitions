@@ -21,7 +21,7 @@ class RequestForCABApproval extends Notification implements ShouldQueue
     public function __construct(RequisitionRequestForm $requisitionRequestForm)
     {
         $this->requisitionRequestForm = $requisitionRequestForm;
-        Log::info('Notification sent to CAB for Requisition Request Form ' . $this->requisitionRequestForm->requisition->requisition_no . ' from queue');
+        Log::info('Notification sent to CAB for Requisition Request Form ' . $this->requisitionRequestForm->form_code . ' from queue');
     }
 
     /**

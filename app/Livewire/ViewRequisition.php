@@ -374,7 +374,7 @@ class ViewRequisition extends Component
             }
 
             $this->requisition->statuslogs()->create([
-                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username,
+                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name,
                 'created_by' => Auth::user()->username,
             ]);
 
@@ -826,12 +826,12 @@ class ViewRequisition extends Component
 
         if ($this->requisition->is_first_pass) {
             $this->requisition->statuslogs()->create([
-                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username . ' for commitment',
+                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->name . ' for commitment',
                 'created_by' => Auth::user()->username,
             ]);
         } else {
             $this->requisition->statuslogs()->create([
-                'details' => 'Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username,
+                'details' => 'Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->name,
                 'created_by' => Auth::user()->username,
             ]);
         }

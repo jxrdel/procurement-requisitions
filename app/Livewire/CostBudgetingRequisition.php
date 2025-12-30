@@ -224,6 +224,11 @@ class CostBudgetingRequisition extends Component
             'date_completed' => Carbon::now(),
         ]);
 
+        $this->requisition->statusLogs()->create([
+            'details' => 'Sent from Cost & Budgeting to Procurement by ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
+
         foreach ($this->vendors as $vendor) {
             $this->requisition->vendors()->where('id', $vendor['id'])->update([
                 'vendor_status' => 'Sent to Procurement',

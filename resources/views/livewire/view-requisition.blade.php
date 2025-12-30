@@ -1215,7 +1215,7 @@
                                         <div class="divider-text fw-bold fs-5">{{ $vendor['vendor_name'] }}</div>
                                     </div>
 
-                                    <div class="row mt-8">
+                                    {{-- <div class="row mt-8">
 
                                         <div class="col mx-5">
                                             <label><strong>Date Received From Procurement For Commitment :</strong>
@@ -1226,7 +1226,7 @@
                                             <label><strong>Date Sent to Vote Control For Commitment:</strong>
                                                 {{ $this->getFormattedDate($vendor['date_sent_vc']) }}</label>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     @if (!$this->requisition->is_first_pass)
                                         <div class="row mt-8">

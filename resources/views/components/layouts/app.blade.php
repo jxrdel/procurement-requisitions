@@ -504,7 +504,7 @@
                 "closeButton": true,
             }
             toastr.error(event.detail.message, '', {
-                timeOut: 3000
+                timeOut: 6000
             });
         })
 

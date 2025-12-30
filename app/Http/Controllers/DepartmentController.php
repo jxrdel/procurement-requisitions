@@ -37,7 +37,7 @@ class DepartmentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:departments,name,' . $department->id,
-            'head_of_department_id' => ['nullable', 'exists:users,id', new UniqueHeadOfDepartment($department->id)],
+            'head_of_department_id' => ['nullable', 'exists:users,id'],
         ]);
 
         if ($validator->fails()) {

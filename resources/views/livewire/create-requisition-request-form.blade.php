@@ -218,7 +218,7 @@
             <div class="row mt-6">
                 <div class="col-md-6">
                     <div class="mb-3 row">
-                        <label for="estimated_value_input" class="col-md-4 col-form-label">Estimated Value <span
+                        <label for="estimated_value_input" class="col-md-4 col-form-label">Estimated Value (TTD)<span
                                 class="text-danger">*</span></label>
                         <div class="col-md-8">
                             <input autocomplete="off" wire:model="estimated_value" type="number" step="0.01"
@@ -273,7 +273,7 @@
                                 <th>Colour</th>
                                 <th>Brand/Model</th>
                                 <th>Other</th>
-                                <th class="text-center">Actions</th>
+                                <th class="text-center" style="width: 130px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
@@ -288,10 +288,10 @@
                                     <td>{{ $item['brand_model'] }}</td>
                                     <td>{{ $item['other'] }}</td>
                                     <td>
-                                        <button class="btn btn-dark mx-auto me-1"
+                                        <button class="btn btn-icon btn-outline-primary waves-effect me-1"
                                             wire:click="displayEditModal({{ $key }})"><i
                                                 class="fa-solid fa-pen-to-square"></i></button>
-                                        <button class="btn btn-danger mx-auto"
+                                        <button class="btn btn-icon btn-outline-danger waves-effect"
                                             wire:click="removeItem({{ $key }})"><i
                                                 class="fa-solid fa-trash-can"></i></button>
                                     </td>
@@ -366,7 +366,7 @@
                     <div class="text-start m-auto mt-5" style="max-width: 400px;">
                         <ul class="list-unstyled text-danger">
                             <li><i class="fa-solid fa-circle-dot me-2"></i>File must be <strong>less than
-                                    10MB</strong>.
+                                    100MB</strong>.
                             </li>
                             <li><i class="fa-solid fa-circle-dot me-2"></i>For items with multiple specifications,
                                 please upload additional documentation as necessary.</li>
