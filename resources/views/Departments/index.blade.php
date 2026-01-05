@@ -4,6 +4,44 @@
     <title>Departments | PRA</title>
 @endsection
 
+@section('styles')
+    <style>
+        /* Custom styles for Select2 */
+        .select2-container--default .select2-selection--single {
+            min-height: 38px;
+            /* Adjust as needed */
+            height: 38px;
+            padding: 6px 12px;
+            /* Standard input padding */
+            display: flex;
+            align-items: center;
+            /* Vertically center content */
+            border-color: #d9dee3;
+            /* Match existing border color */
+        }
+
+        .select2-container--default .select2-selection__arrow {
+            height: 36px;
+            /* Match the height of the select box */
+            top: 1px;
+            right: 1px;
+        }
+
+        /* Adjust for the rendered text inside select2 */
+        .select2-container--default .select2-selection__rendered {
+            line-height: 24px;
+            /* Adjust line height to vertically center text */
+            padding-left: 0;
+            /* Remove default padding as it's handled by parent */
+            padding-right: 0;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            padding-right: 6px;
+        }
+    </style>
+@endsection
+
 @section('content')
     <div class="card">
         <div class="card-body">
@@ -96,6 +134,12 @@
                 ]
             });
 
+            // Initialize Select2 for Head of Department
+            $('#edit_head_of_department_id').select2({
+                dropdownParent: $('#editDepartmentModal'),
+                width: '100%' // Ensure full width
+            });
+
             $('#editDepartmentForm').on('submit', function(e) {
                 e.preventDefault();
                 var form = $(this);
@@ -137,9 +181,9 @@
             $('#editDepartmentForm').attr('action', '/departments/' + id);
             $('#edit_name').val(name);
             if (head_of_department_id === 'null') {
-                $('#edit_head_of_department_id').val('');
+                $('#edit_head_of_department_id').val('').trigger('change'); // Trigger change for Select2
             } else {
-                $('#edit_head_of_department_id').val(head_of_department_id);
+                $('#edit_head_of_department_id').val(head_of_department_id).trigger('change'); // Trigger change for Select2
             }
             $('#editDepartmentModal').modal('show');
         }
