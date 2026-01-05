@@ -456,6 +456,22 @@ class ViewRequisitionForm extends Component
 
     public function approveRequisitionReportingOfficer()
     {
+        $specialDepartments = [
+            'Office of the Chief Medical Officer',
+            'Office of the Deputy Permanent Secretary',
+            'Office of the Permanent Secretary'
+        ];
+
+        if (
+            $this->requisitionForm->status == RequestFormStatus::SENT_TO_HOD &&
+            in_array($this->requisitionForm->requestingUnit->name, $specialDepartments)
+        ) {
+            $this->requisitionForm->reporting_officer_id = Auth::user()->id;
+            $this->requisitionForm->hod_approval = true;
+            $this->requisitionForm->hod_approval_date = now();
+            $this->requisitionForm->hod_digital_signature = Auth::user()->digital_signature;
+        }
+
         $this->requisitionForm->reporting_officer_approval = true;
         $this->requisitionForm->reporting_officer_approval_date = now();
         $this->requisitionForm->reporting_officer_digital_signature = Auth::user()->digital_signature;

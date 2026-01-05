@@ -56,11 +56,29 @@
                             @if (Auth::user()->id == $requisitionForm->head_of_department_id ||
                                     $requisitionForm->requestingUnit->head_of_department_id == Auth::user()->id)
                                 {{-- Approve and Decline Buttons for HOD --}}
-                                <button wire:loading.attr="disabled" data-bs-toggle="modal"
-                                    data-bs-target="#approveRequisitionFormHOD" type="button"
-                                    class="btn btn-sm btn-success">
-                                    <i class="ri-checkbox-circle-line me-1"></i> Accept
-                                </button>
+                                @if (in_array($requisitionForm->requestingUnit->name, [
+                                        'Office of the Chief Medical Officer',
+                                        'Office of the Deputy Permanent Secretary',
+                                        'Office of the Permanent Secretary',
+                                    ]))
+                                    <button type="button"
+                                        wire:confirm="Are you sure you want to confirm non-objection and send to procurement?"
+                                        wire:loading.attr="disabled" wire:target="approveRequisitionReportingOfficer"
+                                        wire:click="approveRequisitionReportingOfficer" class="btn btn-sm btn-success">
+                                        <span wire:loading.remove>
+                                            <i class="ri-checkbox-circle-line me-1"></i> Accept
+                                        </span>
+                                        <span wire:loading>
+                                            <i class="ri-loader-2-line ri-spin me-1"></i>
+                                        </span>
+                                    </button>
+                                @else
+                                    <button wire:loading.attr="disabled" data-bs-toggle="modal"
+                                        data-bs-target="#approveRequisitionFormHOD" type="button"
+                                        class="btn btn-sm btn-success">
+                                        <i class="ri-checkbox-circle-line me-1"></i> Accept
+                                    </button>
+                                @endif
                                 <button data-bs-toggle="modal" data-bs-target="#declineRequisitionForm" type="button"
                                     class="btn btn-sm btn-danger"> <i class="ri-close-circle-line me-1"></i>
                                     Decline
