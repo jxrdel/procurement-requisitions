@@ -48,16 +48,16 @@
                     </div>
 
                     <div class="row mt-4">
-                        <div class="form-floating form-floating-outline">
+                        <div wire:ignore>
+                            <label class="form-label" style="color: black" for="editDepartmentSelect">Department</label>
                             <select required wire:model="department"
                                 class="form-select @error('department')is-invalid @enderror"
-                                id="exampleFormControlSelect1" aria-label="Default select example">
+                                id="editDepartmentSelect" aria-label="Default select example">
                                 <option value="">Select a Department</option>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department->id }}">{{ $department->name }}</option>
                                 @endforeach
                             </select>
-                            <label for="exampleFormControlSelect1">Department</label>
                         </div>
                         @error('department')
                             <div class="text-danger"> {{ $message }} </div>
@@ -67,7 +67,7 @@
                     <div class="row mt-4">
                         <div class="form-floating form-floating-outline">
                             <select required wire:model="role_id"
-                                class="form-select @error('role_id')is-invalid @enderror" id="exampleFormControlSelect1"
+                                class="form-select @error('role_id')is-invalid @enderror" id="editRoleSelect"
                                 aria-label="Default select example">
                                 <option value="">Select a Role</option>
                                 @foreach ($roles as $role)
@@ -134,3 +134,41 @@
         </div>
     </div>
 </div>
+
+@script
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 for Department Select
+            $('#editDepartmentSelect').select2({
+                dropdownParent: $('#editUserModal')
+            });
+
+            // Listen for changes on the Department Select2 and update Livewire
+            $('#editDepartmentSelect').on('change', function() {
+                var selectedValue = $(this).val();
+                $wire.set('department', selectedValue);
+            });
+
+            // Re-initialize Select2 when the modal is shown to ensure it works correctly
+            $('#editUserModal').on('shown.bs.modal', function () {
+                $('#editDepartmentSelect').select2({
+                    dropdownParent: $('#editUserModal')
+                });
+            });
+
+            // When Livewire updates the component, re-initialize Select2 if it's not already
+            Livewire.hook('element.updated', (el, component) => {
+                if (el.id === 'editDepartmentSelect' && !$(el).data('select2')) {
+                    $(el).select2({
+                        dropdownParent: $('#editUserModal')
+                    });
+                }
+            });
+
+            // When Livewire dispatches 'display-edit-modal', and this modal is shown, re-select the department
+            Livewire.on('display-edit-modal', () => {
+                $('#editDepartmentSelect').val($wire.get('department')).trigger('change');
+            });
+        });
+    </script>
+@endscript
