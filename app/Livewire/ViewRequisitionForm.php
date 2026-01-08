@@ -170,10 +170,44 @@ class ViewRequisitionForm extends Component
         $this->forwardingOfficers = User::reportingOfficers()->where('id', '!=', Auth::id())->orderBy('name')->get();
     }
 
+    private function getFilteredCategories()
+    {
+        $allCategories = FormCategory::options();
+        $departmentName = Auth::user()->department->name ?? '';
+
+        if ($departmentName === 'General Administration') {
+            return $allCategories;
+        }
+
+        if ($departmentName === 'ICT') {
+            return array_filter($allCategories, function ($value) {
+                return $value !== FormCategory::GROCERY_FOOD_CLEANING->value;
+            });
+        }
+
+        // Everybody else can see everything except Grocery, Food & Cleaning Supplies and Stationery & Toners
+        return array_filter($allCategories, function ($value) {
+            return $value !== FormCategory::GROCERY_FOOD_CLEANING->value &&
+                $value !== FormCategory::STATIONERY_TONERS->value;
+        });
+    }
+
+    private function validateCategory()
+    {
+        $allowedCategories = $this->getFilteredCategories();
+        if (!array_key_exists($this->category, $allowedCategories)) {
+            $this->addError('category', 'The selected category is invalid for your department.');
+            $this->dispatch('scrollToError');
+            return false;
+        }
+        return true;
+    }
+
     public function save()
     {
         // Build validation rules for items dynamically
         $rules = [
+            'category' => 'required',
             'requesting_unit' => 'required|exists:departments,id',
             'head_of_department' => 'required|exists:users,id',
             'contact_person_id' => 'required|exists:users,id',
@@ -185,6 +219,10 @@ class ViewRequisitionForm extends Component
             'estimated_value' => 'nullable|numeric|min:0|max:99999999.99',
             'items' => 'required|array|min:1',
         ];
+
+        if (!$this->validateCategory()) {
+            return;
+        }
 
         foreach ($this->items as $index => $item) {
             $rules["items.{$index}.name"] = 'required|string';

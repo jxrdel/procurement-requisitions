@@ -31,7 +31,8 @@ class RequisitionFormController extends Controller
                 return Carbon::parse($row->created_at)->format('d/m/Y');
             })
             ->addColumn('items_list', function ($row) {
-                return $row->items->pluck('name')->implode(', ') ?: 'N/A';
+                $items = $row->items->pluck('name')->implode(', ');
+                return strlen($items) > 25 ? substr($items, 0, 25) . '...' : $items;
             })
             ->addColumn('status_badge', function ($row) {
                 $status = $row->status ?? 'Draft';

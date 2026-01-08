@@ -79,7 +79,29 @@ class CreateRequisitionRequestForm extends Component
         $this->requesting_unit = Auth::user()->department_id;
         $this->head_of_department = Auth::user()->department->head_of_department_id ?? null;
         $this->votes = Vote::orderBy('number')->get();
-        $this->categories = FormCategory::options();
+        $this->categories = $this->getFilteredCategories();
+    }
+
+    private function getFilteredCategories()
+    {
+        $allCategories = FormCategory::options();
+        $departmentName = Auth::user()->department->name ?? '';
+
+        if ($departmentName === 'General Administration') {
+            return $allCategories;
+        }
+
+        if ($departmentName === 'ICT') {
+            return array_filter($allCategories, function ($value) {
+                return $value !== FormCategory::GROCERY_FOOD_CLEANING->value;
+            });
+        }
+
+        // Everybody else can see everything except Grocery, Food & Cleaning Supplies and Stationery & Toners
+        return array_filter($allCategories, function ($value) {
+            return $value !== FormCategory::GROCERY_FOOD_CLEANING->value &&
+                $value !== FormCategory::STATIONERY_TONERS->value;
+        });
     }
 
     public function save()
@@ -150,6 +172,8 @@ class CreateRequisitionRequestForm extends Component
                     'details' => 'Form Created by ' . (Auth::user()->name),
                     'created_by' => Auth::user()->username ?? null,
                 ]);
+
+                Log::info('Requisition form created successfully by ' . (Auth::user()->name));
 
                 return redirect()
                     ->route('requisition_forms.view', ['id' => $form->id])
