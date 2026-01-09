@@ -97,12 +97,16 @@ class AppServiceProvider extends ServiceProvider
             return $user->department->name === 'Check Staff' || ($user->role->name === 'Viewer' && $user->department->name === 'Office of the Permanent Secretary');
         });
 
+        Gate::define('view-departments-page', function ($user) {
+            return $user->role->name === 'Admin' || $user->role->name === 'Helpdesk';
+        });
+
         Gate::define('view-cheque-processing-requisitions', function ($user) {
             return $user->department->name === 'Cheque Processing' || ($user->role->name === 'Viewer' && $user->department->name === 'Office of the Permanent Secretary');
         });
 
         Gate::define('view-users-page', function ($user) {
-            return $user->role->name === 'Admin';
+            return $user->role->name === 'Admin' || $user->role->name === 'Helpdesk';
         });
 
         Gate::define('view-votes-page', function ($user) {

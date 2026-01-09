@@ -166,15 +166,17 @@
                         @endif
                     @endcan
 
-                    <li @class([
-                        'menu-item',
-                        'active' => request()->routeIs('requisition_forms.*'),
-                    ])>
-                        <a href="{{ route('requisition_forms.index') }}" class="menu-link">
-                            <i class="menu-icon ri-file-edit-line"></i>
-                            <div data-i18n="Basic">Requisition Forms</div>
-                        </a>
-                    </li>
+                    @if (Auth::user()->role->name !== 'Helpdesk')
+                        <li @class([
+                            'menu-item',
+                            'active' => request()->routeIs('requisition_forms.*'),
+                        ])>
+                            <a href="{{ route('requisition_forms.index') }}" class="menu-link">
+                                <i class="menu-icon ri-file-edit-line"></i>
+                                <div data-i18n="Basic">Requisition Forms</div>
+                            </a>
+                        </li>
+                    @endif
 
                     @can('view-queue-page')
                         <li @class(['menu-item', 'active' => request()->routeIs('queue')])>
@@ -208,7 +210,7 @@
                         </li>
                     @endcan
 
-                    @can('view-votes-page')
+                    @can('view-departments-page')
                         <li @class([
                             'menu-item',
                             'active' => request()->routeIs('departments.index'),
@@ -220,15 +222,17 @@
                         </li>
                     @endcan
 
-                    <li @class([
-                        'menu-item mb-3',
-                        'active' => request()->routeIs('notifications.*'),
-                    ])>
-                        <a href="{{ route('notifications.index') }}" class="menu-link">
-                            <i class="menu-icon ri-notification-3-line"></i>
-                            <div data-i18n="Basic">Notifications</div>
-                        </a>
-                    </li>
+                    @if (Auth::user()->role->name !== 'Helpdesk')
+                        <li @class([
+                            'menu-item mb-3',
+                            'active' => request()->routeIs('notifications.*'),
+                        ])>
+                            <a href="{{ route('notifications.index') }}" class="menu-link">
+                                <i class="menu-icon ri-notification-3-line"></i>
+                                <div data-i18n="Basic">Notifications</div>
+                            </a>
+                        </li>
+                    @endif
                     <li class="menu-header mt-7">
                         <span class="menu-header-text text-white">Help</span>
                     </li>
