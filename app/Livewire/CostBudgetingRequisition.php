@@ -137,6 +137,7 @@ class CostBudgetingRequisition extends Component
 
             $this->requisition->update([
                 'requisition_status' => $status,
+                'source_of_funds' => $this->source_of_funds,
             ]);
 
             foreach ($this->vendors as $vendor) {

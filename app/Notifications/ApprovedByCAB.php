@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class ApprovedByCAB extends Notification implements ShouldQueue
 {
@@ -20,6 +21,7 @@ class ApprovedByCAB extends Notification implements ShouldQueue
     public function __construct(RequisitionRequestForm $requisitionRequestForm)
     {
         $this->requisitionRequestForm = $requisitionRequestForm;
+        Log::info("CAB Approval Notification sent from queue for form " . $this->requisitionRequestForm->form_code);
     }
 
     /**

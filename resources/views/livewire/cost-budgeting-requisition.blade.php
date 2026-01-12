@@ -12,11 +12,25 @@
                 </h1>
             </div>
 
-            <div class="row mt-2">
-
-                <div class="col mx-5 fs-5">
+            <div class="row mt-2 align-items-center">
+                <div class="col-md-4 mx-5 fs-5">
                     <label style="text-decoration: underline"><strong>Total:</strong>
                         ${{ number_format($this->total, 2) }}</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center" wire:ignore>
+                        <label for="sofSelect" class="me-2 mb-0 text-nowrap"><strong>Source of Funds:</strong></label>
+                        <select wire:model="source_of_funds" class="js-example-basic-single form-control"
+                            id="sofSelect" style="width: 100%">
+                            <option value="" selected>Select a Vote</option>
+                            @foreach ($votes as $vote)
+                                <option value="{{ $vote->number }}">{{ $vote->number }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error('source_of_funds')
+                        <div class="text-danger"> {{ $message }} </div>
+                    @enderror
                 </div>
             </div>
 
@@ -494,8 +508,15 @@
         $(document).ready(function() {
             initSelect2();
 
+            $('#sofSelect').select2();
+            $('#sofSelect').on('change', function() {
+                var selectedValue = $(this).val();
+                $wire.set('source_of_funds', selectedValue);
+            });
+
             document.addEventListener('livewire:update', function() {
                 initSelect2();
+                $('#sofSelect').select2();
             });
         });
 

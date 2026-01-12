@@ -30,6 +30,8 @@ class Controller
                 return redirect()->route('cheque_processing.index');
             } elseif (Auth::user()->department->name === 'Accounts Payable') {
                 return redirect()->route('accounts_payable.index');
+            } elseif (Auth::user()->department->name === 'Helpdesk') {
+                return redirect()->route('users');
             } else {
                 return redirect()->route('requisition_forms.index');
             }

@@ -152,29 +152,21 @@
                                     {{-- 🔹 Row 3: Source of Funds & Date Received by Procurement --}}
                                     <div class="row mt-6">
                                         <div class="col-md-6">
-                                            <label><strong>Source of Funds:</strong>
-                                                {{ $this->source_of_funds }}</label>
-                                        </div>
-                                        <div class="col-md-6">
                                             <label><strong>Date Received by Procurement:</strong>
                                                 {{ $this->getFormattedDate($this->requisition->date_received_procurement) }}</label>
+                                        </div>
+                                        <div class="col">
+                                            <label><strong>Assigned To:</strong>
+                                                {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}</label>
                                         </div>
                                     </div>
 
                                     {{-- 🔹 Row 4: Assigned To & Date Assigned to Officer --}}
                                     <div class="row mt-6">
                                         <div class="col">
-                                            <label><strong>Assigned To:</strong>
-                                                {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}</label>
-                                        </div>
-                                        <div class="col">
                                             <label><strong>Date Assigned to Officer:</strong>
                                                 {{ $this->getFormattedDateAssigned() }}</label>
                                         </div>
-                                    </div>
-
-                                    {{-- 🔹 Row 6: Date Sent to AOV Procurement --}}
-                                    <div class="row mt-6">
                                         <div class="col-md-6">
                                             <label><strong>Date Sent to AOV Procurement:</strong>
                                                 {{ $this->getFormattedDate($this->date_sent_aov_procurement) }}</label>

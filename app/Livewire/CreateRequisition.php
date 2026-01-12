@@ -37,7 +37,6 @@ class CreateRequisition extends Component
     public $date_assigned;
     public $date_received_procurement;
     public $actual_cost;
-    public $funding_availability;
     public $date_sent_aov_procurement;
     public $note_to_ps = false;
     public $note_to_ps_date;
@@ -84,9 +83,9 @@ class CreateRequisition extends Component
         $this->staff = User::procurement()->get();
         $this->votes = Vote::active()->get();
         $this->requesting_unit = $form->requesting_unit;
-        $this->item = $form->items->pluck('name')->implode(', ');
+        $itemnames = $form->items->pluck('name')->implode(', ');
+        $this->item = strlen($itemnames) > 100 ? substr($itemnames, 0, 100) . '...' : $itemnames;
         $this->date_received_procurement = $form->reporting_officer_approval_date->format('Y-m-d');
-        $this->source_of_funds = $form->votes->first()->number;
 
         $this->originalVendorIds = [];
         $this->ps_approval_date = null;
@@ -196,12 +195,10 @@ class CreateRequisition extends Component
                 'requesting_unit' => $this->requesting_unit,
                 'file_no' => $this->file_no,
                 'item' => $this->item,
-                'source_of_funds' => $this->source_of_funds,
                 'assigned_to' => $this->assigned_to,
                 'date_assigned' => $this->date_assigned,
                 'date_received_procurement' => $this->date_received_procurement,
                 'actual_cost' => $this->actual_cost,
-                'funding_availability' => $this->funding_availability,
                 'date_sent_aov_procurement' => $this->date_sent_aov_procurement,
                 'site_visit' => $this->site_visit,
                 'site_visit_date' => $this->site_visit_date,
@@ -375,7 +372,7 @@ class CreateRequisition extends Component
 
     public function updating($name, $value)
     {
-        if ($name == 'requesting_unit' || $name == 'uploads' || $name == 'source_of_funds' || $name == 'funding_availability') {
+        if ($name == 'requesting_unit' || $name == 'uploads') {
             $this->skipRender();
         } else {
             $this->dispatch('preserveScroll');

@@ -96,100 +96,48 @@
                 <div class="row mt-6">
 
                     <div class="col-md-6">
-                        <div wire:ignore>
-                            <label style="width:100%" for="sofSelect">Source of Funds:</label>
-
-                            <select wire:model="source_of_funds" class="js-example-basic-single form-control"
-                                id="sofSelect" style="width: 100%">
-                                <option value="" selected>Select a Vote</option>
-                                @foreach ($votes as $vote)
-                                    <option value="{{ $vote->number }}">{{ $vote->number }}</option>
-                                @endforeach
-
-                            </select>
-                        </div>
-                        @error('source_of_funds')
-                            <div class="text-danger"> {{ $message }} </div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <input autocomplete="off" wire:model="date_received_procurement" type="date"
                                 class="form-control @error('date_received_procurement')is-invalid @enderror"
-                                id="floatingInput" aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Date Received by Procurement</label>
+                                id="date_received_procurement_input" aria-describedby="date_received_procurement_help" />
+                            <label for="date_received_procurement_input">Date Received by Procurement</label>
                         </div>
                         @error('date_received_procurement')
                             <div class="text-danger"> {{ $message }} </div>
                         @enderror
                     </div>
-                </div>
 
-                <div class="row mt-6">
-
-                    <div class="col">
+                    <div class="col-md-6">
                         <div class="form-floating form-floating-outline mb-6">
                             <select wire:model="assigned_to"
                                 class="form-select @error('assigned_to')is-invalid @enderror"
-                                id="exampleFormControlSelect1" aria-label="Default select example">
+                                id="assigned_to_select" aria-label="Assigned To Select">
                                 <option value="" selected>Select Employee</option>
-                                @foreach ($staff as $staff)
-                                    <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                @foreach ($staff as $person)
+                                    <option value="{{ $person->id }}">{{ $person->name }}</option>
                                 @endforeach
                             </select>
-                            <label for="exampleFormControlSelect1">Assigned To</label>
+                            <label for="assigned_to_select">Assigned To</label>
                             @error('assigned_to')
                                 <div class="text-danger"> {{ $message }} </div>
                             @enderror
                         </div>
                     </div>
+                </div>
 
-                    <div class="col">
+                <div class="row">
+
+                    <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <input autocomplete="off" wire:model="date_assigned" type="date"
-                                class="form-control @error('date_assigned')is-invalid @enderror" id="floatingInput"
-                                aria-describedby="floatingInputHelp" />
-                            <label for="floatingInput">Date Assigned to Officer</label>
+                                class="form-control @error('date_assigned')is-invalid @enderror" id="date_assigned_input"
+                                aria-describedby="date_assigned_help" />
+                            <label for="date_assigned_input">Date Assigned to Officer</label>
                         </div>
                         @error('date_assigned')
                             <div class="text-danger"> {{ $message }} </div>
                         @enderror
                     </div>
-                </div>
-
-                {{-- <div class="row">
-
-                    <div class="col">
-                        <div class="form-floating form-floating-outline">
-                            <input autocomplete="off" wire:model="actual_cost" type="number" step="0.01"
-                                class="form-control @error('actual_cost')is-invalid @enderror" id="actualCostInput"
-                                placeholder="Enter Actual Cost" />
-                            <label for="actualCostInput">Actual Cost</label>
-                        </div>
-                        @error('actual_cost')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col">
-                        <div wire:ignore>
-                            <label style="width:100%" for="fundingSelect">Funding Availability:</label>
-                            <select wire:model="funding_availability" class="js-example-basic-single form-control"
-                                id="fundingSelect" style="width: 100%">
-                                <option value="" selected>Select a Vote</option>
-                                @foreach ($votes as $vote)
-                                    <option value="{{ $vote->number }}">{{ $vote->number }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @error('funding_availability')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div> --}}
-
-                <div class="row mt-6">
 
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
@@ -534,19 +482,6 @@
             $('#unitSelect').on('change', function() {
                 var selectedValue = $(this).val(); // Get selected values as an array
                 $wire.set('requesting_unit', selectedValue); // Pass selected values to Livewire
-            });
-
-            $('#sofSelect').select2();
-
-            $('#sofSelect').on('change', function() {
-                var selectedValue = $(this).val(); // Get selected values as an array
-                $wire.set('source_of_funds', selectedValue); // Pass selected values to Livewire
-            });
-
-            $('#fundingSelect').select2();
-            $('#fundingSelect').on('change', function() {
-                var selectedValue = $(this).val(); // Get selected values as an array
-                $wire.set('funding_availability', selectedValue); // Pass selected values to Livewire
             });
         });
 
