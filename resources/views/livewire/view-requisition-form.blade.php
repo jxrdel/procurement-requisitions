@@ -199,9 +199,8 @@
                                 <div class="mb-3 row">
                                     <label for="cab_note_input" class="col-md-4 col-form-label">Note</label>
                                     <div class="col-md-8">
-                                        <input autocomplete="off" wire:model="cab_note" type="text"
-                                            class="form-control @error('cab_note')is-invalid @enderror"
-                                            id="cab_note_input" placeholder="" />
+                                        <textarea rows="5" wire:model="cab_note" class="form-control @error('cab_note')is-invalid @enderror"
+                                            id="cab_note_input" placeholder=""></textarea>
                                         @error('cab_note')
                                             <div class="text-danger"> {{ $message }} </div>
                                         @enderror
