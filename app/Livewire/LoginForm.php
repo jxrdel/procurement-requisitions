@@ -21,6 +21,14 @@ class LoginForm extends Component
         return view('livewire.login-form');
     }
 
+    public function mount()
+    {
+        //If user is already logged in, redirect to dashboard
+        if (Auth::check()) {
+            redirect()->route('/');
+        }
+    }
+
     public function login()
     {
         //Donald : 25
