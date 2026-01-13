@@ -92,6 +92,9 @@ class RequisitionController extends Controller
             ->filterColumn('RequestingUnit', function ($query, $keyword) {
                 $query->whereRaw("departments.name like ?", ["%{$keyword}%"]);
             })
+            ->filterColumn('requisition_status', function ($query, $keyword) {
+                $query->whereRaw("requisitions.requisition_status like ?", ["%{$keyword}%"]);
+            })
             ->make(true);
     }
 
@@ -148,6 +151,9 @@ class RequisitionController extends Controller
             })
             ->filterColumn('RequestingUnit', function ($query, $keyword) {
                 $query->whereRaw("departments.name like ?", ["%{$keyword}%"]);
+            })
+            ->filterColumn('requisition_status', function ($query, $keyword) {
+                $query->whereRaw("requisitions.requisition_status like ?", ["%{$keyword}%"]);
             })
             ->make(true);
     }
@@ -228,6 +234,9 @@ class RequisitionController extends Controller
             })
             ->filterColumn('RequestingUnit', function ($query, $keyword) {
                 $query->whereRaw("departments.name like ?", ["%{$keyword}%"]);
+            })
+            ->filterColumn('requisition_status', function ($query, $keyword) {
+                $query->whereRaw("requisitions.requisition_status like ?", ["%{$keyword}%"]);
             })
             ->make(true);
     }

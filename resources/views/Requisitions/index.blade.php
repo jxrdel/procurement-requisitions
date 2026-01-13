@@ -147,6 +147,11 @@
                         data: 'id',
                         name: 'id',
                         visible: false // Hidden but usable for sorting
+                    },
+                    {
+                        data: 'requisition_status',
+                        name: 'requisition_status',
+                        visible: false // Hidden but usable for sorting
                     }
                 ]
             });
