@@ -479,6 +479,10 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->save();
 
         if ($reportingOfficer) {
+            Log::info('Requisition form approved by HOD ' . Auth::user()->name . ' and sent to ' . $reportingOfficer->reporting_officer_role . ' ' . $reportingOfficer->name . ' for non-objection.');
+            Log::info('Run in tinker if fails: $user = User::find(' . $reportingOfficer->id .');');
+            Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, new \App\Notifications\RequestForReportingOfficerApproval($form));');
             Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
         }
 
@@ -518,6 +522,10 @@ class ViewRequisitionForm extends Component
 
         $procurementHOD = User::where('name', 'Maryann Basdeo')->first();
         if ($procurementHOD) {
+            Log::info('Requisition form approved by Reporting Officer ' . Auth::user()->name . ' and sent to Procurement HOD ' . $procurementHOD->name . ' for approval.');
+            Log::info('Run in tinker if fails: $user = User::find(' . $procurementHOD->id .');');
+            Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, new \App\Notifications\ApprovedByReportingOfficer($form));');
             Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
         }
 

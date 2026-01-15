@@ -220,8 +220,25 @@
                     <div class="mb-3 row">
                         <label for="estimated_value_input" class="col-md-4 col-form-label">Estimated Value (TTD)<span
                                 class="text-danger">*</span></label>
-                        <div class="col-md-8">
-                            <input autocomplete="off" wire:model="estimated_value" type="number" step="0.01"
+                        <div class="col-md-8" x-data="{
+                            rawValue: @entangle('estimated_value'),
+                            displayValue: '',
+                            formatNumber(val) {
+                                if (val === null || val === undefined || val === '') return '';
+                                let parts = val.toString().split('.');
+                                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                return parts.join('.');
+                            },
+                            stripCommas(val) {
+                                return val.replace(/,/g, '');
+                            }
+                        }" x-init="displayValue = formatNumber(rawValue);
+                        $watch('rawValue', v => {
+                            if (v !== stripCommas(displayValue)) displayValue = formatNumber(v);
+                        })">
+                            <input autocomplete="off" type="text" x-model="displayValue"
+                                @input="displayValue = $event.target.value.replace(/[^0-9.,]/g, ''); rawValue = stripCommas(displayValue)"
+                                @blur="displayValue = formatNumber(rawValue)"
                                 class="form-control @error('estimated_value')is-invalid @enderror"
                                 id="estimated_value_input" placeholder="Estimated Value"
                                 aria-describedby="estimated_value_help" />
