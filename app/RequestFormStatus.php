@@ -22,5 +22,6 @@ enum RequestFormStatus
     public const SENT_TO_PROCUREMENT = 'Sent to Procurement';
     public const APPROVED_BY_PROCUREMENT = 'Approved by Procurement';
     public const DENIED_BY_PROCUREMENT = 'Denied by Procurement';
+    public const DENIED_BY_CAB = 'Denied by Cost & Budgeting';
     public const COMPLETED = 'Completed';
 }

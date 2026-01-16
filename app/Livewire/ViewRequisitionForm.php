@@ -13,6 +13,7 @@ use App\Notifications\DeclinedByHOD;
 use App\Notifications\DeclinedByProcurement;
 use App\Notifications\DeclinedByReportingOfficer;
 use App\Notifications\ForwardForm;
+use App\Notifications\DeclinedByCAB;
 use App\Notifications\ApprovedByCAB;
 use App\Notifications\RequestForCABApproval;
 use App\Notifications\RequestForFurtherApproval;
@@ -136,12 +137,12 @@ class ViewRequisitionForm extends Component
         $this->requesting_unit = $this->requisitionForm->requesting_unit;
         $this->head_of_department = $this->requisitionForm->head_of_department_id;
         $this->contact_person_id = $this->requisitionForm->contact_person_id;
-        $this->date = $this->requisitionForm->date ? $this->requisitionForm->date->format('Y-m-d') : null;
+        $this->date = $this->requisitionForm->date ? \Carbon\Carbon::parse($this->requisitionForm->date)->format('Y-m-d') : null;
         $this->category = $this->requisitionForm->category;
         $this->contact_info = $this->requisitionForm->contact_info;
         $this->justification = $this->requisitionForm->justification;
         $this->location_of_delivery = $this->requisitionForm->location_of_delivery;
-        $this->date_required_by = $this->requisitionForm->date_required_by ? $this->requisitionForm->date_required_by->format('Y-m-d') : null;
+        $this->date_required_by = $this->requisitionForm->date_required_by ? \Carbon\Carbon::parse($this->requisitionForm->date_required_by)->format('Y-m-d') : null;
         $this->estimated_value = $this->requisitionForm->estimated_value;
         $this->availability_of_funds = $this->requisitionForm->availability_of_funds;
         $this->verified_by_accounts = $this->requisitionForm->verified_by_accounts;
@@ -419,6 +420,10 @@ class ViewRequisitionForm extends Component
 
         $hod = $this->requisitionForm->headOfDepartment;
         if ($hod) {
+            Log::info('Requisition form sent to Head of Department for approval by ' . Auth::user()->name . ' and sent to ' . $hod->name . ' for approval.');
+            Log::info('Run in tinker if fails: $user = User::find(' . $hod->id .');');
+            Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\RequestForHODApproval($form));');
             Notification::send($hod, new RequestForHODApproval($this->requisitionForm));
         }
 
@@ -482,7 +487,7 @@ class ViewRequisitionForm extends Component
             Log::info('Requisition form approved by HOD ' . Auth::user()->name . ' and sent to ' . $reportingOfficer->reporting_officer_role . ' ' . $reportingOfficer->name . ' for non-objection.');
             Log::info('Run in tinker if fails: $user = User::find(' . $reportingOfficer->id .');');
             Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, new \App\Notifications\RequestForReportingOfficerApproval($form));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new RequestForReportingOfficerApproval($form));');
             Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
         }
 
@@ -525,7 +530,7 @@ class ViewRequisitionForm extends Component
             Log::info('Requisition form approved by Reporting Officer ' . Auth::user()->name . ' and sent to Procurement HOD ' . $procurementHOD->name . ' for approval.');
             Log::info('Run in tinker if fails: $user = User::find(' . $procurementHOD->id .');');
             Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, new \App\Notifications\ApprovedByReportingOfficer($form));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\ApprovedByReportingOfficer($form));');
             Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
         }
 
@@ -584,7 +589,10 @@ class ViewRequisitionForm extends Component
 
             $this->requisitionForm->reporting_officer_approval = false;
             $this->requisitionForm->reporting_officer_reason_for_denial = $this->declineReason;
-            //Reset approval flags
+            Log::info('Requisition form declined by Reporting Officer by ' . Auth::user()->name);
+            Log::info('Run in tinker if fails: $user = User::find(' . $this->requisitionForm->contactPerson->id .');');
+            Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\DeclinedByReportingOfficer($form));');
             Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
         }
 
@@ -592,7 +600,22 @@ class ViewRequisitionForm extends Component
             $this->requisitionForm->status = RequestFormStatus::DENIED_BY_PROCUREMENT;
             $this->requisitionForm->procurement_approval = false;
             $this->requisitionForm->procurement_reason_for_denial = $this->declineReason;
+            Log::info('Requisition form declined by Procurement by ' . Auth::user()->name);
+            Log::info('Run in tinker if fails: $user = User::find(' . $this->requisitionForm->contactPerson->id .');');
+            Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\DeclinedByProcurement($form));');
             Notification::send($this->requisitionForm->contactPerson, new DeclinedByProcurement($this->requisitionForm));
+        }
+
+        if (Auth::user()->department->name == 'Cost & Budgeting') {
+            $this->requisitionForm->status = RequestFormStatus::DENIED_BY_CAB;
+            $this->requisitionForm->completed_by_cab = false;
+            $this->requisitionForm->cab_reason_for_denial = $this->declineReason;
+            Log::info('Requisition form declined by Cost & Budgeting by ' . Auth::user()->name);
+            Log::info('Run in tinker if fails: $user = User::find(' . $this->requisitionForm->contactPerson->id .');');
+            Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\DeclinedByCAB($form));');
+            Notification::send($this->requisitionForm->contactPerson, new DeclinedByCAB($this->requisitionForm));
         }
 
         $this->requisitionForm->save();
@@ -601,6 +624,10 @@ class ViewRequisitionForm extends Component
             'details' => 'Requisition form declined by ' . Auth::user()->name . '. Reason: ' . $this->declineReason,
             'created_by' => Auth::user()->username,
         ]);
+
+        if (Auth::user()->department->name == 'Cost & Budgeting') {
+            return redirect()->route('queue')->with ('success','Requisition form declined successfully.');
+        }
 
         $this->reset('declineReason');
 

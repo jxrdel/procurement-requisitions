@@ -48,7 +48,7 @@ class User extends Authenticatable
             return $forms + $requisitions;
         } else {
             if ($departmentName === 'Cost & Budgeting') {
-                $forms = \App\Models\RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', false)->count();
+                $forms = \App\Models\RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', false)->where('status', '!=', RequestFormStatus::DENIED_BY_CAB)->count();
                 $requisitions = \App\Models\CBRequisition::where('is_completed', false)->count();
                 $query = $forms + $requisitions;
             } elseif ($departmentName === 'Procurement Unit') {

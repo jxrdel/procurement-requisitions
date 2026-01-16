@@ -39,7 +39,8 @@
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO ||
-                                $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT)
+                                $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT ||
+                                $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CAB)
                             @can('edit-requisition-form', $requisitionForm)
                                 <button type="submit" x-show="isEditing" class="btn btn-sm btn-primary"
                                     x-bind:class="isEditing ? '' : 'd-none'"> <i class="fa-solid fa-save me-1"></i> Save
@@ -231,6 +232,12 @@
                                         <span>Sending...</span>
                                     </span>
                                 </button>
+
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#declineRequisitionForm"
+                                    class="btn btn-dark waves-effect waves-light d-flex align-items-center justify-content-center gap-2 mb-5 ms-3">
+                                    <i class="ri-arrow-go-back-line me-1_5"></i>
+                                    <span>Return</span>
+                                </button>
                             </div>
                         </div>
 
@@ -275,6 +282,17 @@
                             <strong>Requisition Declined!</strong>
                         </div>
                         <ul class="mt-1">{{ $requisitionForm->procurement_reason_for_denial }}</ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                    </div>
+                @elseif (
+                    $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CAB &&
+                        $requisitionForm->cab_reason_for_denial)
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <div class="text-center">
+                            <strong>Requisition Declined by Cost & Budgeting!</strong>
+                        </div>
+                        <ul class="mt-1">{{ $requisitionForm->cab_reason_for_denial }}</ul>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"
                             aria-label="Close"></button>
                     </div>
@@ -610,7 +628,7 @@
                         Budgeting</div>
                 </div>
 
-                @if (!$requisitionForm->sent_to_cab)
+                @if (!$requisitionForm->sent_to_cab || $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CAB)
                     <div class="col d-flex justify-content-center">
                         <button type="button" wire:click="sendToCAB" wire:loading.attr="disabled"
                             wire:target="sendToCAB" wire:confirm="Are you sure you want to send to Cost & Budgeting?"
@@ -1039,7 +1057,8 @@
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
                         $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO ||
-                        $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT)
+                        $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PROCUREMENT ||
+                        $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CAB)
                     <div class="row mt-8" x-show="isEditing">
                         <div class="col"></div>
                         <div class="col text-center m-auto">

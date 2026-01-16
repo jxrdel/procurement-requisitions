@@ -57,6 +57,7 @@ class RequisitionRequestForm extends Model
         'sent_to_cmo',
         'cab_note',
         'date_sent_to_cab',
+        'cab_reason_for_denial',
     ];
 
     protected $casts = [

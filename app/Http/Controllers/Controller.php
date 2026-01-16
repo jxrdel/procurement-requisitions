@@ -381,7 +381,7 @@ class Controller
             $query = $query->merge($requisitions);
         } else {
             if ($departmentName === 'Cost & Budgeting') {
-                $forms = RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', false)->get()->map(function ($item) {
+                $forms = RequisitionRequestForm::where('sent_to_cab', true)->where('completed_by_cab', false)->where('status', '!=', RequestFormStatus::DENIED_BY_CAB)->get()->map(function ($item) {
                     $status = $item->completed_by_cab == true
                         ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';
