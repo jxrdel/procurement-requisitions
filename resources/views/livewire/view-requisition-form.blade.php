@@ -4,6 +4,7 @@
     @include('livewire.approve-form-hod-modal')
     @include('livewire.approve-form-reporting-officer')
     @include('livewire.decline-form-modal')
+    @include('livewire.return-form-cab')
     @include('livewire.add-form-log')
     @include('livewire.send-to-hod-modal')
     @include('livewire.forward-form-modal')
@@ -34,7 +35,7 @@
                     <div class="col text-end d-flex justify-content-end gap-2">
 
                         @if (
-                            !$requisitionForm->date_sent_to_hod ||
+                                ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD && !$requisitionForm->hod_approval && Auth::user()->id != $requisitionForm->head_of_department_id) ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_HOD ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
@@ -138,7 +139,7 @@
                 @if (
                     $requisitionForm->status === \App\RequestFormStatus::SENT_TO_COST_BUDGETING &&
                         Auth::user()->department->name == 'Cost & Budgeting')
-                    <div>
+                    <div id="cabSection">
                         <div class="divider mt-6">
                             <div class="divider-text fs-5"><i class="fa-solid fa-money-check-dollar me-2"></i>Cost
                                 &
@@ -146,7 +147,7 @@
                         </div>
 
                         <div class="row mt-6">
-                            {{-- LEFT COLUMN: Availability of Funds Checkbox --}}
+                            {{-- LEFT COLUMN: Checkboxes --}}
                             <div class="col-md-6">
                                 <div class="d-flex flex-column gap-3">
                                     <div class="form-check">
@@ -156,18 +157,31 @@
                                             Availability of Funds
                                         </label>
                                     </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value=""
+                                            id="defaultCheck2" wire:model.live="verified_by_accounts">
+                                        <label class="form-check-label" for="defaultCheck2" style="color:black">
+                                            Verified by Accounts
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value=""
+                                            id="virementCheck" wire:model.live="virement_required">
+                                        <label class="form-check-label" for="virementCheck" style="color:black">
+                                            Virement Required
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
-                            {{-- RIGHT COLUMN: Vote Number(s) Select2 --}}
-                            <div wire:ignore class="col-md-6">
-                                <div class="mb-3 row">
+                            {{-- RIGHT COLUMN: Vote Number(s) and Note --}}
+                            <div class="col-md-6">
+                                <div wire:ignore class="mb-3 row">
                                     <label for="vote_no_input" class="col-md-4 col-form-label">Vote Number(s)</label>
                                     <div class="col-md-8">
                                         {{-- Select2 element --}}
                                         <select style="width: 100%;" id="voteSelect"
                                             class="js-example-basic-multiple form-control" multiple="multiple">
-
                                             @foreach ($votes as $vote)
                                                 {{-- Ensure selected votes are pre-selected if available --}}
                                                 <option value="{{ $vote->id }}"
@@ -179,24 +193,6 @@
                                         </select>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            {{-- LEFT COLUMN: Verified by Accounts Checkbox --}}
-                            <div class="col-md-6">
-                                <div class="d-flex flex-column gap-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value=""
-                                            id="defaultCheck2" wire:model.live="verified_by_accounts">
-                                        <label class="form-check-label" for="defaultCheck2" style="color:black">
-                                            Verified by Accounts
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
                                 <div class="mb-3 row">
                                     <label for="cab_note_input" class="col-md-4 col-form-label">Note</label>
                                     <div class="col-md-8">
@@ -233,8 +229,8 @@
                                     </span>
                                 </button>
 
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#declineRequisitionForm"
-                                    class="btn btn-dark waves-effect waves-light d-flex align-items-center justify-content-center gap-2 mb-5 ms-3">
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#returnRequisitionForm"
+                                    class="btn btn-danger waves-effect waves-light d-flex align-items-center justify-content-center gap-2 mb-5 ms-3">
                                     <i class="ri-arrow-go-back-line me-1_5"></i>
                                     <span>Return</span>
                                 </button>
@@ -659,22 +655,36 @@
                     </div>
                 @else
                     <div class="row mt-6">
-                        {{-- LEFT COLUMN: Availability of Funds Checkbox --}}
+                        {{-- LEFT COLUMN: Checkboxes (Disabled) --}}
                         <div class="col-md-6">
                             <div class="d-flex flex-column gap-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value=""
-                                        id="defaultCheck1" disabled wire:model="availability_of_funds">
-                                    <label class="form-check-label fw-bold" for="defaultCheck1" style="color:black">
+                                        id="displayCheck1" disabled wire:model="availability_of_funds">
+                                    <label class="form-check-label fw-bold" for="displayCheck1" style="color:black">
                                         Availability of Funds
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value=""
+                                        id="displayCheck2" disabled wire:model="verified_by_accounts">
+                                    <label class="form-check-label fw-bold" for="displayCheck2" style="color:black">
+                                        Verified by Accounts
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value=""
+                                        id="displayCheck3" disabled wire:model="virement_required">
+                                    <label class="form-check-label fw-bold" for="displayCheck3" style="color:black">
+                                        Virement Required
                                     </label>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- RIGHT COLUMN: Vote Number(s) Select2 --}}
-                        <div wire:ignore class="col-md-6">
-                            <div class="mb-3 row">
+                        {{-- RIGHT COLUMN: Vote Number(s) and Note --}}
+                        <div class="col-md-6">
+                            <div wire:ignore class="mb-3 row">
                                 <label for="vote_no_input" class="col-md-4 col-form-label">Vote Number(s)</label>
                                 <div class="col-md-8">
                                     {{-- Select2 element --}}
@@ -692,26 +702,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        {{-- LEFT COLUMN: Verified by Accounts Checkbox --}}
-                        <div class="col-md-6">
-                            <div class="d-flex flex-column gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value=""
-                                        id="defaultCheck2" disabled wire:model="verified_by_accounts">
-                                    <label class="form-check-label fw-bold" for="defaultCheck2" style="color:black">
-                                        Verified by Accounts
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- RIGHT COLUMN: Note (cab_note) Textarea --}}
-                        @if ($requisitionForm->cab_note)
-                            <div class="col-md-6">
+                            @if ($requisitionForm->cab_note)
                                 <div class="mb-3 row">
                                     <label for="cab_note_input" class="col-md-4 col-form-label">Note</label>
                                     <div class="col-md-8">
@@ -722,8 +713,8 @@
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
                     </div>
                 @endif
 

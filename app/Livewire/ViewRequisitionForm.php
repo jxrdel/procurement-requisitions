@@ -56,6 +56,7 @@ class ViewRequisitionForm extends Component
 
     public $availability_of_funds;
     public $verified_by_accounts;
+    public $virement_required;
     public $vote_no;
     public $seen_by;
     public $procurement_officer_assigned;
@@ -146,6 +147,7 @@ class ViewRequisitionForm extends Component
         $this->estimated_value = $this->requisitionForm->estimated_value;
         $this->availability_of_funds = $this->requisitionForm->availability_of_funds;
         $this->verified_by_accounts = $this->requisitionForm->verified_by_accounts;
+        $this->virement_required = $this->requisitionForm->virement_required;
         $this->vote_no = $this->requisitionForm->vote_no;
         $this->cab_note = $this->requisitionForm->cab_note;
 
@@ -478,6 +480,12 @@ class ViewRequisitionForm extends Component
 
         $this->requisitionForm->hod_approval = true;
         $this->requisitionForm->hod_note = $this->hod_note;
+
+        // If user is not the head of department, make them head of department
+        if (Auth::user()->id != $this->requisitionForm->head_of_department_id) {
+            $this->requisitionForm->head_of_department_id = Auth::user()->id;
+        }
+
         $this->requisitionForm->hod_approval_date = now();
         $this->requisitionForm->hod_digital_signature = Auth::user()->digital_signature;
         $this->requisitionForm->reporting_officer_id = $this->selectedOfficer;
@@ -492,7 +500,7 @@ class ViewRequisitionForm extends Component
         }
 
         $this->requisitionForm->logs()->create([
-            'details' => 'Requisition form approved by ' . Auth::user()->name . ' and sent to ' . $reportingOfficer->reporting_officer_role . ' ' . $reportingOfficer->name . ' for non-objection.',
+            'details' => 'Requisition form approved by ' . Auth::user()->name . ' and sent to ' . $reportingOfficer->reporting_officer_role . ' ' . $reportingOfficer->name . ' for non-objection. Minute: ' . $this->hod_note,
             'created_by' => Auth::user()->username,
         ]);
 
@@ -731,6 +739,7 @@ class ViewRequisitionForm extends Component
         // dd($this->requisitionForm->requestingUnit->name);
         $this->requisitionForm->availability_of_funds = $this->availability_of_funds;
         $this->requisitionForm->verified_by_accounts = $this->verified_by_accounts;
+        $this->requisitionForm->virement_required = $this->virement_required;
         $this->requisitionForm->cab_note = $this->cab_note;
         $this->requisitionForm->votes()->sync($this->selected_votes);
         $this->requisitionForm->status = RequestFormStatus::APPROVED_BY_COST_BUDGETING;
@@ -738,7 +747,7 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->save();
 
         $this->requisitionForm->logs()->create([
-            'details' => 'Requisition form approved by Cost & Budgeting user ' . Auth::user()->name . ' and sent to ' . $this->requisitionForm->requestingUnit->name,
+            'details' => 'Availability of funding confirmed by Cost & Budgeting user ' . Auth::user()->name . ' and sent to ' . $this->requisitionForm->requestingUnit->name,
             'created_by' => Auth::user()->username,
         ]);
 

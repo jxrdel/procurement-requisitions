@@ -58,11 +58,13 @@ class RequisitionRequestForm extends Model
         'cab_note',
         'date_sent_to_cab',
         'cab_reason_for_denial',
+        'virement_required',
     ];
 
     protected $casts = [
         'availability_of_funds' => 'boolean',
         'verified_by_accounts' => 'boolean',
+        'virement_required' => 'boolean',
         'hod_approval' => 'boolean',
         'reporting_officer_approval' => 'boolean',
         'procurement_approval' => 'boolean',
