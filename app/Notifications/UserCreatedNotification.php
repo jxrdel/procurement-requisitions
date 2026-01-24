@@ -15,6 +15,8 @@ class UserCreatedNotification extends Notification implements ShouldQueue
 
     public $user; // Public property to access user in toMail
 
+    public bool $mailOnly = false;
+
     /**
      * Create a new notification instance.
      */
@@ -22,6 +24,18 @@ class UserCreatedNotification extends Notification implements ShouldQueue
     {
         $this->user = $user;
         Log::info('User Created Notification for ' . $this->user->email . ' from queue');
+    }
+
+    /**
+     * Set the notification to be sent as mail-only.
+     *
+     * @return $this
+     */
+    public function mailOnly(): self
+    {
+        $this->mailOnly = true;
+
+        return $this;
     }
 
     /**

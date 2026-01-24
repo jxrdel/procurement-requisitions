@@ -17,6 +17,8 @@ class ForwardForm extends Notification implements ShouldQueue
     public $forwardedBy;
     public $forwarding_minute;
 
+    public bool $mailOnly = false;
+
     /**
      * Create a new notification instance.
      */
@@ -28,13 +30,25 @@ class ForwardForm extends Notification implements ShouldQueue
     }
 
     /**
+     * Set the notification to be sent as mail-only.
+     *
+     * @return $this
+     */
+    public function mailOnly(): self
+    {
+        $this->mailOnly = true;
+
+        return $this;
+    }
+
+    /**
      * Get the notification's delivery channels.
      *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return $this->mailOnly ? ['mail'] : ['mail', 'database'];
     }
 
     /**

@@ -12,6 +12,8 @@ class DeclinedByProcurement extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    public bool $mailOnly = false;
+
     /**
      * Create a new notification instance.
      */
@@ -21,13 +23,25 @@ class DeclinedByProcurement extends Notification implements ShouldQueue
     }
 
     /**
+     * Set the notification to be sent as mail-only.
+     *
+     * @return $this
+     */
+    public function mailOnly(): self
+    {
+        $this->mailOnly = true;
+
+        return $this;
+    }
+
+    /**
      * Get the notification's delivery channels.
      *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return $this->mailOnly ? ['mail'] : ['mail', 'database'];
     }
 
     /**

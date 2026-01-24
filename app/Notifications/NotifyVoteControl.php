@@ -16,6 +16,8 @@ class NotifyVoteControl extends Notification implements ShouldQueue
 
     public $vendor;
 
+    public bool $mailOnly = false;
+
     /**
      * Create a new notification instance.
      *
@@ -28,6 +30,18 @@ class NotifyVoteControl extends Notification implements ShouldQueue
     }
 
     /**
+     * Set the notification to be sent as mail-only.
+     *
+     * @return $this
+     */
+    public function mailOnly(): self
+    {
+        $this->mailOnly = true;
+
+        return $this;
+    }
+
+    /**
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
@@ -35,7 +49,7 @@ class NotifyVoteControl extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return $this->mailOnly ? ['mail'] : ['mail', 'database'];
     }
 
     /**

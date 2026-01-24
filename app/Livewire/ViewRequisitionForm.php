@@ -425,7 +425,7 @@ class ViewRequisitionForm extends Component
             Log::info('Requisition form sent to Head of Department for approval by ' . Auth::user()->name . ' and sent to ' . $hod->name . ' for approval.');
             Log::info('Run in tinker if fails: $user = User::find(' . $hod->id .');');
             Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\RequestForHODApproval($form));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, (new \App\Notifications\RequestForHODApproval($form))->mailOnly());');
             Notification::send($hod, new RequestForHODApproval($this->requisitionForm));
         }
 
@@ -495,7 +495,7 @@ class ViewRequisitionForm extends Component
             Log::info('Requisition form approved by HOD ' . Auth::user()->name . ' and sent to ' . $reportingOfficer->reporting_officer_role . ' ' . $reportingOfficer->name . ' for non-objection.');
             Log::info('Run in tinker if fails: $user = User::find(' . $reportingOfficer->id .');');
             Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new RequestForReportingOfficerApproval($form));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, (new \App\Notifications\RequestForReportingOfficerApproval($form))->mailOnly());');
             Notification::send($reportingOfficer, new RequestForReportingOfficerApproval($this->requisitionForm));
         }
 
@@ -538,7 +538,7 @@ class ViewRequisitionForm extends Component
             Log::info('Requisition form approved by Reporting Officer ' . Auth::user()->name . ' and sent to Procurement HOD ' . $procurementHOD->name . ' for approval.');
             Log::info('Run in tinker if fails: $user = User::find(' . $procurementHOD->id .');');
             Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\ApprovedByReportingOfficer($form));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, (new \App\Notifications\ApprovedByReportingOfficer($form))->mailOnly());');
             Notification::send($procurementHOD, new ApprovedByReportingOfficer($this->requisitionForm));
         }
 
@@ -600,7 +600,7 @@ class ViewRequisitionForm extends Component
             Log::info('Requisition form declined by Reporting Officer by ' . Auth::user()->name);
             Log::info('Run in tinker if fails: $user = User::find(' . $this->requisitionForm->contactPerson->id .');');
             Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\DeclinedByReportingOfficer($form));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, (new \App\Notifications\DeclinedByReportingOfficer($form))->mailOnly());');
             Notification::send($this->requisitionForm->contactPerson, new DeclinedByReportingOfficer($this->requisitionForm));
         }
 
@@ -611,7 +611,7 @@ class ViewRequisitionForm extends Component
             Log::info('Requisition form declined by Procurement by ' . Auth::user()->name);
             Log::info('Run in tinker if fails: $user = User::find(' . $this->requisitionForm->contactPerson->id .');');
             Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\DeclinedByProcurement($form));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, (new \App\Notifications\DeclinedByProcurement($form))->mailOnly());');
             Notification::send($this->requisitionForm->contactPerson, new DeclinedByProcurement($this->requisitionForm));
         }
 
@@ -622,7 +622,7 @@ class ViewRequisitionForm extends Component
             Log::info('Requisition form declined by Cost & Budgeting by ' . Auth::user()->name);
             Log::info('Run in tinker if fails: $user = User::find(' . $this->requisitionForm->contactPerson->id .');');
             Log::info('Run in tinker if fails: $form = RequisitionRequestForm::find(' . $this->requisitionForm->id .');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Notifications\DeclinedByCAB($form));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, (new \App\Notifications\DeclinedByCAB($form))->mailOnly());');
             Notification::send($this->requisitionForm->contactPerson, new DeclinedByCAB($this->requisitionForm));
         }
 
