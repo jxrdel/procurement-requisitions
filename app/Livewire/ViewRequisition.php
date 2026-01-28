@@ -473,6 +473,10 @@ class ViewRequisition extends Component
     {
         $status = $this->requisition_status;
 
+        if ($this->assigned_to) {
+            $this->requisition_status = 'Assigned to Procurement Officer';
+        }
+
         if ($this->tender_issue_date === null && $this->tender_deadline_date === null) {
             $this->requisition_status = 'Tender To Be Issued';
         }

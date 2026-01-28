@@ -35,7 +35,7 @@
                     <div class="col text-end d-flex justify-content-end gap-2">
 
                         @if (
-                                ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD && !$requisitionForm->hod_approval && Auth::user()->id != $requisitionForm->head_of_department_id) ||
+                                ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD && !$requisitionForm->hod_approval && Auth::user()->id != $requisitionForm->head_of_department_id && Auth::user()->id != $requisitionForm->requestingUnit->head_of_department_id) ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_HOD ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
@@ -743,7 +743,7 @@
                     <div class="row mt-4">
                         <div class="alert alert-warning text-center" role="alert">
                             <strong>This requisition form is pending approval from
-                                {{ $requisitionForm->headOfDepartment->name ?? 'the Head of Department' }}.</strong>
+                                {{ $requisitionForm->requestingUnit->headOfDepartment->name ?? 'the Head of Department' }}.</strong>
                         </div>
                     </div>
                 @elseif ($requisitionForm->hod_approval)

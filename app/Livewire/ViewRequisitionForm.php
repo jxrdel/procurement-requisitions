@@ -585,7 +585,7 @@ class ViewRequisitionForm extends Component
             Notification::send($this->requisitionForm->contactPerson, new DeclinedByHOD($this->requisitionForm));
         }
 
-        if (Auth::user()->id == $this->requisitionForm->reporting_officer_id && Auth::user()->is_reporting_officer) {
+        if (Auth::user()->id == $this->requisitionForm->head_of_department_id || Auth::user()->id == $this->requisitionForm->requestingUnit->head_of_department_id) {
             //Change status based on role
             if (Auth::user()->reporting_officer_role == 'Permanent Secretary') {
                 $this->requisitionForm->status = RequestFormStatus::DENIED_BY_PS;
