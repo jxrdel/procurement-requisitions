@@ -420,7 +420,7 @@ class ViewRequisitionForm extends Component
         $this->requisitionForm->date_sent_to_hod = now();
         $this->requisitionForm->save();
 
-        $hod = $this->requisitionForm->headOfDepartment;
+        $hod = $this->requisitionForm->requestingUnit->headOfDepartment;
         if ($hod) {
             Log::info('Requisition form sent to Head of Department for approval by ' . Auth::user()->name . ' and sent to ' . $hod->name . ' for approval.');
             Log::info('Run in tinker if fails: $user = User::find(' . $hod->id .');');
@@ -564,7 +564,7 @@ class ViewRequisitionForm extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        Notification::send($this->requisitionForm->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
+        Notification::send($this->requisitionForm->requestingUnit->headOfDepartment, new ApprovedByProcurement($this->requisitionForm));
 
 
         $this->dispatch('show-message', message: 'Requisition form approved successfully.');
