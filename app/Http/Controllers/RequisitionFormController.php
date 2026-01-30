@@ -20,7 +20,7 @@ class RequisitionFormController extends Controller
     public function getForms()
     {
         $user = Auth::user();
-        $forms = RequisitionRequestForm::with(['items', 'requisition'])->select('requisition_request_forms.*');
+        $forms = RequisitionRequestForm::with(['items', 'requisition', 'requestingUnit'])->select('requisition_request_forms.*');
 
         if ($user->role->name !== 'Super Admin') {
             $forms->where('requesting_unit', $user->department_id);
@@ -34,10 +34,24 @@ class RequisitionFormController extends Controller
                 $items = $row->items->pluck('name')->implode(', ');
                 return strlen($items) > 25 ? substr($items, 0, 25) . '...' : $items;
             })
-            ->addColumn('status_badge', function ($row) {
+           ->addColumn('status_badge', function ($row) use ($user) {
                 $status = $row->status ?? 'Draft';
-                $bgColor = $status === 'Completed' ? '#8bc34a' : '#e09e03';
-                return '<div style="text-align:center;"><span style="background-color: ' . $bgColor . ' !important; color: white;" class="badge">' . $status . '</span></div>';
+
+                if ($status === 'Completed') {
+                    $bgColor = '#8bc34a';
+                } elseif (str_contains($status, 'Denied')) {
+                    $bgColor = '#f44336';
+                } elseif($user->id === $row->requestingUnit->head_of_department_id && $row->status === 'Sent to HOD'){
+                    $bgColor = '#f44336';
+                } else {
+                    $bgColor = '#e09e03';
+                }
+
+                return '<div style="text-align:center;">
+                            <span style="background-color: ' . $bgColor . ' !important; color: white;" class="badge">
+                                ' . $status . '
+                            </span>
+                        </div>';
             })
             ->addColumn('requisition_status_badge', function ($row) {
                 if ($row->requisition) {
