@@ -300,6 +300,34 @@ class ViewRequisition extends Component
                 $this->date_received_procurement = null;
             }
 
+            if ($this->date_sent_aov_procurement === '') {
+                $this->date_sent_aov_procurement = null;
+            }
+
+            if ($this->site_visit_date === '') {
+                $this->site_visit_date = null;
+            }
+
+            if ($this->note_to_ps_date === '') {
+                $this->note_to_ps_date = null;
+            }
+
+            if ($this->tender_issue_date === '') {
+                $this->tender_issue_date = null;
+            }
+
+            if ($this->tender_deadline_date === '') {
+                $this->tender_deadline_date = null;
+            }
+
+            if ($this->evaluation_start_date === '') {
+                $this->evaluation_start_date = null;
+            }
+
+            if ($this->evaluation_end_date === '') {
+                $this->evaluation_end_date = null;
+            }
+
             if ($this->ps_approval_date === '') {
                 $this->ps_approval_date = null;
             }
