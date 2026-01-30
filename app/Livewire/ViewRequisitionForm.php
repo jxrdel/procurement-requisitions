@@ -577,7 +577,7 @@ class ViewRequisitionForm extends Component
             'declineReason' => 'required',
         ]);
 
-        if (Auth::user()->id == $this->requisitionForm->head_of_department_id) {
+        if (Auth::user()->id == $this->requisitionForm->head_of_department_id || Auth::user()->id == $this->requisitionForm->requestingUnit->head_of_department_id) {
             $this->requisitionForm->status = RequestFormStatus::DENIED_BY_HOD;
             $this->requisitionForm->hod_approval = false;
             $this->requisitionForm->hod_reason_for_denial = $this->declineReason;
@@ -585,7 +585,7 @@ class ViewRequisitionForm extends Component
             Notification::send($this->requisitionForm->contactPerson, new DeclinedByHOD($this->requisitionForm));
         }
 
-        if (Auth::user()->id == $this->requisitionForm->head_of_department_id || Auth::user()->id == $this->requisitionForm->requestingUnit->head_of_department_id) {
+        if (Auth::user()->id == $this->requisitionForm->reporting_officer_id) {
             //Change status based on role
             if (Auth::user()->reporting_officer_role == 'Permanent Secretary') {
                 $this->requisitionForm->status = RequestFormStatus::DENIED_BY_PS;
