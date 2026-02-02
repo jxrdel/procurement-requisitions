@@ -10,6 +10,22 @@
             </div>
             <form wire:submit.prevent="createUser" action="">
                 <div class="modal-body" style="color: black">
+                    <div class="row mb-4" wire:ignore>
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-primary">Search Active Directory</label>
+                            <select id="ldapUserSelect" class="form-select" style="width: 100%;" wire:model="ldapUser">
+                                <option value="">Select a user...</option>
+                                @foreach ($ldapUsers as $adUser)
+                                    <option value="{{ $adUser->getFirstAttribute('samaccountname') }}">
+                                        {{ $adUser->getFirstAttribute('givenname') }}
+                                        {{ $adUser->getFirstAttribute('sn') }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr>
 
                     <div class="row">
 
@@ -140,16 +156,35 @@
                 dropdownParent: $('#createUserModal')
             });
 
+            // Initialize Select2 for AD User Select
+            $('#ldapUserSelect').select2({
+                dropdownParent: $('#createUserModal'),
+                placeholder: 'Select an AD User to auto-fill',
+                allowClear: true
+            });
+
             // Listen for changes on the Department Select2 and update Livewire
             $('#departmentSelect').on('change', function() {
                 var selectedValue = $(this).val();
                 $wire.set('department', selectedValue);
             });
 
+            $('#ldapUserSelect').on('change', function() {
+                var selectedUser = $(this).val();
+                if (selectedUser) {
+                    // Call the PHP method passing the samaccountname
+                    $wire.selectAdUser(selectedUser);
+                }
+            });
+
             // Re-initialize Select2 when the modal is shown to ensure it works correctly
             $('#createUserModal').on('shown.bs.modal', function() {
                 $('#departmentSelect').select2({
                     dropdownParent: $('#createUserModal')
+                });
+                $('#ldapUserSelect').select2({
+                    dropdownParent: $('#createUserModal'),
+                    width: '100%'
                 });
             });
 
@@ -160,6 +195,13 @@
                         dropdownParent: $('#createUserModal')
                     });
                 }
+            });
+
+            // Listen for 'close-create-modal' and reset Select2 fields
+            window.addEventListener('close-create-modal', event => {
+                $('#ldapUserSelect').val(null).trigger('change');
+                $('#departmentSelect').val(null).trigger('change');
+                $('#createUserModal').modal('hide');
             });
         });
     </script>

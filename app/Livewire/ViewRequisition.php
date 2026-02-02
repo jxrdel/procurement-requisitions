@@ -499,8 +499,6 @@ class ViewRequisition extends Component
 
     public function setRequisitionStatus()
     {
-        $status = $this->requisition_status;
-
         if ($this->assigned_to) {
             $this->requisition_status = 'Assigned to Procurement Officer';
         }
@@ -509,16 +507,16 @@ class ViewRequisition extends Component
             $this->requisition_status = 'Tender To Be Issued';
         }
 
-        if ($this->tender_issue_date !== null && $this->tender_deadline_date !== null && $this->tender_deadline_date >= date('Y-m-d')) {
+        if ($this->tender_issue_date !== null && $this->tender_deadline_date !== null && $this->tender_deadline_date >= $this->today) {
             $this->requisition_status = 'Tender In Progress';
         }
 
         // If evaluation dates are set and evaluation end date is in the future
-        if ($this->evaluation_start_date !== null && $this->evaluation_end_date !== null && $this->evaluation_end_date >= date('Y-m-d')) {
+        if ($this->evaluation_start_date !== null && $this->evaluation_end_date !== null && $this->evaluation_end_date >= $this->today) {
             $this->requisition_status = 'Evaluation In Progress';
         }
 
-        if ($this->evaluation_end_date !== null && $this->evaluation_end_date < date('Y-m-d') && $this->ps_approval === 'Not Sent') {
+        if ($this->evaluation_end_date !== null && $this->evaluation_end_date < $this->today && $this->ps_approval === 'Not Sent') {
             $this->requisition_status = 'To be Sent to DPS';
         }
 
@@ -535,7 +533,7 @@ class ViewRequisition extends Component
         }
 
         $this->requisition->update([
-            'requisition_status' => $status,
+            'requisition_status' => $this->requisition_status,
         ]);
     }
 

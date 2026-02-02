@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use LdapRecord\Models\ActiveDirectory\User as ActiveDirectoryUser;
 use Livewire\Component;
 
 class CreateUserModal extends Component
@@ -23,12 +24,17 @@ class CreateUserModal extends Component
     public $departments;
     public $is_reporting_officer = false;
     public $reporting_officer_role;
+    public $ldapUser;
 
     public function render()
     {
         $this->roles = Role::all();
         $this->departments = Department::orderBy('name')->get();
-        return view('livewire.create-user-modal');
+        $ldapUsers = ActiveDirectoryUser::select(['givenname', 'sn', 'samaccountname', 'mail'])
+            ->get();
+        return view('livewire.create-user-modal', compact(
+            'ldapUsers'
+        ));
     }
 
     public function createUser()
@@ -54,7 +60,7 @@ class CreateUserModal extends Component
 
         if ($this->sendEmail) {
             Notification::send($newuser, new \App\Notifications\UserCreatedNotification($newuser));
-            Log::info('Run in tinker if fails: $user = User::find(' . $newuser->id .');');
+            Log::info('Run in tinker if fails: $user = User::find(' . $newuser->id . ');');
             Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, (new \App\Notifications\UserCreatedNotification($user));');
         }
 
@@ -63,10 +69,30 @@ class CreateUserModal extends Component
         $this->dispatch('refresh-table');
         $this->dispatch('show-message', message: 'User created successfully');
     }
+    public function selectAdUser($samaccountname)
+    {
+        // Find the specific user from AD again (or filter the collection)
+        $user = ActiveDirectoryUser::where('samaccountname', $samaccountname)->first();
+
+        if ($user) {
+            // 1. Set Name (GivenName + SN)
+            $firstName = trim($user->getFirstAttribute('givenname'));
+            $lastName = trim($user->getFirstAttribute('sn'));
+            $this->name = "$firstName $lastName";
+
+            // 2. Set Username (lowercase samaccountname)
+            $this->username = strtolower($user->getFirstAttribute('samaccountname'));
+
+            $email = $firstName . '.' . $lastName . '@health.gov.tt';
+            $this->email = strtolower($email);
+        }
+    }
 
     public function updatedName()
     {
-        $this->username = strtolower(str_replace(' ', '.', $this->name));
-        $this->email = $this->username . '@health.gov.tt';
+        if (empty($this->username)) {
+            $this->username = strtolower(str_replace(' ', '.', $this->name));
+            $this->email = $this->username . '@health.gov.tt';
+        }
     }
 }
