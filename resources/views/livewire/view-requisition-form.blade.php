@@ -592,7 +592,7 @@
                                         <td>{{ $item['size'] }}</td>
                                         <td>{{ $item['colour'] }}</td>
                                         <td>{{ $item['brand_model'] }}</td>
-                                        <td>{{ $item['other'] }}</td>
+                                        <td style="max-width: 150px">{{ $item['other'] }}</td>
                                         <td>
                                             <button type="button" x-bind:disabled="!isEditing"
                                                 class="btn btn-icon btn-outline-primary waves-effect me-1"

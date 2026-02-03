@@ -30,8 +30,16 @@ class CreateUserModal extends Component
     {
         $this->roles = Role::all();
         $this->departments = Department::orderBy('name')->get();
-        $ldapUsers = ActiveDirectoryUser::select(['givenname', 'sn', 'samaccountname', 'mail'])
-            ->get();
+        $ldapUsers = [];
+
+        ActiveDirectoryUser::select(['givenname', 'sn', 'samaccountname'])
+            ->orderBy('givenname')
+            ->chunk(1000, function ($chunk) use (&$ldapUsers) {
+                foreach ($chunk as $user) {
+                    $ldapUsers[] = $user;
+                }
+            });
+
         return view('livewire.create-user-modal', compact(
             'ldapUsers'
         ));
@@ -71,20 +79,17 @@ class CreateUserModal extends Component
     }
     public function selectAdUser($samaccountname)
     {
-        // Find the specific user from AD again (or filter the collection)
+        // Find the specific user from AD
         $user = ActiveDirectoryUser::where('samaccountname', $samaccountname)->first();
 
         if ($user) {
-            // 1. Set Name (GivenName + SN)
             $firstName = trim($user->getFirstAttribute('givenname'));
             $lastName = trim($user->getFirstAttribute('sn'));
             $this->name = "$firstName $lastName";
 
-            // 2. Set Username (lowercase samaccountname)
             $this->username = strtolower($user->getFirstAttribute('samaccountname'));
 
-            $email = $firstName . '.' . $lastName . '@health.gov.tt';
-            $this->email = strtolower($email);
+            $this->email = $this->username . '@health.gov.tt';
         }
     }
 
