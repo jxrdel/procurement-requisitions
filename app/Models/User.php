@@ -154,4 +154,19 @@ class User extends Authenticatable
 
         return hash('sha256', $this->username . $salt);
     }
+
+    public function isHOD()
+    {
+        return $this->department && $this->department->head_of_department_id == $this->id;
+    }
+
+    public function getSentToHODCount()
+    {
+        if ($this->isHOD()) {
+            return \App\Models\RequisitionRequestForm::where('status', RequestFormStatus::SENT_TO_HOD)
+                ->where('requesting_unit', $this->department_id)
+                ->count();
+        }
+        return 0;
+    }
 }

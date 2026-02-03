@@ -209,6 +209,11 @@
                         <a href="{{ route('requisition_forms.index') }}" class="menu-link">
                             <i class="menu-icon ri-file-edit-line"></i>
                             <div data-i18n="Basic">Requisition Forms</div>
+                            @if (Auth::user()->isHOD() && Auth::user()->getSentToHODCount() > 0)
+                                <span class="badge bg-danger rounded-pill ms-auto">
+                                    {{ Auth::user()->getSentToHODCount() }}
+                                </span>
+                            @endif
                         </a>
                     </li>
 

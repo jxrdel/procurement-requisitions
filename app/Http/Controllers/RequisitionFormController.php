@@ -34,14 +34,14 @@ class RequisitionFormController extends Controller
                 $items = $row->items->pluck('name')->implode(', ');
                 return strlen($items) > 25 ? substr($items, 0, 25) . '...' : $items;
             })
-           ->addColumn('status_badge', function ($row) use ($user) {
+            ->addColumn('status_badge', function ($row) use ($user) {
                 $status = $row->status ?? 'Draft';
 
                 if ($status === 'Completed') {
                     $bgColor = '#8bc34a';
                 } elseif (str_contains($status, 'Denied')) {
                     $bgColor = '#f44336';
-                } elseif($user->id === $row->requestingUnit->head_of_department_id && $row->status === 'Sent to HOD'){
+                } elseif ($user->id == $row->requestingUnit->head_of_department_id && $row->status === 'Sent to HOD') {
                     $bgColor = '#f44336';
                 } else {
                     $bgColor = '#e09e03';
