@@ -693,9 +693,9 @@ class ViewRequisition extends Component
         }
 
         return
-            empty(trim($vendor['purchase_order_no'])) ||
-            empty($vendor['eta']) ||
-            empty($vendor['date_sent_commit']);
+            empty(trim($vendor['purchase_order_no'] ?? '')) ||
+            empty($vendor['eta'] ?? '') ||
+            empty($vendor['date_sent_commit'] ?? '');
     }
 
 
