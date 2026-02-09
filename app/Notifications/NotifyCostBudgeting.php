@@ -70,7 +70,7 @@ class NotifyCostBudgeting extends Notification implements ShouldQueue
             ->subject($subject)
             ->markdown('emails.sent-to-cost-budgeting', [
                 'requisition' => $this->requisition,
-                'url' => route('queue.requisition.view', $this->requisition->cost_budgeting_requisition->id),
+                'url' => route('cost_and_budgeting.view', $this->requisition->cost_budgeting_requisition->id),
             ]);
     }
 
