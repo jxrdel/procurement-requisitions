@@ -283,10 +283,7 @@
                     },
                     {
                         data: 'created_at',
-                        name: 'requisitions.created_at',
-                        render: function(data) {
-                            return data ? new Date(data).toLocaleDateString('en-GB') : '';
-                        }
+                        name: 'requisitions.created_at'
                     },
                     {
                         data: 'EmployeeName',
@@ -294,10 +291,7 @@
                     },
                     {
                         data: 'date_assigned',
-                        name: 'requisitions.date_assigned',
-                        render: function(data) {
-                            return data ? new Date(data).toLocaleDateString('en-GB') : '';
-                        }
+                        name: 'requisitions.date_assigned'
                     },
                     {
                         data: 'source_of_funds',

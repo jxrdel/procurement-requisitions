@@ -228,6 +228,14 @@ class RequisitionController extends Controller
                 // If vendors have mixed statuses, return "Complex Status"
                 return "Complex Status";
             })
+            ->editColumn('created_at', function ($row) {
+                return $row->created_at ? $row->created_at->format('d/m/Y') : '';
+            })
+            ->editColumn('date_assigned', function ($row) {
+                return $row->date_assigned ? \Carbon\Carbon::parse($row->date_assigned)->format('d/m/Y') : '';
+            })
+            ->orderColumn('created_at', 'requisitions.created_at $1')
+            ->orderColumn('date_assigned', 'requisitions.date_assigned $1')
             ->orderColumn('requisition_no', function ($query, $order) {
                 $query->orderBy('year_start', $order)
                     ->orderBy('year_end', $order)
