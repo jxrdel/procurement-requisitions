@@ -119,9 +119,11 @@
                                 <thead>
                                     <tr>
                                         <th>Requisition #</th>
+                                        <th>Date Created</th>
+                                        <th>Assigned To</th>
+                                        <th>Date Assigned</th>
                                         <th>Vote Number</th>
                                         <th>Requesting Unit</th>
-                                        <th>Assigned To</th>
                                         <th style="text-align: center">Status</th>
                                         <th style="width: 20%;text-align:center">Actions</th>
                                     </tr>
@@ -267,8 +269,8 @@
             $('#inprogressTable').DataTable({
                 "pageLength": 10,
                 order: [
-                    [5, 'desc']
-                ], // Sorting by the hidden `created_at` column (index 5)
+                    [1, 'desc']
+                ], // Sorting by the `created_at` column (index 1)
                 "processing": true,
                 "serverSide": false,
                 "ajax": {
@@ -280,16 +282,30 @@
                         name: 'requisition_no'
                     },
                     {
+                        data: 'created_at',
+                        name: 'requisitions.created_at',
+                        render: function(data) {
+                            return data ? new Date(data).toLocaleDateString('en-GB') : '';
+                        }
+                    },
+                    {
+                        data: 'EmployeeName',
+                        name: 'users.name'
+                    },
+                    {
+                        data: 'date_assigned',
+                        name: 'requisitions.date_assigned',
+                        render: function(data) {
+                            return data ? new Date(data).toLocaleDateString('en-GB') : '';
+                        }
+                    },
+                    {
                         data: 'source_of_funds',
                         name: 'source_of_funds'
                     },
                     {
                         data: 'RequestingUnit',
                         name: 'departments.name'
-                    },
-                    {
-                        data: 'EmployeeName',
-                        name: 'users.name'
                     },
                     {
                         data: 'vendor_status',

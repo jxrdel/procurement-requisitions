@@ -171,7 +171,9 @@ class RequisitionController extends Controller
                 'requisitions.source_of_funds',
                 'users.name as EmployeeName',
                 'departments.name as RequestingUnit',
-                'requisitions.requisition_status'
+                'requisitions.requisition_status',
+                'requisitions.created_at',
+                'requisitions.date_assigned'
             ])
             ->where('requisitions.is_completed', '!=', true)
             ->selectRaw("
@@ -190,7 +192,9 @@ class RequisitionController extends Controller
                 'users.name',
                 'departments.name',
                 'requisitions.requisition_status',
-                'cost_budgeting_requisitions.is_completed'
+                'cost_budgeting_requisitions.is_completed',
+                'requisitions.created_at',
+                'requisitions.date_assigned'
             ]);
 
         // Restrict for Viewers (not Procurement or Office of the Permanent Secretary)
