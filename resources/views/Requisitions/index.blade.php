@@ -55,6 +55,7 @@
                 <thead>
                     <tr>
                         <th style="width: 12%">Requisition #</th>
+                        <th>Assigned To</th>
                         {{-- <th>Vote Number</th> --}}
                         <th>Requesting Unit</th>
                         <th>Item</th>
@@ -92,6 +93,10 @@
                 "columns": [{
                         data: 'requisition_no',
                         name: 'requisition_no'
+                    },
+                    {
+                        data: 'EmployeeName',
+                        name: 'users.name'
                     },
                     {
                         data: 'RequestingUnit',
