@@ -269,7 +269,7 @@
             $('#inprogressTable').DataTable({
                 "pageLength": 10,
                 order: [
-                    [1, 'desc']
+                    [0, 'desc']
                 ], // Sorting by the `created_at` column (index 1)
                 "processing": true,
                 "serverSide": false,
