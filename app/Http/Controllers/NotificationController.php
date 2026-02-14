@@ -27,8 +27,8 @@ class NotificationController extends Controller
             ->addColumn('message', function ($notification) {
                 $message = $notification->data['message'] ?? 'You have a new notification';
                 // Truncate long messages
-                if (strlen($message) > 40) {
-                    return substr($message, 0, 40) . '...';
+                if (strlen($message) > 60) {
+                    return substr($message, 0, 60) . '...';
                 }
                 return $message;
             })

@@ -32,7 +32,7 @@ class LoginForm extends Component
     public function login()
     {
         //Donald : 25
-        //Crystal CAB: 8
+        //Dirk CAB: 43
         //Candise Accounts Payable: 11
         //Cindy Vote Control: 24
         //Cheryl Check Staff: 12
@@ -44,7 +44,7 @@ class LoginForm extends Component
         // return redirect()->intended('/'); // Fallback to dashboard if no intended page
 
         // if ($this->username == 'jardel.regis') {
-        //     $user = User::find(18);
+        //     $user = User::find(43);
         //     Auth::login($user);
         //     return redirect()->intended('/');
         // }
