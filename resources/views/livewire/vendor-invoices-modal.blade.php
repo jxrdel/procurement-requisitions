@@ -19,7 +19,7 @@
                             <div class="form-floating form-floating-outline">
                                 <input required wire:model="date_invoice_received" type="date"
                                     class="form-control @error('date_invoice_received')is-invalid @enderror"
-                                    autocomplete="off" id="date_invoice_receivedInput" placeholder="firstname.lastname"
+                                    autocomplete="off" id="date_invoice_receivedInput"
                                     aria-describedby="date_invoice_receivedInputHelp" />
                                 <label for="date_invoice_receivedInput">Date Invoice Received</label>
                             </div>
@@ -55,7 +55,12 @@
                         </div>
 
                         <div class="col-2">
-                            <button class="btn btn-primary mt-1">Add Invoice</button>
+                            @can('edit-requisition')
+                                <button class="btn btn-primary mt-1">Add Invoice</button>
+                            @endcan
+                            @cannot('edit-requisition')
+                                <button class="btn btn-primary mt-1" disabled>Add Invoice</button>
+                            @endcannot
                         </div>
 
                     </div>
@@ -79,10 +84,15 @@
                                     <td>{{ $invoice['invoice_no'] }}</td>
                                     <td>{{ $invoice['invoice_amount'] }}</td>
                                     <td>
-                                        <button class="btn btn-danger" wire:click="deleteInvoice({{ $invoice['id'] }})"
-                                            wire:confirm="Are you sure you want to delete this invoice?">
-                                            Remove
-                                        </button>
+                                        @can('edit-requisition')
+                                            <button class="btn btn-danger" wire:click="deleteInvoice({{ $invoice['id'] }})"
+                                                wire:confirm="Are you sure you want to delete this invoice?">
+                                                Remove
+                                            </button>
+                                        @endcan
+                                        @cannot('edit-requisition')
+                                            <button class="btn btn-danger" disabled>Remove</button>
+                                        @endcannot
                                     </td>
                                 </tr>
                             @empty
