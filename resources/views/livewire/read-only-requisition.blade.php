@@ -88,32 +88,24 @@
                     </div>
                 </div>
 
-                {{-- 🔹 Row 3: Source of Funds & Date Received by Procurement --}}
+                {{-- 🔹 Row 3: Date Received by Procurement & Assigned To --}}
                 <div class="row mt-6">
-                    <div class="col-md-6">
-                        <label><strong>Source of Funds:</strong>
-                            {{ $this->source_of_funds }}</label>
-                    </div>
                     <div class="col-md-6">
                         <label><strong>Date Received by Procurement:</strong>
                             {{ $this->getFormattedDate($this->requisition->date_received_procurement) }}</label>
                     </div>
-                </div>
-
-                {{-- 🔹 Row 4: Assigned To & Date Assigned to Officer --}}
-                <div class="row mt-6">
                     <div class="col">
                         <label><strong>Assigned To:</strong>
                             {{ $this->requisition->procurement_officer->name ?? 'Not Assigned' }}</label>
                     </div>
+                </div>
+
+                {{-- 🔹 Row 4: Date Assigned to Officer & Date Sent to AOV Procurement --}}
+                <div class="row mt-6">
                     <div class="col">
                         <label><strong>Date Assigned to Officer:</strong>
                             {{ $this->getFormattedDate($this->requisition->date_assigned) }}</label>
                     </div>
-                </div>
-
-                {{-- 🔹 Row 6: Date Sent to AOV Procurement --}}
-                <div class="row mt-6">
                     <div class="col-md-6">
                         <label><strong>Date Sent to AOV Procurement:</strong>
                             {{ $this->getFormattedDate($this->requisition->date_sent_aov_procurement) }}</label>
@@ -146,7 +138,7 @@
                     </div>
                 </div>
 
-                {{-- 🔹 Row 7: Site Visit & Site Visit Date --}}
+                {{-- 🔹 Row 7: Note to PS & Note to PS Date --}}
                 <div class="row mt-4 align-items-center">
                     <div class="col-md-6">
                         <label><strong>Note to PS:</strong>
@@ -239,13 +231,39 @@
                     @endif
                 @endif
 
+                {{-- 🔹 Row 12: Date Sent to Cost & Budgeting --}}
+                @if ($this->sent_to_cb)
+                    <div class="row mt-6">
+                        <div class="col-md-6">
+                            <label><strong>Date Sent to Cost & Budgeting:</strong>
+                                {{ $this->getFormattedDate($this->requisition->date_sent_cb) }}</label>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- 🔹 Row 13: Reason for Denial --}}
+                @if ($this->ps_approval == 'Approval Denied')
+                    <div class="row mt-6">
+                        <div class="col">
+                            <label><strong>Reason for Denial:</strong>
+                                {{ $this->requisition->denied_note }}</label>
+                        </div>
+                    </div>
+                @endif
+
             </div>
 
         </div>
 
         <div wire:ignore.self @class(['tab-pane fade', 'show active' => $this->panes === '2']) id="navs-justified-cost_budgeting" role="tabpanel">
             <div>
-
+                <div class="row mt-8">
+                    <div class="col mx-5">
+                        <label><strong>Source of Funds:</strong>
+                            {{ $this->source_of_funds }}
+                        </label>
+                    </div>
+                </div>
 
                 @foreach ($vendors as $vendor)
                     <div class="divider">

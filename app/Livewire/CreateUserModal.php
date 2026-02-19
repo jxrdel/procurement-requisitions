@@ -69,7 +69,7 @@ class CreateUserModal extends Component
         if ($this->sendEmail) {
             Notification::send($newuser, new \App\Notifications\UserCreatedNotification($newuser));
             Log::info('Run in tinker if fails: $user = User::find(' . $newuser->id . ');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, (new \App\Notifications\UserCreatedNotification($user));');
+            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, new \App\Notifications\UserCreatedNotification($user));');
         }
 
         $this->reset();

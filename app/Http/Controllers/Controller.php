@@ -30,7 +30,7 @@ class Controller
                 return redirect()->route('cheque_processing.index');
             } elseif (Auth::user()->department->name === 'Accounts Payable') {
                 return redirect()->route('accounts_payable.index');
-            } elseif (Auth::user()->department->name === 'Helpdesk') {
+            } elseif (Auth::user()->role->name == 'Helpdesk') {
                 return redirect()->route('users');
             } else {
                 return redirect()->route('requisition_forms.index');
@@ -330,7 +330,7 @@ class Controller
                     if ($departmentName === 'Cost & Budgeting') {
                         $url = route('cost_and_budgeting.view', $row['id']);
                     } else {
-                        $url = route('queue.requisition.view', $row['id']);
+                        $url = route('cost_and_budgeting.view', $row['id']);
                     }
                 }
                 return '<div style="text-align:center;"><a href="' . $url . '" class="btn btn-primary btn-sm">View</a></div>';
@@ -494,7 +494,7 @@ class Controller
                     if ($departmentName === 'Cost & Budgeting') {
                         $url = route('cost_and_budgeting.view', $row['id']);
                     } else {
-                        $url = route('queue.requisition.view', $row['id']);
+                        $url = route('cost_and_budgeting.view', $row['id']);
                     }
                 }
                 return '<div style="text-align:center;"><a href="' . $url . '" class="btn btn-primary btn-sm">View</a></div>';
@@ -658,7 +658,7 @@ class Controller
                     if ($departmentName === 'Cost & Budgeting') {
                         $url = route('cost_and_budgeting.view', $row['id']);
                     } else {
-                        $url = route('queue.requisition.view', $row['id']);
+                        $url = route('cost_and_budgeting.view', $row['id']);
                     }
                 }
                 return '<div style="text-align:center;"><a href="' . $url . '" class="btn btn-primary btn-sm">View</a></div>';
