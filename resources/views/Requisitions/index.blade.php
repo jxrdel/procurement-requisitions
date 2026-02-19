@@ -33,7 +33,18 @@
                 </div>
             @endcan
 
-            <div class="row mb-4">
+            <div class="row mb-4 align-items-center">
+                <!-- Assigned To Filter -->
+                <div class="col-md-3">
+                    <label for="assigned-to-filter" class="form-label">Assigned To:</label>
+                    <select id="assigned-to-filter" class="form-select">
+                        <option value="">All Users</option>
+                        @foreach(\App\Models\User::procurement()->get() as $user)
+                            <option value="{{ $user->name }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Button group aligned to the right -->
                 <div class="col text-end">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
@@ -82,7 +93,7 @@
             @endcan ;
 
         $(document).ready(function() {
-            $('#myTable').DataTable({
+            var table = $('#myTable').DataTable({
                 "pageLength": 100,
                 "processing": true,
                 "serverSide": true,
@@ -159,6 +170,11 @@
                         visible: false // Hidden but usable for sorting
                     }
                 ]
+            });
+
+            // Assigned To filter
+            $('#assigned-to-filter').on('change', function() {
+                table.column(1).search(this.value).draw();
             });
         });
 
