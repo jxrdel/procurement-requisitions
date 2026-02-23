@@ -33,18 +33,7 @@
                 </div>
             @endcan
 
-            <div class="row mb-4 align-items-center">
-                <!-- Assigned To Filter -->
-                <div class="col-md-3">
-                    <label for="assigned-to-filter" class="form-label">Assigned To:</label>
-                    <select id="assigned-to-filter" class="form-select">
-                        <option value="">All Users</option>
-                        @foreach(\App\Models\User::procurement()->get() as $user)
-                            <option value="{{ $user->name }}">{{ $user->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
+            <div class="row mb-4">
                 <!-- Button group aligned to the right -->
                 <div class="col text-end">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
@@ -61,8 +50,23 @@
                 </div>
             </div>
 
+            <!-- Custom wrapper for filters -->
+            <div id="custom-filters" class="d-flex align-items-center gap-3 mb-3 mx-5">
+                <div class="dataTables_length" id="entries-wrapper"></div>
+                <div class="assigned-to-wrapper">
+                    <label class="d-inline-flex align-items-center gap-2">
+                        <span class="fw-bold">Assigned To:</span>
+                        <select id="assigned-to-filter" class="form-select form-select-sm" style="width: auto;">
+                            <option value="">All Users</option>
+                            @foreach(\App\Models\User::procurement()->get() as $user)
+                                <option value="{{ $user->name }}">{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                </div>
+            </div>
 
-            <table id="myTable" class="table table-hover table-bordered mt-5">
+            <table id="myTable" class="table table-hover table-bordered">
                 <thead>
                     <tr>
                         <th style="width: 12%">Requisition #</th>
@@ -97,6 +101,8 @@
                 "pageLength": 100,
                 "processing": true,
                 "serverSide": true,
+                "dom": "<'row'<'col-sm-12'tr>>" +
+                       "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 "ajax": {
                     "url": "{{ route('getrequisitions') }}",
                     "type": "GET"
@@ -169,7 +175,26 @@
                         name: 'requisition_status',
                         visible: false // Hidden but usable for sorting
                     }
-                ]
+                ],
+                "initComplete": function(settings, json) {
+                    // Create custom entries per page dropdown
+                    var lengthMenu = '<label class="d-inline-flex align-items-center gap-2">' +
+                                    '<span class="fw-bold">Show</span>' +
+                                    '<select class="form-select form-select-sm" style="width: auto;" id="custom-length-select">' +
+                                    '<option value="10">10</option>' +
+                                    '<option value="25">25</option>' +
+                                    '<option value="50">50</option>' +
+                                    '<option value="100" selected>100</option>' +
+                                    '</select>' +
+                                    '</label>';
+                    
+                    $('#entries-wrapper').html(lengthMenu);
+                    
+                    // Handle page length change
+                    $('#custom-length-select').on('change', function() {
+                        table.page.len($(this).val()).draw();
+                    });
+                }
             });
 
             // Assigned To filter
