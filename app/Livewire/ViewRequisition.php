@@ -511,10 +511,18 @@ class ViewRequisition extends Component
             $this->requisition_status = 'Tender In Progress';
         }
 
+        if ($this->tender_deadline_date !== null && $this->tender_deadline_date < $this->today) {
+            $this->requisition_status = 'Tender Completed';
+        }
+
         // If evaluation dates are set and evaluation end date is in the future
-        if ($this->evaluation_start_date !== null && $this->evaluation_end_date !== null && $this->evaluation_end_date >= $this->today) {
+        if ($this->evaluation_start_date !== null && ($this->evaluation_end_date === null || $this->evaluation_end_date >= $this->today)) {
             $this->requisition_status = 'Evaluation In Progress';
         }
+
+        // if ($this->evaluation_end_date !== null && $this->evaluation_start_date !== null && $this->evaluation_end_date < $this->today) {
+        //     $this->requisition_status = 'Evaluation Completed';
+        // }
 
         if ($this->evaluation_end_date !== null && $this->evaluation_end_date < $this->today && $this->ps_approval === 'Not Sent') {
             $this->requisition_status = 'To be Sent to DPS';
