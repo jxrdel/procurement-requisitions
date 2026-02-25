@@ -64,6 +64,12 @@
                         </select>
                     </label>
                 </div>
+                <div class="ms-auto">
+                    <label class="d-inline-flex align-items-center gap-2">
+                        <span class="fw-bold">Search:</span>
+                        <input type="search" id="custom-search-input" class="form-control form-control-sm" placeholder="Search...">
+                    </label>
+                </div>
             </div>
 
             <table id="myTable" class="table table-hover table-bordered">
@@ -200,6 +206,11 @@
             // Assigned To filter
             $('#assigned-to-filter').on('change', function() {
                 table.column(1).search(this.value).draw();
+            });
+
+            // Custom Search
+            $('#custom-search-input').on('input', function() {
+                table.search(this.value).draw();
             });
         });
 
