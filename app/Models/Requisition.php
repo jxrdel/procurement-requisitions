@@ -71,6 +71,7 @@ class Requisition extends Model
         'is_completed',
         'date_completed',
         'requisition_status',
+        'cancelation_reason',
         'created_by',
         'updated_by',
     ];

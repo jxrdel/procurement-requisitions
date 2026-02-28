@@ -1464,11 +1464,23 @@
                 </div>
             </div>
 
+            @if($this->requisition->cancelation_reason)
+                <div class="row">
+                        <div class="alert alert-danger" role="alert">
+                            <h5 class="alert-heading"><i class="ri-error-warning-line me-2"></i>Requisition Canceled!</h5>
+                            <p class="mb-0">{{ $this->requisition->cancelation_reason }}</p>
+                            <hr>
+                            <small class="text-dark">Canceled on: {{ $this->requisition->updated_at->format('F jS, Y \a\t g:i A') }}</small>
+                        </div>
+                </div>
+            @endif
+
             <div class="divider" style="margin-top: 40px">
                 <div class="divider-text">
                     <i class="fa-solid fa-file-pen fs-4"></i>
                 </div>
             </div>
+
 
             <div class="row">
                 <h4 class="text-center fw-bold">Status Log</h4>
@@ -1577,19 +1589,75 @@
                         </div>
                     </div>
                 </div>
-                @if (!$this->requisition->is_completed && $this->requisition->requisition_status !== \App\RequestFormStatus::CANCELED)
-                    <div class="row mt-8">
-                        <div class="col text-center">
-                            <button type="button" wire:click="cancelRequisition"
-                                wire:confirm="Are you sure you want to cancel this requisition?"
-                                class="btn btn-danger">
-                                <i class="ri-close-circle-line me-1"></i> Cancel Requisition
-                            </button>
+                @can('cancel-requisition')
+                    @if (!$this->requisition->is_completed && $this->requisition->requisition_status !== \App\RequestFormStatus::CANCELED)
+                        <div class="row mt-8">
+                            <div class="col text-center">
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#cancelRequisitionModal"
+                                    class="btn btn-danger">
+                                    <i class="ri-close-circle-line me-1"></i> Cancel Requisition
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                @endif
+                    @endif
+                @endcan
             </div>
 
+        </div>
+    </div>
+
+    {{-- Cancel Requisition Modal --}}
+    <div class="modal fade" id="cancelRequisitionModal" tabindex="-1" aria-labelledby="cancelRequisitionModalLabel"
+        aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger" style="height: 30;">
+                    <h5 class="modal-title text-white" id="cancelRequisitionModalLabel">
+                        <i class="ri-error-warning-line me-2 text-white"></i>Cancel Requisition
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" role="alert" style="color: black;">
+                        <i class="ri-alert-line me-2 text-danger"></i>
+                        <strong>Warning:</strong> This action will cancel the requisition and notify all relevant parties.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cancelation_reason" class="form-label">Reason for Cancelation <span
+                                class="text-danger">*</span></label>
+                        <textarea wire:model="cancelation_reason" class="form-control" id="cancelation_reason" rows="4"
+                            placeholder="Please provide a detailed reason for canceling this requisition..."
+                            @error('cancelation_reason') aria-invalid="true" aria-describedby="cancelation_reason-error" @enderror></textarea>
+                        @error('cancelation_reason')
+                            <div id="cancelation_reason-error" class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Requisition:</strong> {{ $this->requisition_no }}<br>
+                        <strong>Requesting Unit:</strong> {{ $this->requisition->department->name }}<br>
+                        <strong>Item:</strong> {{ $this->item }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button wire:loading.attr="disabled" wire:target="cancelRequisition" type="button" wire:click="cancelRequisition" class="btn btn-danger">
+                        <span wire:loading wire:target="cancelRequisition">
+                            <i class="ri-loader-2-line me-1"></i>
+                        </span>
+                        <span wire:loading.remove wire:target="cancelRequisition">
+                            <i class="ri-check-line me-1"></i>
+                        </span>
+                        Confirm Cancelation
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i>Close
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1625,6 +1693,10 @@
 
         window.addEventListener('close-log-modal', event => {
             $('#addLogModal').modal('hide');
+        })
+
+        window.addEventListener('close-cancel-modal', event => {
+            $('#cancelRequisitionModal').modal('hide');
         })
 
         window.addEventListener('display-invoices-modal', event => {

@@ -132,5 +132,9 @@ class AppServiceProvider extends ServiceProvider
             ];
             return in_array($user->department->name, $allowedDepartments);
         });
+
+        Gate::define('cancel-requisition', function ($user) {
+            return $user->department->name === 'Procurement Unit';
+        });
     }
 }

@@ -119,6 +119,8 @@ class ViewRequisition extends Component
 
     public $logdetails;
 
+    public $cancelation_reason;
+
     public $departments;
     public $staff;
     public $logs;
@@ -1235,21 +1237,67 @@ class ViewRequisition extends Component
 
     public function cancelRequisition()
     {
-        $this->requisition->requisition_status = RequestFormStatus::CANCELED;
-        $this->requisition->is_completed = false; // Just to be sure, though usually it wouldn't be if it's being canceled
-        $this->requisition->save();
+        $this->validate([
+            'cancelation_reason' => 'required|string|min:10',
+        ], [
+            'cancelation_reason.required' => 'Please provide a reason for cancellation.',
+            'cancelation_reason.min' => 'The cancellation reason must be at least 10 characters.',
+        ]);
+
+        if (Gate::denies('cancel-requisition')) {
+            $this->dispatch('show-message', message: 'You do not have permission to cancel requisitions.');
+            return;
+        }
+
+        $this->requisition->update([
+            'requisition_status' => RequestFormStatus::CANCELED,
+            'is_completed' => false,
+            'cancelation_reason' => $this->cancelation_reason,
+            'updated_by' => Auth::user()->username,
+        ]);
 
         if ($this->requisition->requisitionForm) {
-            $this->requisition->requisitionForm->status = RequestFormStatus::CANCELED;
-            $this->requisition->requisitionForm->save();
+
+            $this->requisition->requisitionForm->logs()->create([
+                'details' => 'Requisition #' . $this->requisition->requisition_no . ' was canceled by ' . Auth::user()->name . '. Reason: ' . $this->cancelation_reason,
+                'created_by' => Auth::user()->username,
+            ]);
         }
 
         $this->requisition->statuslogs()->create([
-            'details' => 'Requisition canceled by ' . Auth::user()->name,
+            'details' => 'Requisition #' . $this->requisition->requisition_no . ' was canceled by ' . Auth::user()->name . '. Reason: ' . $this->cancelation_reason,
             'created_by' => Auth::user()->username,
         ]);
 
+        Log::info('Requisition #' . $this->requisition->requisition_no . ' was canceled by ' . Auth::user()->username);
+
+        $notifiableUsers = collect();
+
+        if ($this->requisition->requisitionForm) {
+            $headOfDepartment = $this->requisition->requisitionForm->requestingUnit->headOfDepartment;
+            $contactPerson = $this->requisition->requisitionForm->contactPerson;
+            $reportingOfficer = $this->requisition->requisitionForm->reportingOfficer;
+
+            if ($headOfDepartment) {
+                $notifiableUsers->push($headOfDepartment);
+            }
+
+            if ($contactPerson && $contactPerson->id !== $headOfDepartment?->id) {
+                $notifiableUsers->push($contactPerson);
+            }
+
+            if ($reportingOfficer) {
+                $notifiableUsers->push($reportingOfficer);
+            }
+        }
+
+        foreach ($notifiableUsers->unique('id') as $user) {
+            Notification::send($user, new \App\Notifications\RequisitionCanceled($this->requisition));
+        }
+
+        $this->dispatch('close-cancel-modal');
         $this->dispatch('show-message', message: 'Requisition canceled successfully.');
         $this->requisition_status = RequestFormStatus::CANCELED;
+        $this->requisition = $this->requisition->fresh();
     }
 }
