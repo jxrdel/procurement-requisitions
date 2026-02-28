@@ -120,14 +120,16 @@
                         <div id="procurementView1">
                             <form wire:submit.prevent="edit">
                                 @can('edit-requisition')
-                                    <div class="row text-center">
-                                        <div x-show="!isEditingProcurement1">
-                                            <button type="button" @click="isEditingProcurement1 = ! isEditingProcurement1"
-                                                class="btn btn-dark waves-effect waves-light" style="width: 100px">
-                                                <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
-                                            </button>
+                                    @if($this->requisition->requisition_status !== \App\RequestFormStatus::CANCELED)
+                                        <div class="row text-center">
+                                            <div x-show="!isEditingProcurement1">
+                                                <button type="button" @click="isEditingProcurement1 = ! isEditingProcurement1"
+                                                    class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                                    <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 @endcan
 
                                 <div x-transition x-show="!isEditingProcurement1">
@@ -921,15 +923,17 @@
                         <div id="procurementView2">
                             <form wire:submit.prevent="editProcurement2">
                                 @can('edit-requisition')
-                                    <div class="row text-center">
-                                        <div x-show="!isEditingProcurement2">
-                                            <button type="button"
-                                                @click="isEditingProcurement2 = ! isEditingProcurement2"
-                                                class="btn btn-dark waves-effect waves-light" style="width: 100px">
-                                                <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
-                                            </button>
+                                    @if($this->requisition->requisition_status !== \App\RequestFormStatus::CANCELED)
+                                        <div class="row text-center">
+                                            <div x-show="!isEditingProcurement2">
+                                                <button type="button"
+                                                    @click="isEditingProcurement2 = ! isEditingProcurement2"
+                                                    class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                                    <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 @endcan
 
                                 <div x-transition x-show="!isEditingProcurement2">
