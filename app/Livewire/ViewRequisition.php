@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
+use App\RequestFormStatus;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -1230,5 +1231,25 @@ class ViewRequisition extends Component
             }
         }
         return false;
+    }
+
+    public function cancelRequisition()
+    {
+        $this->requisition->requisition_status = RequestFormStatus::CANCELED;
+        $this->requisition->is_completed = false; // Just to be sure, though usually it wouldn't be if it's being canceled
+        $this->requisition->save();
+
+        if ($this->requisition->requisitionForm) {
+            $this->requisition->requisitionForm->status = RequestFormStatus::CANCELED;
+            $this->requisition->requisitionForm->save();
+        }
+
+        $this->requisition->statuslogs()->create([
+            'details' => 'Requisition canceled by ' . Auth::user()->name,
+            'created_by' => Auth::user()->username,
+        ]);
+
+        $this->dispatch('show-message', message: 'Requisition canceled successfully.');
+        $this->requisition_status = RequestFormStatus::CANCELED;
     }
 }

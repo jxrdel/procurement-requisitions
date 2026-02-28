@@ -24,4 +24,5 @@ enum RequestFormStatus
     public const DENIED_BY_PROCUREMENT = 'Denied by Procurement';
     public const DENIED_BY_CAB = 'Denied by Cost & Budgeting';
     public const COMPLETED = 'Completed';
+    public const CANCELED = 'Canceled';
 }

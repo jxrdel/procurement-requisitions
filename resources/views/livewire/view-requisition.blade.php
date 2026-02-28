@@ -27,6 +27,11 @@
                                 Completed
                             </span>
                         @endif
+                        @if ($this->requisition->requisition_status === \App\RequestFormStatus::CANCELED)
+                            <span class="badge rounded-pill bg-danger fs-5">
+                                Canceled
+                            </span>
+                        @endif
                     </h1>
                 </div>
                 @if ($this->requisition->requisitionForm)
@@ -774,7 +779,7 @@
                             </form>
 
                             @can('edit-requisition')
-                                @if (!$this->sent_to_cb)
+                                @if (!$this->sent_to_cb && $this->requisition_status !== 'Canceled')
                                     <div class="row mt-8" x-show="!isEditingProcurement1">
                                         <button @disabled($this->isSendCBButtonDisabled)
                                             wire:confirm="Are you sure you want to send to cost & budgeting?"
@@ -1572,6 +1577,17 @@
                         </div>
                     </div>
                 </div>
+                @if (!$this->requisition->is_completed && $this->requisition->requisition_status !== \App\RequestFormStatus::CANCELED)
+                    <div class="row mt-8">
+                        <div class="col text-center">
+                            <button type="button" wire:click="cancelRequisition"
+                                wire:confirm="Are you sure you want to cancel this requisition?"
+                                class="btn btn-danger">
+                                <i class="ri-close-circle-line me-1"></i> Cancel Requisition
+                            </button>
+                        </div>
+                    </div>
+                @endif
             </div>
 
         </div>
