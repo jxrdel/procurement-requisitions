@@ -35,8 +35,12 @@
                     <div class="col text-end d-flex justify-content-end gap-2">
 
                         @if (
-                                ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD && !$requisitionForm->hod_approval && Auth::user()->id != $requisitionForm->head_of_department_id && Auth::user()->id != $requisitionForm->requestingUnit->head_of_department_id) ||
+                            ($requisitionForm->status === \App\RequestFormStatus::SENT_TO_HOD &&
+                                !$requisitionForm->hod_approval &&
+                                Auth::user()->id != $requisitionForm->head_of_department_id &&
+                                Auth::user()->id != $requisitionForm->requestingUnit->head_of_department_id) ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_HOD ||
+                                $requisitionForm->status === \App\RequestFormStatus::CREATED ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_PS ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_DPS ||
                                 $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CMO ||
@@ -281,9 +285,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"
                             aria-label="Close"></button>
                     </div>
-                @elseif (
-                    $requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CAB &&
-                        $requisitionForm->cab_reason_for_denial)
+                @elseif ($requisitionForm->status === \App\RequestFormStatus::DENIED_BY_CAB && $requisitionForm->cab_reason_for_denial)
                     <div class="alert alert-danger alert-dismissible" role="alert">
                         <div class="text-center">
                             <strong>Requisition Declined by Cost & Budgeting!</strong>

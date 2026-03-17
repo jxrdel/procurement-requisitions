@@ -242,11 +242,13 @@ class ViewAccountsPayableVendor extends Component
         }
 
         //Get Vote Control users
-        $users = User::voteControl()->get();
+        $users = User::find(24);
 
-        foreach ($users as $user) {
-            Notification::send($user, new NotifyVoteControl($this->vendor));
-        }
+        Notification::send($users, new NotifyVoteControl($this->vendor));
+
+        // foreach ($users as $user) {
+        //     Notification::send($user, new NotifyVoteControl($this->vendor));
+        // }
 
         return redirect()->route('accounts_payable.index')->with('success', 'Sent to Vote Control successfully');
     }

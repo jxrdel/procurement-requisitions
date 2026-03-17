@@ -189,7 +189,7 @@ class ViewVoteControlVendor extends Component
             ->filter()
             ->unique('id');
 
-        Notification::send($recipients, new FundsCommitted($this->requisition));
+        Notification::send($maryann, new FundsCommitted($this->requisition));
 
         $this->requisition->update([
             'requisition_status' => 'Sent to Procurement',
@@ -225,10 +225,12 @@ class ViewVoteControlVendor extends Component
         Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Check Staff by ' . Auth::user()->name . ' from Vote Control');
 
         //Get Emails of Check Staff
-        $checkStaff = User::checkStaff()->get();
-        foreach ($checkStaff as $staff) {
-            Notification::send($staff, new NotifyCheckRoom($this->vendor));
-        }
+        $checkStaff = User::find(12);
+        Notification::send($checkStaff, new NotifyCheckRoom($this->vendor));
+
+        // foreach ($checkStaff as $staff) {
+        //     Notification::send($staff, new NotifyCheckRoom($this->vendor));
+        // }
 
         return redirect()->route('vote_control.index')->with('success', 'Sent to Check Staff successfully');
     }

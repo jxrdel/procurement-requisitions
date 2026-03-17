@@ -246,7 +246,7 @@ class CostBudgetingRequisition extends Component
             ->filter()
             ->unique('id');
 
-        Notification::send($recipients, new \App\Notifications\CostBudgetingCompleted($this->requisition));
+        Notification::send($maryann, new \App\Notifications\CostBudgetingCompleted($this->requisition));
 
         return redirect()->route('queue')->with('success', 'Sent to procurement successfully');
     }

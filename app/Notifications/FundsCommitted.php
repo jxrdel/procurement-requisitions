@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FundsCommitted extends Notification implements ShouldQueue
+class FundsCommitted extends Notification
 {
     use Queueable;
 
@@ -48,7 +48,7 @@ class FundsCommitted extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return $this->mailOnly ? ['mail'] : ['mail', 'database'];
+        return $this->mailOnly ? ['mail'] : ['database'];
     }
 
     /**

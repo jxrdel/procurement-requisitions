@@ -42,6 +42,7 @@ class CreateRequisition extends Component
     public $note_to_ps_date;
     public $site_visit = false;
     public $site_visit_date;
+    public $tender_type;
     public $tender_issue_date;
     public $tender_deadline_date;
     public $evaluation_start_date;
@@ -202,6 +203,7 @@ class CreateRequisition extends Component
                 'date_sent_aov_procurement' => $this->date_sent_aov_procurement,
                 'site_visit' => $this->site_visit,
                 'site_visit_date' => $this->site_visit_date,
+                'tender_type' => $this->tender_type,
                 'note_to_ps' => $this->note_to_ps,
                 'note_to_ps_date' => $this->note_to_ps_date,
                 'tender_issue_date' => $this->tender_issue_date,
@@ -298,6 +300,7 @@ class CreateRequisition extends Component
                 'date_received_procurement' => $this->date_received_procurement,
                 'site_visit' => $this->site_visit,
                 'site_visit_date' => $this->site_visit_date,
+                'tender_type' => $this->tender_type,
                 'tender_issue_date' => $this->tender_issue_date,
                 'tender_deadline_date' => $this->tender_deadline_date,
                 'evaluation_start_date' => $this->evaluation_start_date,
@@ -311,6 +314,7 @@ class CreateRequisition extends Component
                 'item' => 'required',
                 'site_visit' => 'boolean',
                 'site_visit_date' => 'nullable|date|date_format:Y-m-d|required_if:site_visit,true',
+                'tender_type' => 'nullable',
                 'tender_issue_date' => 'nullable|date|date_format:Y-m-d',
                 'tender_deadline_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:tender_issue_date',
                 'evaluation_start_date' => 'nullable|date|date_format:Y-m-d',

@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
-class ApprovedByCAB extends Notification implements ShouldQueue
+class ApprovedByCAB extends Notification
 {
     use Queueable;
 

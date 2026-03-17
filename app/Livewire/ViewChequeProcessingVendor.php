@@ -263,7 +263,7 @@ class ViewChequeProcessingVendor extends Component
                 // Remove duplicates based on User ID (fixes the Maryann/Officer overlap)
                 ->unique('id');
 
-            Notification::send($recipients, new \App\Notifications\RequisitionCompleted($this->requisition));
+            Notification::send($contactPerson, new \App\Notifications\RequisitionCompleted($this->requisition));
         }
         return redirect()->route('cheque_processing.index')->with('success', 'Completed successfully');
     }

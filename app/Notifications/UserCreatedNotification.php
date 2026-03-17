@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log; // Added for Log::info
 
-class UserCreatedNotification extends Notification implements ShouldQueue
+class UserCreatedNotification extends Notification
 {
     use Queueable;
 

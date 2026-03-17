@@ -204,10 +204,12 @@ class ViewCheckStaffVendor extends Component
             'created_by' => Auth::user()->username,
         ]);
         //Get Cheque Processing Staff
-        $chequeProcessingStaff = User::chequeProcessing()->get();
-        foreach ($chequeProcessingStaff as $staff) {
-            Notification::send($staff, new NotifyChequeProcessing($this->vendor));
-        }
+        $chequeProcessingStaff = User::find(15);
+        Notification::send($chequeProcessingStaff, new NotifyChequeProcessing($this->vendor));
+
+        // foreach ($chequeProcessingStaff as $staff) {
+        //     Notification::send($staff, new NotifyChequeProcessing($this->vendor));
+        // }
 
         return redirect()->route('check_room.index')->with('success', 'Requisition sent to Cheque Processing successfully');
     }

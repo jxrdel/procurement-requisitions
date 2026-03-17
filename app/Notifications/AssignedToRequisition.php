@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AssignedToRequisition extends Notification implements ShouldQueue
+class AssignedToRequisition extends Notification
 {
     use Queueable;
 
@@ -42,7 +42,7 @@ class AssignedToRequisition extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return $this->mailOnly ? ['mail'] : ['mail', 'database'];
+        return $this->mailOnly ? ['mail'] : ['database'];
     }
 
     /**

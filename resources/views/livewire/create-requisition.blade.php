@@ -182,6 +182,24 @@
                         </div>
                     </div>
 
+                    {{-- 🔹 Row 2: Tender Type --}}
+                    <div class="row mt-4 align-items-center">
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline">
+                                <select wire:model="tender_type" class="form-select @error('tender_type')is-invalid @enderror">
+                                    <option value="">Select Tender Type</option>
+                                    <option value="Open Tender">Open Tender</option>
+                                    <option value="Sole Select">Sole Select</option>
+                                    <option value="Selective Tender">Selective Tender</option>
+                                </select>
+                                <label>Tender Type</label>
+                            </div>
+                            @error('tender_type')
+                                <div class="text-danger"> {{ $message }} </div>
+                            @enderror
+                        </div>
+                    </div>
+
                     {{-- 🔹 Row 2: Note to PS --}}
                     <div class="row mt-4 align-items-center" x-show="siteVisit" x-transition>
                         <div class="col-md-6">

@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
-class RequisitionCompleted extends Notification implements ShouldQueue
+class RequisitionCompleted extends Notification
 {
     use Queueable;
 
@@ -48,7 +48,7 @@ class RequisitionCompleted extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return $this->mailOnly ? ['mail'] : ['mail', 'database'];
+        return $this->mailOnly ? ['mail'] : ['database'];
     }
 
     /**

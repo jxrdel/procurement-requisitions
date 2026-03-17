@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class DeclinedByCAB extends Notification implements ShouldQueue
+class DeclinedByCAB extends Notification
 {
     use Queueable;
 

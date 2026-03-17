@@ -392,24 +392,6 @@
 
                                     <div class="row mt-6">
                                         <div class="col-md-6">
-                                            <div wire:ignore>
-                                                <label style="width:100%" for="sofSelect">Source of Funds:</label>
-                                                <select wire:model="source_of_funds"
-                                                    class="js-example-basic-single form-control" id="sofSelect"
-                                                    style="width: 100%">
-                                                    <option value="" selected>Select a Vote</option>
-                                                    @foreach ($votes as $vote)
-                                                        <option value="{{ $vote->number }}">{{ $vote->number }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            @error('source_of_funds')
-                                                <div class="text-danger"> {{ $message }} </div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="date_received_procurement"
                                                     type="date"
@@ -421,9 +403,7 @@
                                                 <div class="text-danger"> {{ $message }} </div>
                                             @enderror
                                         </div>
-                                    </div>
 
-                                    <div class="row mt-6">
                                         <div class="col">
                                             <div class="form-floating form-floating-outline mb-6">
                                                 <select wire:model="assigned_to"
@@ -442,7 +422,9 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                    </div>
 
+                                    <div class="row mt-6">
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="date_assigned" type="date"
@@ -454,9 +436,7 @@
                                                 <div class="text-danger"> {{ $message }} </div>
                                             @enderror
                                         </div>
-                                    </div>
 
-                                    <div class="row mt-6">
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="date_sent_aov_procurement"
@@ -510,7 +490,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row mt-4 align-items-center" x-show="siteVisit" x-transition>
+                                        <div class="row mt-4 align-items-center">
                                             <div class="col-md-6">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox"
@@ -1597,13 +1577,7 @@
                 $wire.set('funding_availability', selectedValue); // Pass selected values to Livewire
             });
 
-            $('#sofSelect').select2();
 
-            $('#sofSelect').on('change', function() {
-                var selectedValue = $(this).val(); // Get selected values as an array
-                $wire.set('source_of_funds', selectedValue); // Pass selected values to Livewire
-                $wire.set('active_pane', 'procurement1');
-            });
         });
 
 

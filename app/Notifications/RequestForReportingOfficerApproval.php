@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class RequestForReportingOfficerApproval extends Notification implements ShouldQueue
+class RequestForReportingOfficerApproval extends Notification
 {
     use Queueable;
     public bool $mailOnly = false;
@@ -40,7 +40,7 @@ class RequestForReportingOfficerApproval extends Notification implements ShouldQ
      */
     public function via(object $notifiable): array
     {
-        return $this->mailOnly ? ['mail'] : ['mail', 'database'];
+        return $this->mailOnly ? ['mail'] : ['database'];
     }
 
     /**

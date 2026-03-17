@@ -654,13 +654,14 @@ class ViewRequisition extends Component
         Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Cost & Budgeting by ' . Auth::user()->name);
 
         //Get Cost & Budgeting users
-        $users = User::costBudgeting()->get();
+        $users = User::find(8);
+        Notification::send($users, new NotifyCostBudgeting($this->requisition));
 
-        foreach ($users as $user) {
-            Notification::send($user, new NotifyCostBudgeting($this->requisition));
-            // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
-            Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
-        }
+        // foreach ($users as $user) {
+        //     Notification::send($user, new NotifyCostBudgeting($this->requisition));
+        //     // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
+        //     Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
+        // }
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
     }
@@ -879,11 +880,12 @@ class ViewRequisition extends Component
         Log::info('Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username);
 
         //Get Accounts Payable users
-        $users = User::accountsPayable()->get();
+        $users = User::find(11);
+        Notification::send($users, new NotifyAccountsPayable($vendor));
 
-        foreach ($users as $user) {
-            Notification::send($user, new NotifyAccountsPayable($vendor));
-        }
+        // foreach ($users as $user) {
+        //     Notification::send($user, new NotifyAccountsPayable($vendor));
+        // }
 
         $this->refreshVendors();
 
@@ -922,11 +924,12 @@ class ViewRequisition extends Component
         ]);
 
         //Get Vote Control users
-        $users = User::voteControl()->get();
+        $users = User::find(24);
+        Notification::send($users, new NotifyVoteControl($vendor));
 
-        foreach ($users as $user) {
-            Notification::send($user, new NotifyVoteControl($vendor));
-        }
+        // foreach ($users as $user) {
+        //     Notification::send($user, new NotifyVoteControl($vendor));
+        // }
 
         $this->dispatch('show-message', message: 'Sent to Vote Control successfully');
     }
