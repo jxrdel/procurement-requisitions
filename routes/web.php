@@ -93,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getqueue', [Controller::class, 'getQueue'])->name('getqueue');
 
     Route::get('/help', [Controller::class, 'help'])->name('help');
+
+    Route::get('/reports/requisitions', [\App\Http\Controllers\ReportController::class, 'requisitions'])->name('reports.requisitions');
 });
 
 use App\Http\Controllers\DepartmentController;

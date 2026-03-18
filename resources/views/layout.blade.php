@@ -238,6 +238,17 @@
                             </a>
                         </li>
                     @endif
+
+                    <li class="menu-header mt-7">
+                        <span class="menu-header-text text-white">Reports</span>
+                    </li>
+                    <li @class(['menu-item mb-3', 'active' => request()->routeIs('reports.requisitions')])>
+                        <a href="{{ route('reports.requisitions') }}" target="_blank" class="menu-link">
+                            <i class="menu-icon ri-file-chart-line"></i>
+                            <div data-i18n="Basic">Requisition Report</div>
+                        </a>
+                    </li>
+
                     <li class="menu-header mt-7">
                         <span class="menu-header-text text-white">Help</span>
                     </li>
