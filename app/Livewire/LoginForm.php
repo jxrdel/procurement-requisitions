@@ -44,7 +44,7 @@ class LoginForm extends Component
         // return redirect()->intended('/'); // Fallback to dashboard if no intended page
 
         // if ($this->username == 'jardel.regis') {
-        //     $user = User::find(43);
+        //     $user = User::find(202);
         //     Auth::login($user);
         //     return redirect()->intended('/');
         // }

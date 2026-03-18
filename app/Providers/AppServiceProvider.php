@@ -78,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-requisition', function ($user, $requisition) {
-            return $user->department->name === 'Procurement Unit' || $user->department->name === 'Cost & Budgeting' || ($user->role->name === 'Viewer') || $user->department->id == $requisition->requesting_unit;
+            return $user->department->name === 'Procurement Unit' || $user->department->name === 'Cost & Budgeting' || $user->reporting_officer_role === 'Permanent Secretary' || $user->reporting_officer_role === 'Deputy Permanent Secretary' || $user->reporting_officer_role === 'Chief Medical Officer' || $user->department->id == $requisition->requesting_unit;
         });
 
         Gate::define('view-accounts-payable-requisitions', function ($user) {
@@ -110,7 +110,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-votes-page', function ($user) {
-            return $user->role->name === 'Admin';
+            return $user->role->name === 'Admin' || $user->department->name === 'Cost & Budgeting';
         });
 
         Gate::define('view-log', function ($user, $log) {
