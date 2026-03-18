@@ -1,6 +1,16 @@
 <div x-data="{ isEditing: $wire.entangle('isEditing') }" x-cloak>
+    @php
+        $isCanceled = $this->requisition->requisition_status === \App\RequestFormStatus::CANCELED;
+    @endphp
     <div class="card">
         <div class="card-body">
+
+            @if($isCanceled)
+                <div class="alert alert-danger text-center mb-4" role="alert">
+                    <i class="ri-error-warning-line me-2"></i>
+                    <strong>This requisition has been canceled and cannot be edited.</strong>
+                </div>
+            @endif
 
             <div class="d-sm-flex align-items-center justify-content-between mb-5">
                 <a href="{{ route('queue') }}" class="btn btn-primary">
@@ -190,7 +200,7 @@
 
                     <div class="row d-flex justify-content-center text-center mt-6">
 
-                        <button class="btn btn-primary waves-effect waves-light mt-5" style="width:100px">
+                        <button class="btn btn-primary waves-effect waves-light mt-5" style="width:100px" @disabled($isCanceled)>
                             <span class="tf-icons ri-save-3-line me-1_5"></span>Save
                         </button>
                         &nbsp;
@@ -265,12 +275,12 @@
                     <div>
                         @can('edit-records')
                             <button type="button" @click="isEditing = true"
-                                class="btn btn-dark waves-effect waves-light" style="width: 100px">
+                                class="btn btn-dark waves-effect waves-light" style="width: 100px" @disabled($isCanceled)>
                                 <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
                             </button>
                             &nbsp;
                             @if (!$this->cb_requisition->is_completed)
-                                <button @disabled($this->isButtonDisabled)
+                                <button @disabled($this->isButtonDisabled || $isCanceled)
                                     wire:confirm="Are you sure you want to send to procurement?"
                                     wire:loading.attr="disabled" wire:click="sendToProcurement"
                                     class="btn btn-success waves-effect waves-light" style="width:250px">

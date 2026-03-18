@@ -149,6 +149,10 @@
                             } else if (data === 'Completed') {
                                 statusHtml =
                                     '<span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span>';
+                            } else if (data === 'Canceled') {
+                                statusHtml =
+                                    '<span style="background-color: #e30b0b !important;" class="badge bg-danger">' +
+                                    data + '</span>';
                             } else {
                                 statusHtml =
                                     '<span style="background-color: #e09e03 !important;" class="badge bg-warning">' +
