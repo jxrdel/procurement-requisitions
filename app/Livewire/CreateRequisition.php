@@ -172,7 +172,7 @@ class CreateRequisition extends Component
             }
 
             if ($this->ps_approval === 'Pending') {
-                $this->requisition_status = 'Pending PS Approval';
+                $this->requisition_status = 'Physical File Sent for PS Approval';
             }
 
             if ($this->ps_approval === 'Approval Denied') {

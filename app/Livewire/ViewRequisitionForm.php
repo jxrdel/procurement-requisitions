@@ -134,7 +134,7 @@ class ViewRequisitionForm extends Component
         $this->categories = FormCategory::options();
 
         $this->requesting_unit = $this->requisitionForm->requesting_unit;
-        $this->head_of_department = $this->requisitionForm->head_of_department_id;
+        $this->head_of_department = $this->requisitionForm->requestingUnit->headOfDepartment->id;
         $this->contact_person_id = $this->requisitionForm->contact_person_id;
         $this->date = $this->requisitionForm->date ? \Carbon\Carbon::parse($this->requisitionForm->date)->format('Y-m-d') : null;
         $this->category = $this->requisitionForm->category;

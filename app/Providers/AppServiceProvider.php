@@ -138,7 +138,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-reports', function ($user) {
-            return $user->department->name === 'Procurement Unit' || $user->is_reporting_officer;
+            return $user->department->name === 'Procurement Unit' || $user->is_reporting_officer || $user->username === 'varma.maharaj';
         });
     }
 }

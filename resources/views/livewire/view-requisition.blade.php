@@ -509,6 +509,7 @@
                                                     <select wire:model="tender_type" class="form-select">
                                                         <option value="">Select Tender Type</option>
                                                         <option value="Open Tender">Open Tender</option>
+                                                        <option value="Single Source">Single Source</option>
                                                         <option value="Sole Select">Sole Select</option>
                                                         <option value="Selective Tender">Selective Tender</option>
                                                     </select>
@@ -926,7 +927,8 @@
                                     @if($this->requisition->requisition_status !== \App\RequestFormStatus::CANCELED)
                                         <div class="row text-center">
                                             <div x-show="!isEditingProcurement2">
-                                                <button type="button"
+                                                {{-- Button disabled if there are no vendors --}}
+                                                <button type="button" @disabled($this->requisition->vendors->isEmpty())
                                                     @click="isEditingProcurement2 = ! isEditingProcurement2"
                                                     class="btn btn-dark waves-effect waves-light" style="width: 100px">
                                                     <span class="tf-icons ri-edit-box-fill me-1_5"></span>Edit
@@ -1231,12 +1233,12 @@
                                     <div class="row mt-8">
 
                                         <div class="col mx-5">
-                                            <label><strong>Date Received From Procurement For Invoices :</strong>
+                                            <label><strong>Date Received From Procurement :</strong>
                                                 {{ $this->getFormattedDate($vendor['date_received_ap_invoices']) }}</label>
                                         </div>
 
                                         <div class="col mx-5">
-                                            <label><strong>Date Sent to Vote Control For Invoices:</strong>
+                                            <label><strong>Date Sent to Vote Control:</strong>
                                                 {{ $this->getFormattedDate($vendor['date_sent_vc_invoices']) }}</label>
                                         </div>
                                     </div>
@@ -1246,11 +1248,11 @@
                                 <div class="row mt-8">
 
                                     <div class="col mx-5">
-                                        <label><strong>Date Received From Procurement For Commitment :</strong></label>
+                                        <label><strong>Date Received From Procurement :</strong></label>
                                     </div>
 
                                     <div class="col mx-5">
-                                        <label><strong>Date Sent to Vote Control For Commitment:</strong></label>
+                                        <label><strong>Date Sent to Vote Control:</strong></label>
                                     </div>
                                 </div>
                             @endforelse
