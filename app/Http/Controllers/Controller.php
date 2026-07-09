@@ -415,7 +415,7 @@ class Controller
                 });
                 $query = $query->merge($requisitions);
             } elseif ($departmentName === 'Procurement Unit') {
-                $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', '!=', 'Completed')->get()->map(function ($item) {
+                $forms = RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', '!=', 'Completed')->where('status', '!=', RequestFormStatus::DENIED_BY_PROCUREMENT)->get()->map(function ($item) {
                     $status = $item->status === 'Completed'
                         ? '<div style="text-align:center;"><span style="background-color: #8bc34a !important;" class="badge bg-success">Completed</span></div>'
                         : '<div style="text-align:center;"><span style="background-color: #e09e03 !important;" class="badge bg-warning">' . $item->status . '</span></div>';

@@ -52,7 +52,7 @@ class User extends Authenticatable
                 $requisitions = \App\Models\CBRequisition::where('is_completed', false)->count();
                 $query = $forms + $requisitions;
             } elseif ($departmentName === 'Procurement Unit') {
-                $forms = \App\Models\RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', '!=', 'Completed')->count();
+                $forms = \App\Models\RequisitionRequestForm::where('reporting_officer_approval', true)->where('status', '!=', 'Completed')->where('status', '!=', RequestFormStatus::DENIED_BY_PROCUREMENT)->count();
                 $query = $forms;
             } elseif ($departmentName === 'Office of the Permanent Secretary') {
                 $forms = \App\Models\RequisitionRequestForm::where('sent_to_ps', true)->where('reporting_officer_approval', false)->where('status', '!=', RequestFormStatus::DENIED_BY_PS)->count();

@@ -53,5 +53,13 @@
             </div>
         </form>
 
+        <div class="text-center mt-4">
+            <a href="{{ asset('manual.pdf') }}" target="_blank" class="d-flex align-items-center justify-content-center gap-1">
+                <i class="ri-book-open-line"></i>
+                <span>User Manual</span>
+            </a>
+        </div>
+
     </div>
 </div>
+
