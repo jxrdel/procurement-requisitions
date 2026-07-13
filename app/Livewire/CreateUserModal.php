@@ -6,7 +6,6 @@ use App\Mail\NewUserEmail;
 use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use LdapRecord\Models\ActiveDirectory\User as ActiveDirectoryUser;
@@ -68,8 +67,6 @@ class CreateUserModal extends Component
 
         if ($this->sendEmail) {
             Notification::send($newuser, new \App\Notifications\UserCreatedNotification($newuser));
-            Log::info('Run in tinker if fails: $user = User::find(' . $newuser->id . ');');
-            Log::info('Run in tinker if fails: \Illuminate\Support\Facades\Notification::send($user, new \App\Notifications\UserCreatedNotification($user));');
         }
 
         $this->reset();

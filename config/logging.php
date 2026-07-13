@@ -1,5 +1,6 @@
 <?php
 
+use App\Logging\JardelogsHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -54,7 +55,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', env('LOG_STACK', 'single')),
+            'channels' => explode(',', env('LOG_STACK', 'single,jardelogs')),
             'ignore_exceptions' => false,
         ],
 
@@ -125,6 +126,17 @@ return [
 
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
+        ],
+
+        'jardelogs' => [
+            'driver' => 'monolog',
+            'handler' => JardelogsHandler::class,
+            'level' => env('LOG_LEVEL', 'debug'),
+            'with' => [
+                'endpoint' => rtrim((string) env('JARDELOGS_URL', 'http://localhost'), '/').'/api/v1/logs',
+                'token' => env('JARDELOGS_TOKEN'),
+            ],
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
     ],
