@@ -140,7 +140,12 @@ class ViewVoteControlVendor extends Component
                 ]);
             }
 
-            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Vote Control');
+            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Vote Control', [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'vendor_id' => $this->vendor->id,
+                'url' => route('vote_control.view', $this->vc_vendor->id, absolute: true),
+            ]);
             $this->isEditing = false;
             $this->resetValidation();
             $this->dispatch('show-message', message: 'Record edited successfully');
@@ -222,7 +227,12 @@ class ViewVoteControlVendor extends Component
             'details' => 'Vendor ' . $this->vendor->vendor_name . ' sent to Check Staff by ' . Auth::user()->name . ' from Vote Control',
             'created_by' => Auth::user()->username,
         ]);
-        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Check Staff by ' . Auth::user()->name . ' from Vote Control');
+        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Check Staff by ' . Auth::user()->name . ' from Vote Control', [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'vendor_id' => $this->vendor->id,
+            'url' => route('vote_control.view', $this->vc_vendor->id, absolute: true),
+        ]);
 
         //Get Emails of Check Staff
         $checkStaff = User::checkStaff()->get();

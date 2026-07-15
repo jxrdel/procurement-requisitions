@@ -22,7 +22,7 @@ class SendLogToJardelogs implements ShouldQueue
     public int $timeout = 10;
 
     /**
-     * @param  array{level: string, message: string, context?: array<string, mixed>, channel?: string|null, logged_at?: string}  $payload
+     * @param  array{level: string, message: string, context?: array<string, mixed>, channel?: string|null, url?: string|null, logged_at?: string}  $payload
      */
     public function __construct(
         public string $endpoint,

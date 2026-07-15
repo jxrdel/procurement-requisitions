@@ -152,7 +152,12 @@ class CostBudgetingRequisition extends Component
                 $this->requisition->vendors()->find($vendor['id'])->votes()->sync($vendor['selected_votes']);
             }
 
-            Log::info('Cost & Budgeting Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
+            Log::info('Cost & Budgeting Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username, [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'cb_requisition_id' => $this->cb_requisition->id,
+                'url' => route('cost_and_budgeting.view', $this->cb_requisition->id, absolute: true),
+            ]);
             $this->isEditing = false;
             $this->resetValidation();
             $this->dispatch('show-message', message: 'Record edited successfully');
@@ -236,7 +241,12 @@ class CostBudgetingRequisition extends Component
             ]);
         }
 
-        Log::info('Cost & Budgeting Requisition #' . $this->requisition->requisition_no . ' was sent to Procurement by ' . Auth::user()->username);
+        Log::info('Cost & Budgeting Requisition #' . $this->requisition->requisition_no . ' was sent to Procurement by ' . Auth::user()->username, [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'cb_requisition_id' => $this->cb_requisition->id,
+            'url' => route('cost_and_budgeting.view', $this->cb_requisition->id, absolute: true),
+        ]);
 
         //Send email to assigned procurement officer
         $assigned_to = $this->requisition->procurement_officer;

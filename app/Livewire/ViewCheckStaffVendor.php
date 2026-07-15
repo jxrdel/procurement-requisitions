@@ -142,7 +142,12 @@ class ViewCheckStaffVendor extends Component
                 'date_sent_chequeprocessing' => $this->date_sent_chequeprocessing,
             ]);
 
-            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Check Staff');
+            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Check Staff', [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'vendor_id' => $this->vendor->id,
+                'url' => route('check_room.view', $this->cs_vendor->id, absolute: true),
+            ]);
             $this->isEditing = false;
             $this->resetValidation();
             $this->dispatch('show-message', message: 'Record edited successfully');
@@ -198,7 +203,12 @@ class ViewCheckStaffVendor extends Component
             'date_received' => Carbon::now(),
         ]);
 
-        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Cheque Processing by ' . Auth::user()->name . ' from Check Staff');
+        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Cheque Processing by ' . Auth::user()->name . ' from Check Staff', [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'vendor_id' => $this->vendor->id,
+            'url' => route('check_room.view', $this->cs_vendor->id, absolute: true),
+        ]);
         $this->requisition->statuslogs()->create([
             'details' => 'Vendor ' . $this->vendor->vendor_name . ' sent to Cheque Processing from Check Staff by ' . Auth::user()->name,
             'created_by' => Auth::user()->username,

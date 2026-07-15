@@ -187,7 +187,12 @@ class ViewChequeProcessingVendor extends Component
         //     'date_sent_dispatch' => $this->date_sent_dispatch,
         // ]);
 
-        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Cheque Processing');
+        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Cheque Processing', [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'vendor_id' => $this->vendor->id,
+            'url' => route('cheque_processing.view', $this->cp_vendor->id, absolute: true),
+        ]);
         $this->isEditing = false;
         $this->resetValidation();
         $this->dispatch('show-message', message: 'Record edited successfully');
@@ -237,10 +242,19 @@ class ViewChequeProcessingVendor extends Component
         ]);
 
 
-        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was completed by ' . Auth::user()->name . ' from Cheque Processing');
+        Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was completed by ' . Auth::user()->name . ' from Cheque Processing', [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'vendor_id' => $this->vendor->id,
+            'url' => route('cheque_processing.view', $this->cp_vendor->id, absolute: true),
+        ]);
         //Check if all vendor status are completed
         if ($this->requisition->isCompleted()) {
-            Log::info('Requisition #' . $this->requisition->requisition_no . ' was completed by ' . Auth::user()->name . ' from Cheque Processing');
+            Log::info('Requisition #' . $this->requisition->requisition_no . ' was completed by ' . Auth::user()->name . ' from Cheque Processing', [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'url' => route('requisitions.view', $this->requisition->id, absolute: true),
+            ]);
             $this->requisition->update([
                 'requisition_status' => 'Completed',
                 'is_completed' => true,

@@ -409,7 +409,11 @@ class ViewRequisition extends Component
                 'created_by' => Auth::user()->username,
             ]);
 
-            Log::info('Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
+            Log::info('Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username, [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'url' => route('requisitions.view', $this->requisition->id, absolute: true),
+            ]);
             $this->isEditingProcurement1 = false;
             $this->resetValidation();
             $this->dispatch('show-message', message: 'Requisition edited successfully');
@@ -654,7 +658,11 @@ class ViewRequisition extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Cost & Budgeting by ' . Auth::user()->name);
+        Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Cost & Budgeting by ' . Auth::user()->name, [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'url' => route('requisitions.view', $this->requisition->id, absolute: true),
+        ]);
 
         //Get Cost & Budgeting users
         $users = User::costBudgeting()->get();
@@ -822,7 +830,11 @@ class ViewRequisition extends Component
                 'created_by' => Auth::user()->username,
             ]);
 
-            Log::info('Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username);
+            Log::info('Requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->username, [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'url' => route('requisitions.view', $this->requisition->id, absolute: true),
+            ]);
             $this->isEditingProcurement2 = false;
             $this->refreshVendors();
             $this->resetValidation();
@@ -879,7 +891,12 @@ class ViewRequisition extends Component
 
         $vendor->load('ap');
         //Send email to Accounts Payable
-        Log::info('Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username);
+        Log::info('Vendor ' . $vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Accounts Payable by ' . Auth::user()->username, [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'vendor_id' => $vendor->id,
+            'url' => route('requisitions.view', $this->requisition->id, absolute: true),
+        ]);
 
         //Get Accounts Payable users
         $users = User::accountsPayable()->get();
@@ -918,7 +935,12 @@ class ViewRequisition extends Component
         $vendor->load('voteControl');
 
         //Send email to Vote Control
-        Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Procurement');
+        Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Procurement', [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'vendor_id' => $vendor->id,
+            'url' => route('requisitions.view', $this->requisition->id, absolute: true),
+        ]);
         $this->requisition->statuslogs()->create([
             'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Procurement',
             'created_by' => Auth::user()->username,
@@ -1269,7 +1291,11 @@ class ViewRequisition extends Component
             'created_by' => Auth::user()->username,
         ]);
 
-        Log::info('Requisition #' . $this->requisition->requisition_no . ' was canceled by ' . Auth::user()->username);
+        Log::info('Requisition #' . $this->requisition->requisition_no . ' was canceled by ' . Auth::user()->username, [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'url' => route('requisitions.view', $this->requisition->id, absolute: true),
+        ]);
 
         $notifiableUsers = collect();
 

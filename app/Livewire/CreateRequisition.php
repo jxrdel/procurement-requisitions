@@ -272,7 +272,11 @@ class CreateRequisition extends Component
                 'created_by' => Auth::user()->username,
             ]);
 
-            Log::info('Requisition #' . $this->requisition_no . ' was created by ' . Auth::user()->name);
+            Log::info('Requisition #' . $this->requisition_no . ' was created by ' . Auth::user()->name, [
+                'requisition_id' => $newrequisition->id,
+                'requisition_no' => $this->requisition_no,
+                'url' => route('requisitions.view', $newrequisition->id, absolute: true),
+            ]);
             return redirect()->route('requisitions.view', $newrequisition->id)->with('success', 'Requisition created successfully');
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while creating a requisition: ' . $e->getMessage());

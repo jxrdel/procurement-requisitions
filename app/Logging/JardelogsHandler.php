@@ -37,16 +37,38 @@ class JardelogsHandler extends AbstractProcessingHandler
             SendLogToJardelogs::dispatch(
                 endpoint: $this->endpoint,
                 token: $this->token,
-                payload: [
-                    'level' => strtolower($record->level->getName()),
-                    'message' => $message,
-                    'context' => $record->context,
-                    'channel' => $record->channel,
-                    'logged_at' => $record->datetime->format(DATE_ATOM),
-                ],
+                payload: $this->buildPayload($record, $message),
             );
         } catch (Throwable) {
             // Intentionally swallow failures so logging never breaks the app.
         }
+    }
+
+    /**
+     * @return array{level: string, message: string, context: array<string, mixed>, channel: string, logged_at: string, url?: string}
+     */
+    protected function buildPayload(LogRecord $record, string $message): array
+    {
+        $context = $record->context;
+        $url = null;
+
+        if (isset($context['url']) && is_string($context['url']) && $context['url'] !== '') {
+            $url = $context['url'];
+            unset($context['url']);
+        }
+
+        $payload = [
+            'level' => strtolower($record->level->getName()),
+            'message' => $message,
+            'context' => $context,
+            'channel' => $record->channel,
+            'logged_at' => $record->datetime->format(DATE_ATOM),
+        ];
+
+        if ($url !== null) {
+            $payload['url'] = $url;
+        }
+
+        return $payload;
     }
 }

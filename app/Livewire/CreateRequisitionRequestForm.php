@@ -173,7 +173,11 @@ class CreateRequisitionRequestForm extends Component
                     'created_by' => Auth::user()->username ?? null,
                 ]);
 
-                Log::info('Requisition form created successfully by ' . (Auth::user()->name));
+                Log::info('Requisition form ' . $form->form_code . ' created by ' . Auth::user()->name, [
+                    'form_id' => $form->id,
+                    'form_code' => $form->form_code,
+                    'url' => route('requisition_forms.view', $form->id, absolute: true),
+                ]);
 
                 return redirect()
                     ->route('requisition_forms.view', ['id' => $form->id])

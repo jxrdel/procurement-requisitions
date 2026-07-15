@@ -149,7 +149,12 @@ class ViewAccountsPayableVendor extends Component
                 ]);
             }
 
-            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Accounts Payable');
+            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was edited by ' . Auth::user()->name . ' from Accounts Payable', [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'vendor_id' => $this->vendor->id,
+                'url' => route('accounts_payable.view', $this->ap_vendor->id, absolute: true),
+            ]);
             $this->isEditing = false;
             $this->dispatch('show-message', message: 'Record edited successfully');
             $this->requisition = $this->requisition->fresh();
@@ -228,13 +233,23 @@ class ViewAccountsPayableVendor extends Component
 
         //Send email to Vote Control
         if ($this->requisition->is_first_pass) {
-            Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable');
+            Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable', [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'vendor_id' => $this->vendor->id,
+                'url' => route('accounts_payable.view', $this->ap_vendor->id, absolute: true),
+            ]);
             $this->requisition->statuslogs()->create([
                 'details' => 'Requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control for Commitment by ' . Auth::user()->name . ' from Accounts Payable',
                 'created_by' => Auth::user()->username,
             ]);
         } else {
-            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable');
+            Log::info('Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable', [
+                'requisition_id' => $this->requisition->id,
+                'requisition_no' => $this->requisition->requisition_no,
+                'vendor_id' => $this->vendor->id,
+                'url' => route('accounts_payable.view', $this->ap_vendor->id, absolute: true),
+            ]);
             $this->requisition->statuslogs()->create([
                 'details' => 'Vendor ' . $this->vendor->vendor_name . ' for requisition #' . $this->requisition->requisition_no . ' was sent to Vote Control by ' . Auth::user()->name . ' from Accounts Payable',
                 'created_by' => Auth::user()->username,
