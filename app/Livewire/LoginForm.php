@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use LdapRecord\Container;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class LoginForm extends Component
@@ -65,6 +66,7 @@ class LoginForm extends Component
                             return;
                         }
                         Auth::login($user);
+                        Log::info($user->name . ' logged in successfully');
                         redirect()->intended('/');
                     } else {
                         // dd('Error');
