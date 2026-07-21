@@ -23,7 +23,11 @@ class ApprovedByCAB extends Notification implements ShouldQueue
     public function __construct(RequisitionRequestForm $requisitionRequestForm)
     {
         $this->requisitionRequestForm = $requisitionRequestForm;
-        Log::info("CAB Approval Notification sent from queue for form " . $this->requisitionRequestForm->form_code);
+        Log::info("CAB Approval Notification sent from queue for form " . $this->requisitionRequestForm->form_code, [
+            'form_id' => $this->requisitionRequestForm->id,
+            'form_code' => $this->requisitionRequestForm->form_code,
+            'url' => route('requisition_forms.view', $this->requisitionRequestForm->id, absolute: true),
+        ]);
     }
 
     /**
