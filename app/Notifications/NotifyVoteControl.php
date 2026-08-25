@@ -26,7 +26,6 @@ class NotifyVoteControl extends Notification implements ShouldQueue
     public function __construct(RequisitionVendor $vendor)
     {
         $this->vendor = $vendor;
-        Log::info('Notification sent to Vote Control for Requisition ' . $this->vendor->requisition->requisition_no . ' from queue');
     }
 
     /**

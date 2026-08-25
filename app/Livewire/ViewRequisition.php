@@ -670,8 +670,13 @@ class ViewRequisition extends Component
         foreach ($users as $user) {
             Notification::send($user, new NotifyCostBudgeting($this->requisition));
             // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
-            Log::info('Email sent to ' . $user->email . ' from ' . Auth::user()->name . ' for Requisition #' . $this->requisition->requisition_no);
         }
+
+        Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Cost & Budgeting by ' . Auth::user()->name, [
+            'requisition_id' => $this->requisition->id,
+            'requisition_no' => $this->requisition->requisition_no,
+            'url' => route('requisitions.view', $this->requisition->id, absolute: true),
+        ]);
 
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
     }

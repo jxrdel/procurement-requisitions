@@ -26,7 +26,6 @@ class NotifyAccountsPayable extends Notification implements ShouldQueue
     public function __construct(RequisitionVendor $vendor)
     {
         $this->vendor = $vendor;
-        Log::info('Notification sent to Accounts Payable for Requisition ' . $this->vendor->requisition->requisition_no . ' from queue');
     }
 
     /**

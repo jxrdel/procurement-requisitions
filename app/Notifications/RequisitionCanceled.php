@@ -23,7 +23,6 @@ class RequisitionCanceled extends Notification implements ShouldQueue
     public function __construct(Requisition $requisition)
     {
         $this->requisition = $requisition;
-        Log::info('Requisition Canceled notification created for Requisition ' . $this->requisition->requisition_no);
     }
 
     /**

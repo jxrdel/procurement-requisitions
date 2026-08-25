@@ -25,7 +25,6 @@ class NotifyCostBudgeting extends Notification implements ShouldQueue
     public function __construct(Requisition $requisition)
     {
         $this->requisition = $requisition;
-        Log::info('Notification sent to Cost & Budgeting for Requisition ' . $this->requisition->requisition_no . ' from queue');
     }
 
     /**

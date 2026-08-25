@@ -744,6 +744,12 @@ class ViewRequisitionForm extends Component
         Notification::send($costAndBudgetingUsers, new RequestForCABApproval($this->requisitionForm));
         $this->dispatch('show-message', message: 'Form sent to Cost and Budgeting for Funding Availability.');
 
+        Log::info('Requisition form ' . $this->requisitionForm->form_code . ' was sent to Cost & Budgeting by ' . Auth::user()->name, [
+            'form_id' => $this->requisitionForm->id,
+            'form_code' => $this->requisitionForm->form_code,
+            'url' => route('requisition_forms.view', $this->requisitionForm->id, absolute: true),
+        ]);
+
         $this->requisitionForm->logs()->create([
             'details' => 'Form sent to Cost and Budgeting for Funding Availability by ' . Auth::user()->name,
             'created_by' => Auth::user()->username ?? null,
@@ -769,6 +775,12 @@ class ViewRequisitionForm extends Component
         ]);
 
         Notification::send($this->requisitionForm->contactPerson, new ApprovedByCAB($this->requisitionForm));
+
+        Log::info('Requisition form ' . $this->requisitionForm->form_code . ' was approved by Cost & Budgeting by ' . Auth::user()->name, [
+            'form_id' => $this->requisitionForm->id,
+            'form_code' => $this->requisitionForm->form_code,
+            'url' => route('requisition_forms.view', $this->requisitionForm->id, absolute: true),
+        ]);
 
         return redirect()->route('queue')->with('success', 'Requisition form approved by Cost & Budgeting.');
     }
