@@ -2,18 +2,18 @@
 
 namespace App\Logging;
 
-use App\Jobs\SendLogToJardelogs;
+use App\Jobs\SendLogToMohLogs;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
 use Throwable;
 
 /**
- * Copy this class into your source Laravel app as app/Logging/JardelogsHandler.php.
+ * Copy this class into your source Laravel app as app/Logging/MohLogsHandler.php.
  *
  * Dispatches a queued job so Log:: calls return immediately instead of waiting on HTTP.
  */
-class JardelogsHandler extends AbstractProcessingHandler
+class MohLogsHandler extends AbstractProcessingHandler
 {
     public function __construct(
         protected string $endpoint,
@@ -34,7 +34,7 @@ class JardelogsHandler extends AbstractProcessingHandler
                 return;
             }
 
-            SendLogToJardelogs::dispatch(
+            SendLogToMohLogs::dispatch(
                 endpoint: $this->endpoint,
                 token: $this->token,
                 payload: $this->buildPayload($record, $message),

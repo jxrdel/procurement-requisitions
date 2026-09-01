@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Http;
 use Throwable;
 
 /**
- * Copy this class into your source Laravel app as app/Jobs/SendLogToJardelogs.php.
+ * Copy this class into your source Laravel app as app/Jobs/SendLogToMohLogs.php.
  *
- * Posts a single log entry to jardelogs. Requires a queue worker
+ * Posts a single log entry to MOH Logs. Requires a queue worker
  * (php artisan queue:work) unless QUEUE_CONNECTION=sync.
  */
-class SendLogToJardelogs implements ShouldQueue
+class SendLogToMohLogs implements ShouldQueue
 {
     use Queueable;
 
