@@ -165,7 +165,10 @@
                             $isRequisitionActive = false;
                             $headerText = null;
 
-                            if (Auth::user()->can('view-cost-budgeting-requisitions')) {
+                            if (Auth::user()->role->name === 'Viewer' && Auth::user()->department->name === 'Office of the Permanent Secretary' && Auth::user()->can('view-requisitions-index')) {
+                                $requisitionRoute = route('requisitions.index');
+                                $isRequisitionActive = request()->routeIs('requisitions.*');
+                            } elseif (Auth::user()->department->name === 'Cost & Budgeting' && Auth::user()->can('view-cost-budgeting-requisitions')) {
                                 $requisitionRoute = route('cost_and_budgeting.index');
                                 $isRequisitionActive = request()->routeIs('cost_and_budgeting.*');
                                 $headerText = 'Cost & Budgeting';

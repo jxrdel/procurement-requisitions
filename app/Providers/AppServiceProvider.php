@@ -78,6 +78,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-requisition', function ($user, $requisition) {
+            if ($user->role->name === 'Viewer') {
+                return true;
+            }
+
             return $user->department->name === 'Procurement Unit' || $user->department->name === 'Cost & Budgeting' || $user->reporting_officer_role === 'Permanent Secretary' || $user->reporting_officer_role === 'Deputy Permanent Secretary' || $user->reporting_officer_role === 'Chief Medical Officer' || $user->department->id == $requisition->requesting_unit;
         });
 
