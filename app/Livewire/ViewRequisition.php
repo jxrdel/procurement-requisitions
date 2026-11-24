@@ -194,18 +194,8 @@ class ViewRequisition extends Component
         $this->sent_to_cb = $this->requisition->sent_to_cb;
         $this->date_sent_cb = $this->requisition->date_sent_cb;
         $this->date_completed = $this->requisition->date_completed;
-        $this->vendors = $this->requisition->vendors()
-            ->with('invoices')
-            ->with('ap')
-            ->with('votes')
-            ->get()
-            ->toArray();
-
-        $this->originalVendorIds = collect($this->vendors)->pluck('id')->filter()->all();
-
-        foreach ($this->vendors as $key => $vendor) {
-            $this->vendors[$key]['accordionView'] = 'show';
-        }
+        $this->loadVendors();
+        $this->originalVendorIds = $this->savedVendorIds();
 
         //Cost & Budgeting
         $this->date_sent_request_mof = $this->requisition->date_sent_request_mof;
@@ -290,55 +280,13 @@ class ViewRequisition extends Component
 
     public function edit()
     {
+        $this->nullifyEmptyDates();
+
+        if (!$this->validateForm()) {
+            return;
+        }
+
         try {
-            if ($this->date_assigned === '') {
-                $this->date_assigned = null;
-            }
-
-            if ($this->date_sent_dps === '') {
-                $this->date_sent_dps = null;
-            }
-
-            if ($this->date_received_procurement === '') {
-                $this->date_received_procurement = null;
-            }
-
-            if ($this->date_sent_aov_procurement === '') {
-                $this->date_sent_aov_procurement = null;
-            }
-
-            if ($this->site_visit_date === '') {
-                $this->site_visit_date = null;
-            }
-
-            if ($this->note_to_ps_date === '') {
-                $this->note_to_ps_date = null;
-            }
-
-            if ($this->tender_issue_date === '') {
-                $this->tender_issue_date = null;
-            }
-
-            if ($this->tender_deadline_date === '') {
-                $this->tender_deadline_date = null;
-            }
-
-            if ($this->evaluation_start_date === '') {
-                $this->evaluation_start_date = null;
-            }
-
-            if ($this->evaluation_end_date === '') {
-                $this->evaluation_end_date = null;
-            }
-
-            if ($this->ps_approval_date === '') {
-                $this->ps_approval_date = null;
-            }
-
-            if (!$this->validateForm()) {
-                return;  // Stop execution if form validation fails
-            }
-
             Requisition::where('id', $this->requisition->id)->update([
                 'requisition_no' => $this->requisition_no,
                 'requesting_unit' => $this->requesting_unit,
@@ -380,7 +328,7 @@ class ViewRequisition extends Component
                 $this->setRequisitionStatus();
             }
 
-            $currentVendorIds = collect($this->vendors)->pluck('id')->filter()->all();
+            $currentVendorIds = $this->savedVendorIds();
             $vendorIdsToDelete = array_diff($this->originalVendorIds, $currentVendorIds);
 
             if (!empty($vendorIdsToDelete)) {
@@ -388,19 +336,17 @@ class ViewRequisition extends Component
             }
 
             foreach ($this->vendors as $index => $vendor) {
-                if (isset($vendor['id'])) {
-                    $this->requisition->vendors()->where('id', $vendor['id'])->update([
-                        'vendor_name' => $vendor['vendor_name'],
-                        'vendor_items' => $vendor['vendor_items'],
-                        'amount' => $vendor['amount'],
-                    ]);
+                $vendorData = [
+                    'vendor_name' => $vendor['vendor_name'],
+                    'vendor_items' => $vendor['vendor_items'] ?? null,
+                    'amount' => $vendor['amount'],
+                ];
+
+                if (!empty($vendor['id'])) {
+                    $this->requisition->vendors()->where('id', $vendor['id'])->update($vendorData);
                 } else {
-                    $newvendor = $this->requisition->vendors()->create([
-                        'vendor_name' => $vendor['vendor_name'],
-                        'vendor_items' => $vendor['vendor_items'],
-                        'amount' => $vendor['amount'],
-                    ]);
-                    $this->vendors[$index]['id'] = $newvendor->id;
+                    $newVendor = $this->requisition->vendors()->create($vendorData);
+                    $this->vendors[$index]['id'] = $newVendor->id;
                 }
             }
 
@@ -418,13 +364,8 @@ class ViewRequisition extends Component
             $this->resetValidation();
             $this->dispatch('show-message', message: 'Requisition edited successfully');
             $this->requisition = $this->requisition->fresh();
-            $this->originalVendorIds = collect($this->vendors)->pluck('id')->filter()->all();
-            $this->vendors = $this->requisition->vendors()
-                ->with('invoices')
-                ->with('ap')
-                ->with('votes')
-                ->get()
-                ->toArray();
+            $this->loadVendors();
+            $this->originalVendorIds = $this->savedVendorIds();
         } catch (Exception $e) {
             Log::error('Error from user ' . Auth::user()->username . ' while editing a requisition: ' . $e->getMessage());
             // Mail::to('jardel.regis@health.gov.tt')->queue(new ErrorNotification(Auth::user()->username, $e->getMessage()));
@@ -434,7 +375,6 @@ class ViewRequisition extends Component
 
     public function validateForm()
     {
-
         $reqvalidator = Validator::make(
             [
                 'requisition_no' => $this->requisition_no,
@@ -444,64 +384,62 @@ class ViewRequisition extends Component
                 'assigned_to' => $this->assigned_to,
                 'date_assigned' => $this->date_assigned,
                 'date_sent_dps' => $this->date_sent_dps,
-                'date_sent_procurement' => $this->date_received_procurement,
+                'date_received_procurement' => $this->date_received_procurement,
+                'date_sent_aov_procurement' => $this->date_sent_aov_procurement,
+                'site_visit' => $this->site_visit,
+                'site_visit_date' => $this->site_visit_date,
+                'note_to_ps' => $this->note_to_ps,
+                'note_to_ps_date' => $this->note_to_ps_date,
+                'tender_issue_date' => $this->tender_issue_date,
+                'tender_deadline_date' => $this->tender_deadline_date,
+                'evaluation_start_date' => $this->evaluation_start_date,
+                'evaluation_end_date' => $this->evaluation_end_date,
                 'ps_approval' => $this->ps_approval,
                 'ps_approval_date' => $this->ps_approval_date,
-                // 'sent_to_cb' => $this->sent_to_cb,
-                // 'date_sent_cb' => $this->date_sent_cb,
                 'vendors' => $this->vendors,
             ],
-            [
-                'requisition_no' => 'required',
-                'requesting_unit' => 'required',
-                'file_no' => 'nullable',
-                'item' => 'required',
-                'assigned_to' => 'nullable',
-                'date_assigned' => 'nullable|date|before_or_equal:today',
-                'date_sent_dps' => 'nullable|date|before_or_equal:today',
-                'date_received_procurement' => 'nullable|date|before_or_equal:today',
-                'ps_approval_date' => 'nullable|date|before_or_equal:today',
-                // 'date_sent_cb' => 'nullable|sometimes|after:date_sent_dps',
-                'vendors.*.vendor_name' => 'required',
-                'vendors.*.vendor_items' => 'nullable|string',
-                'vendors.*.amount' => 'required|numeric',
-            ],
-            [
-                'vendors.*.vendor_name.required' => 'Vendor name is required',
-                'vendors.*.amount.required' => 'Amount is required',
-                'vendors.*.amount.numeric' => 'Amount must be a number',
-            ],
-        )
-            ->after(function ($validator) {
-                // Ensure 'ps_approval' is not 'Not Sent' if 'date_sent_dps' is populated
-                if ($this->date_sent_dps !== null && $this->ps_approval === 'Not Sent') {
-                    $validator->errors()->add('ps_approval', 'PS approval cannot be "Not Sent" if the Date sent to DPS is populated.');
-                }
+            $this->procurement1Rules(),
+            $this->procurement1Messages(),
+            $this->procurement1Attributes(),
+        )->after(function ($validator) {
+            if ($this->date_sent_dps && $this->ps_approval === 'Not Sent') {
+                $validator->errors()->add('ps_approval', 'PS approval cannot be "Not Sent" if the Date sent to DPS is populated.');
+            }
 
-                // Ensure 'date_sent_dps' is not null if 'ps_approval' is not 'Not Sent'
-                if ($this->ps_approval !== 'Not Sent' && $this->date_sent_dps === null) {
-                    $validator->errors()->add('date_sent_dps', 'Date sent to DPS cannot be null if PS Approval is set to ' . $this->ps_approval);
-                }
+            if ($this->ps_approval !== 'Not Sent' && empty($this->date_sent_dps) && !$validator->errors()->has('date_sent_dps')) {
+                $validator->errors()->add('date_sent_dps', 'Date sent to DPS is required if PS Approval is set to ' . $this->ps_approval);
+            }
 
-                // Ensure 'ps_approval_date' is not null if 'ps_approval' is 'Approved'
-                if ($this->ps_approval === 'Approved' && $this->ps_approval_date === null) {
-                    $validator->errors()->add('ps_approval_date', 'PS Approval Date cannot be null if PS Approval is "Approved".');
-                }
+            if ($this->ps_approval === 'Approved' && empty($this->ps_approval_date) && !$validator->errors()->has('ps_approval_date')) {
+                $validator->errors()->add('ps_approval_date', 'PS Approval Date is required if PS Approval is "Approved".');
+            }
 
-                // Ensure 'date_sent_cb' is not null if 'sent_to_cb' is "Yes"
-                // if ($this->sent_to_cb === 'Yes' && $this->date_sent_cb === null) {
-                //     $validator->errors()->add('date_sent_cb', 'Date sent to DFA cannot be null if sent to DFA is "Yes".');
-                // }
-            });
+            if ($this->site_visit && empty($this->site_visit_date) && !$validator->errors()->has('site_visit_date')) {
+                $validator->errors()->add('site_visit_date', 'Site visit date is required when a site visit is required.');
+            }
+
+            if ($this->note_to_ps && empty($this->note_to_ps_date) && !$validator->errors()->has('note_to_ps_date')) {
+                $validator->errors()->add('note_to_ps_date', 'Note to PS date is required when Note to PS is checked.');
+            }
+
+            if ($this->isValidYmdDate($this->tender_issue_date) && $this->isValidYmdDate($this->tender_deadline_date)
+                && $this->tender_deadline_date < $this->tender_issue_date) {
+                $validator->errors()->add('tender_deadline_date', 'Tender deadline must be on or after the tender issue date.');
+            }
+
+            if ($this->isValidYmdDate($this->evaluation_start_date) && $this->isValidYmdDate($this->evaluation_end_date)
+                && $this->evaluation_end_date < $this->evaluation_start_date) {
+                $validator->errors()->add('evaluation_end_date', 'Evaluation end date must be on or after the evaluation start date.');
+            }
+        });
 
         if ($reqvalidator->fails()) {
-            // Emit event for scrolling to the first error
-            $this->setErrorBag($reqvalidator->errors()); // Set the error bag for Livewire
+            $this->setErrorBag($reqvalidator->errors());
             $this->dispatch('scrollToError');
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     public function setRequisitionStatus()
@@ -610,33 +548,26 @@ class ViewRequisition extends Component
     }
     public function getIsSendCBButtonDisabledProperty()
     {
-        return $this->requisition_no === null || trim($this->requisition_no) === '' ||
-            $this->requesting_unit === null || trim($this->requesting_unit) === '' ||
-            $this->item === null || trim($this->item) === '' ||
-            $this->date_sent_dps === null || trim($this->date_sent_dps) === '' ||
+        return $this->requisition_no === null || trim((string) $this->requisition_no) === '' ||
+            $this->requesting_unit === null || trim((string) $this->requesting_unit) === '' ||
+            $this->item === null || trim((string) $this->item) === '' ||
+            empty($this->date_sent_dps) ||
             $this->ps_approval === null || $this->ps_approval !== 'Approved' || count($this->requisition->vendors) === 0;
     }
 
     public function getFormattedDateAssigned()
     {
-        if ($this->date_assigned) {
-            return Carbon::parse($this->date_assigned)->format('F jS, Y');
-        }
+        return $this->getFormattedDate($this->date_assigned);
     }
-
 
     public function getFormattedDateSentCB()
     {
-        if ($this->date_sent_cb) {
-            return Carbon::parse($this->date_sent_cb)->format('F jS, Y');
-        }
+        return $this->getFormattedDate($this->date_sent_cb);
     }
 
     public function getFormattedDateSentPs()
     {
-        if ($this->date_sent_dps) {
-            return Carbon::parse($this->date_sent_dps)->format('F jS, Y');
-        }
+        return $this->getFormattedDate($this->date_sent_dps);
     }
 
     public function sendToCB()
@@ -672,12 +603,6 @@ class ViewRequisition extends Component
             // Mail::to($user->email)->queue(new NotifyCostBudgeting($this->requisition));
         }
 
-        Log::info('Requisition #' . $this->requisition->requisition_no . ' was sent to Cost & Budgeting by ' . Auth::user()->name, [
-            'requisition_id' => $this->requisition->id,
-            'requisition_no' => $this->requisition->requisition_no,
-            'url' => route('requisitions.view', $this->requisition->id, absolute: true),
-        ]);
-
         return redirect()->route('requisitions.view', ['id' => $this->requisition->id])->with('success', 'Requisition sent to Cost & Budgeting');
     }
 
@@ -708,12 +633,8 @@ class ViewRequisition extends Component
 
     public function isProcurement2ButtonDisabled($vendor)
     {
-
-        if (!$this->requisition->is_first_pass) {
-
-            if (count($vendor['invoices']) < 1) {
-                return true;
-            }
+        if (!$this->requisition->is_first_pass && count($vendor['invoices'] ?? []) < 1) {
+            return true;
         }
 
         return
@@ -772,19 +693,19 @@ class ViewRequisition extends Component
         }
 
         foreach ($this->vendors as &$vendor) {
-            if ($vendor['eta'] === '') {
+            if (($vendor['eta'] ?? '') === '') {
                 $vendor['eta'] = null;
             }
 
-            if ($vendor['date_sent_commit'] === '') {
+            if (($vendor['date_sent_commit'] ?? '') === '') {
                 $vendor['date_sent_commit'] = null;
             }
 
-            if ($vendor['date_invoice_received'] === '') {
+            if (($vendor['date_invoice_received'] ?? '') === '') {
                 $vendor['date_invoice_received'] = null;
             }
 
-            if ($vendor['date_sent_ap'] === '') {
+            if (($vendor['date_sent_ap'] ?? '') === '') {
                 $vendor['date_sent_ap'] = null;
             }
         }
@@ -793,19 +714,35 @@ class ViewRequisition extends Component
 
         $this->updateVendorStatuses();
 
+        $dateSentDps = $this->isValidYmdDate($this->requisition->date_sent_dps)
+            ? $this->requisition->date_sent_dps
+            : null;
+
         $this->validate(
             [
-                'vendors.*.eta' => 'nullable|date|after_or_equal:today',
-                'vendors.*.date_sent_commit' => 'nullable|date|after_or_equal:' . $this->requisition->date_sent_dps,
+                'vendors.*.eta' => 'nullable|bail|date_format:Y-m-d|after_or_equal:today|before_or_equal:9999-12-31',
+                'vendors.*.date_sent_commit' => 'nullable|bail|date_format:Y-m-d|after_or_equal:1900-01-01|before_or_equal:9999-12-31' . ($dateSentDps ? '|after_or_equal:' . $dateSentDps : ''),
+                'vendors.*.date_sent_ap' => 'nullable|bail|date_format:Y-m-d|after_or_equal:1900-01-01|before_or_equal:9999-12-31',
             ],
             [
-                'vendors.*.eta.after_or_equal' => 'ETA must be a date after or equal to today',
-                'vendors.*.date_sent_commit.after_or_equal' => 'Date sent to Commitment must be a date after or equal to the date sent to DPS',
+                'vendors.*.eta.date_format' => 'Please enter a valid ETA date.',
+                'vendors.*.eta.after_or_equal' => 'ETA must be a date on or after today.',
+                'vendors.*.eta.before_or_equal' => 'Please enter a valid ETA date.',
+                'vendors.*.date_sent_commit.date_format' => 'Please enter a valid date sent for commitment.',
+                'vendors.*.date_sent_commit.after_or_equal' => 'Date sent for commitment must be on or after the date sent to DPS.',
+                'vendors.*.date_sent_commit.before_or_equal' => 'Please enter a valid date sent for commitment.',
+                'vendors.*.date_sent_ap.date_format' => 'Please enter a valid date sent to AP.',
+                'vendors.*.date_sent_ap.after_or_equal' => 'Please enter a valid date sent to AP.',
+                'vendors.*.date_sent_ap.before_or_equal' => 'Please enter a valid date sent to AP.',
             ]
         );
 
         try {
             foreach ($this->vendors as $vendor) {
+                if (empty($vendor['id'])) {
+                    continue;
+                }
+
                 $this->requisition->vendors()->where('id', $vendor['id'])->update([
                     'purchase_order_no' => $vendor['purchase_order_no'],
                     'eta' => $vendor['eta'],
@@ -958,6 +895,7 @@ class ViewRequisition extends Component
             Notification::send($user, new NotifyVoteControl($vendor));
         }
 
+        $this->refreshVendors();
         $this->dispatch('show-message', message: 'Sent to Vote Control successfully');
     }
 
@@ -995,119 +933,46 @@ class ViewRequisition extends Component
 
     public function getFormattedDate($date)
     {
-        if ($date !== null) {
+        if ($date === null || $date === '') {
+            return null;
+        }
+
+        try {
             return Carbon::parse($date)->format('F jS, Y');
+        } catch (Exception $e) {
+            return null;
         }
     }
 
     public function addVendor()
     {
-        $this->vendors[] = [
-            'id' => null,
-            'vendor_name' => '',
-            'amount' => '0.00',
-
-            // Procurement
-            'vendor_status' => '',
-            'purchase_order_no' => '',
-            'eta' => null,
-            'date_sent_commit' => null,
-            'invoice_no' => '',
-            'date_invoice_received' => null,
-            'date_sent_ap' => null,
-            'sent_to_ap' => false,
-
-            // Cost & Budgeting
-            'date_sent_request_mof' => null,
-            'release_type' => '',
-            'request_category' => '',
-            'request_no' => '',
-            'release_no' => '',
-            'release_date' => null,
-            'change_of_vote_no' => '',
-
-            // AP
-            'date_received_ap' => null,
-            'date_sent_vc' => null,
-
-            // Vote Control
-            'batch_no' => '',
-            'voucher_no' => '',
-            'date_sent_checkstaff' => null,
-
-            // Check Staff
-            'date_received_from_vc' => null,
-            'voucher_destination' => '',
-            'date_sent_audit' => null,
-            'date_received_from_audit' => null,
-            'date_sent_chequeprocessing' => null,
-            'date_committed_vc' => null,
-
-            // Cheque Processing
-            'date_of_cheque' => null,
-            'cheque_no' => '',
-            'date_cheque_processed' => null,
-            'date_sent_dispatch' => null,
-
-            'accordionView' => 'hide',
-            'votes' => [],
-        ];
+        $this->vendors[] = $this->newVendorRow();
     }
 
     public function removeVendor($index)
     {
-        // dd($this->vendors[$index]);
-        if (isset($this->vendors[$index]['id'])) {
-            $this->deleted_vendors[] = $this->vendors[$index]['id'];
-        }
         unset($this->vendors[$index]);
+        $this->vendors = array_values($this->vendors);
     }
 
     public function toggleAccordionView($index)
     {
-        $this->vendors[$index]['accordionView'] = $this->vendors[$index]['accordionView'] === 'show' ? 'hide' : 'show';
+        $currentView = $this->vendors[$index]['accordionView'] ?? 'show';
+        $this->vendors[$index]['accordionView'] = $currentView === 'show' ? 'hide' : 'show';
 
         $this->skipRender();
     }
     public function getTotalAmountProperty()
     {
-        return collect($this->vendors)->sum('amount');
+        return collect($this->vendors)->sum(function ($vendor) {
+            return is_numeric($vendor['amount'] ?? null) ? (float) $vendor['amount'] : 0;
+        });
     }
-    // public function getProcurement2Status()
-    // {
-    //     $priority = [
-    //         'Awaiting Invoice' => 1,
-    //         'To Be Sent to AP' => 2,
-    //     ];
 
-    //     $statuses = collect($this->vendors)->map(function ($vendor) {
-    //         if (
-    //             $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
-    //             !$vendor['invoice_no'] && !$vendor['date_invoice_received'] && !$vendor['date_sent_ap']
-    //         ) {
-    //             return 'Awaiting Invoice';
-    //         }
-
-    //         if (
-    //             $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
-    //             $vendor['invoice_no'] && $vendor['date_invoice_received'] && !$vendor['date_sent_ap']
-    //         ) {
-    //             return 'To Be Sent to AP';
-    //         }
-
-    //         if (
-    //             $vendor['purchase_order_no'] && $vendor['eta'] && $vendor['date_sent_commit'] &&
-    //             $vendor['invoice_no'] && $vendor['date_invoice_received'] &&
-    //             $vendor['date_sent_ap'] && !$this->requisition->vote_control_requisition
-    //         ) {
-    //             return 'To Be Sent to AP';
-    //         }
-
-    //         return 'At Procurement'; // Default case if none of the conditions match
-    //     });
-
-    //     return $statuses->sortBy(fn($status) => $priority[$status] ?? PHP_INT_MAX)->first();
-    // }
+    public function getFirstSavedVendorIdProperty()
+    {
+        return $this->savedVendorIds()[0] ?? $this->requisition->vendors->first()?->id;
+    }
 
     public function updateVendorStatuses()
     {
@@ -1116,30 +981,30 @@ class ViewRequisition extends Component
 
             if (!$this->requisition->vote_control_requisition) {
                 if (
-                    $vendor['purchase_order_no'] &&
-                    $vendor['eta'] &&
-                    $vendor['date_sent_commit'] &&
-                    !$vendor['invoice_no'] &&
-                    !$vendor['date_invoice_received'] &&
-                    !$vendor['date_sent_ap']
+                    ($vendor['purchase_order_no'] ?? null) &&
+                    ($vendor['eta'] ?? null) &&
+                    ($vendor['date_sent_commit'] ?? null) &&
+                    !($vendor['invoice_no'] ?? null) &&
+                    !($vendor['date_invoice_received'] ?? null) &&
+                    !($vendor['date_sent_ap'] ?? null)
                 ) {
                     $status = 'Awaiting Invoice';
                 } elseif (
-                    $vendor['purchase_order_no'] &&
-                    $vendor['eta'] &&
-                    $vendor['date_sent_commit'] &&
-                    $vendor['invoice_no'] &&
-                    $vendor['date_invoice_received'] &&
-                    !$vendor['date_sent_ap']
+                    ($vendor['purchase_order_no'] ?? null) &&
+                    ($vendor['eta'] ?? null) &&
+                    ($vendor['date_sent_commit'] ?? null) &&
+                    ($vendor['invoice_no'] ?? null) &&
+                    ($vendor['date_invoice_received'] ?? null) &&
+                    !($vendor['date_sent_ap'] ?? null)
                 ) {
                     $status = 'To Be Sent to AP';
                 } elseif (
-                    $vendor['purchase_order_no'] &&
-                    $vendor['eta'] &&
-                    $vendor['date_sent_commit'] &&
-                    $vendor['invoice_no'] &&
-                    $vendor['date_invoice_received'] &&
-                    $vendor['date_sent_ap'] &&
+                    ($vendor['purchase_order_no'] ?? null) &&
+                    ($vendor['eta'] ?? null) &&
+                    ($vendor['date_sent_commit'] ?? null) &&
+                    ($vendor['invoice_no'] ?? null) &&
+                    ($vendor['date_invoice_received'] ?? null) &&
+                    ($vendor['date_sent_ap'] ?? null) &&
                     !$this->requisition->vote_control_requisition
                 ) {
                     $status = 'To Be Sent to AP';
@@ -1187,15 +1052,15 @@ class ViewRequisition extends Component
                 'required',
                 'numeric',
                 function ($attribute, $value, $fail) {
-                    $totalInvoices = $this->vendor->invoices()->sum('invoice_amount');
-                    $newTotal = $totalInvoices + $value;
+                    $totalInvoices = (float) $this->vendor->invoices()->sum('invoice_amount');
+                    $newTotal = $totalInvoices + (float) $value;
 
-                    if ($newTotal > $this->vendor->amount) {
-                        $fail('The total of all invoices cannot exceed the vendor\'s amount of ' . number_format($this->vendor->amount, 2));
+                    if ($newTotal > (float) $this->vendor->amount) {
+                        $fail('The total of all invoices cannot exceed the vendor\'s amount of ' . number_format((float) $this->vendor->amount, 2));
                     }
                 }
             ],
-            'date_invoice_received' => 'required|date',
+            'date_invoice_received' => 'required|bail|date_format:Y-m-d|after_or_equal:1900-01-01|before_or_equal:today',
         ]);
 
         $this->vendor->invoices()->create([
@@ -1226,39 +1091,161 @@ class ViewRequisition extends Component
         // $this->dispatch('refresh-component')->to(ViewRequisition::class);
     }
 
-    public function getInvoiceCounts($index)
-    {
-        $vendorId = $this->vendors[$index]['id'];
-        $this->invoiceCounts[$vendorId] = VendorInvoice::where('vendor_id', $vendorId)->count();
-    }
-
     public function refreshVendors()
     {
+        $this->loadVendors(preserveAccordion: true);
+    }
 
-        //Get accordion view state
-        $accordionView = collect($this->vendors)->map(function ($vendor) {
-            return $vendor['accordionView'];
-        });
+    protected function loadVendors(bool $preserveAccordion = false): void
+    {
+        $accordionViews = [];
+
+        if ($preserveAccordion) {
+            foreach ($this->vendors as $key => $vendor) {
+                $accordionViews[$key] = $vendor['accordionView'] ?? 'show';
+            }
+        }
 
         $this->vendors = $this->requisition->vendors()
-            ->with('votes')
-            ->with('invoices')
-            ->with('ap')
+            ->with(['invoices', 'ap', 'votes'])
             ->get()
             ->toArray();
 
         foreach ($this->vendors as $key => $vendor) {
-            $this->vendors[$key]['accordionView'] = $accordionView[$key];
+            $this->vendors[$key]['accordionView'] = $accordionViews[$key] ?? 'show';
         }
+    }
+
+    protected function savedVendorIds(): array
+    {
+        return collect($this->vendors)->pluck('id')->filter()->values()->all();
+    }
+
+    protected function newVendorRow(): array
+    {
+        return [
+            'id' => null,
+            'vendor_name' => '',
+            'vendor_items' => '',
+            'amount' => '',
+            'invoices' => [],
+            'votes' => [],
+            'ap' => null,
+            'accordionView' => 'hide',
+        ];
+    }
+
+    protected function dateFieldNames(): array
+    {
+        return [
+            'date_assigned',
+            'date_sent_dps',
+            'date_received_procurement',
+            'date_sent_aov_procurement',
+            'site_visit_date',
+            'note_to_ps_date',
+            'tender_issue_date',
+            'tender_deadline_date',
+            'evaluation_start_date',
+            'evaluation_end_date',
+            'ps_approval_date',
+        ];
+    }
+
+    protected function nullifyEmptyDates(): void
+    {
+        foreach ($this->dateFieldNames() as $field) {
+            if ($this->{$field} === '') {
+                $this->{$field} = null;
+            }
+        }
+    }
+
+    protected function isValidYmdDate($value): bool
+    {
+        if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return false;
+        }
+
+        [$year, $month, $day] = array_map('intval', explode('-', $value));
+
+        return $year >= 1900 && $year <= 9999 && checkdate($month, $day, $year);
+    }
+
+    protected function procurement1Rules(): array
+    {
+        $pastDate = 'nullable|bail|date_format:Y-m-d|after_or_equal:1900-01-01|before_or_equal:today';
+        $anyDate = 'nullable|bail|date_format:Y-m-d|after_or_equal:1900-01-01|before_or_equal:9999-12-31';
+
+        return [
+            'requisition_no' => 'required',
+            'requesting_unit' => 'required',
+            'file_no' => 'nullable',
+            'item' => 'required',
+            'assigned_to' => 'nullable',
+            'date_assigned' => $pastDate,
+            'date_sent_dps' => $pastDate,
+            'date_received_procurement' => $pastDate,
+            'date_sent_aov_procurement' => $pastDate,
+            'site_visit' => 'nullable|boolean',
+            'site_visit_date' => $pastDate,
+            'note_to_ps' => 'nullable|boolean',
+            'note_to_ps_date' => $pastDate,
+            'tender_issue_date' => $anyDate,
+            'tender_deadline_date' => $anyDate,
+            'evaluation_start_date' => $anyDate,
+            'evaluation_end_date' => $anyDate,
+            'ps_approval' => 'required',
+            'ps_approval_date' => $pastDate,
+            'vendors.*.vendor_name' => 'required',
+            'vendors.*.vendor_items' => 'nullable|string',
+            'vendors.*.amount' => 'required|numeric',
+        ];
+    }
+
+    protected function procurement1Messages(): array
+    {
+        return [
+            'date_format' => 'Please enter a valid date.',
+            'before_or_equal' => 'The :attribute cannot be in the future.',
+            'after_or_equal' => 'Please enter a valid date.',
+            'vendors.*.vendor_name.required' => 'Vendor name is required',
+            'vendors.*.amount.required' => 'Amount is required',
+            'vendors.*.amount.numeric' => 'Amount must be a number',
+        ];
+    }
+
+    protected function procurement1Attributes(): array
+    {
+        return [
+            'date_assigned' => 'date assigned',
+            'date_sent_dps' => 'date sent to DPS',
+            'date_received_procurement' => 'date received by procurement',
+            'date_sent_aov_procurement' => 'date sent to AOV procurement',
+            'site_visit_date' => 'site visit date',
+            'note_to_ps_date' => 'note to PS date',
+            'tender_issue_date' => 'tender issue date',
+            'tender_deadline_date' => 'tender deadline date',
+            'evaluation_start_date' => 'evaluation start date',
+            'evaluation_end_date' => 'evaluation end date',
+            'ps_approval_date' => 'PS approval date',
+        ];
     }
 
     public function getIsSendAllToVoteControlButtonDisabledProperty()
     {
-        foreach ($this->vendors as $vendor) {
+        $savedVendors = collect($this->vendors)->filter(fn ($vendor) => !empty($vendor['id']));
+
+        if ($savedVendors->isEmpty()) {
+            return true;
+        }
+
+        foreach ($savedVendors as $vendor) {
             if ($this->isProcurement2ButtonDisabled($vendor)) {
                 return true;
             }
         }
+
         return false;
     }
 

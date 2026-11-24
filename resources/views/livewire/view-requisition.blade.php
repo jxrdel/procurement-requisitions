@@ -296,7 +296,7 @@
                                                 </div>
                                                 <div class="col">
                                                     <label><strong>Amount:</strong>
-                                                        ${{ number_format($vendor['amount'], 2) }}</label>
+                                                        ${{ number_format((float) ($vendor['amount'] ?? 0), 2) }}</label>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -305,7 +305,7 @@
                                             <div class="row mt-6">
                                                 <div class="col">
                                                     <label><strong>Total Amount:</strong>
-                                                        ${{ number_format($this->totalAmount, 2) }}</label>
+                                                        ${{ number_format((float) $this->totalAmount, 2) }}</label>
                                                 </div>
                                             </div>
                                         @endif
@@ -419,7 +419,7 @@
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="date_received_procurement"
-                                                    type="date"
+                                                    type="date" min="1900-01-01" max="{{ $this->today }}"
                                                     class="form-control @error('date_received_procurement')is-invalid @enderror"
                                                     id="floatingInput" aria-describedby="floatingInputHelp" />
                                                 <label for="floatingInput">Date Received by Procurement</label>
@@ -453,6 +453,7 @@
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="date_assigned" type="date"
+                                                    min="1900-01-01" max="{{ $this->today }}"
                                                     class="form-control @error('date_assigned')is-invalid @enderror"
                                                     id="floatingInput" aria-describedby="floatingInputHelp" />
                                                 <label for="floatingInput">Date Assigned to Officer</label>
@@ -467,7 +468,7 @@
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="date_sent_aov_procurement"
-                                                    type="date"
+                                                    type="date" min="1900-01-01" max="{{ $this->today }}"
                                                     class="form-control @error('date_sent_aov_procurement')is-invalid @enderror"
                                                     id="dateSentAOVInput"
                                                     placeholder="Date Sent to AOV Procurement" />
@@ -492,7 +493,7 @@
                                             <div class="col-md-6" x-show="siteVisit" x-transition>
                                                 <div class="form-floating form-floating-outline">
                                                     <input autocomplete="off" wire:model="site_visit_date"
-                                                        type="date"
+                                                        type="date" min="1900-01-01" max="{{ $this->today }}"
                                                         class="form-control @error('site_visit_date')is-invalid @enderror"
                                                         id="siteVisitDateInput" placeholder="Site Visit Date" />
                                                     <label for="siteVisitDateInput">Site Visit Date</label>
@@ -530,7 +531,7 @@
                                             <div class="col-md-6" x-show="noteToPs" x-transition>
                                                 <div class="form-floating form-floating-outline">
                                                     <input autocomplete="off" wire:model="note_to_ps_date"
-                                                        type="date"
+                                                        type="date" min="1900-01-01" max="{{ $this->today }}"
                                                         class="form-control @error('note_to_ps_date')is-invalid @enderror"
                                                         id="noteToPsDateInput" placeholder="Date Sent to PS" />
                                                     <label for="noteToPsDateInput">Date Note Sent to PS</label>
@@ -546,7 +547,7 @@
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="tender_issue_date"
-                                                    type="date"
+                                                    type="date" min="1900-01-01" max="9999-12-31"
                                                     class="form-control @error('tender_issue_date')is-invalid @enderror"
                                                     id="tenderIssueDateInput" placeholder="Tender Issue Date" />
                                                 <label for="tenderIssueDateInput">Tender/RFQ Issue Date</label>
@@ -559,7 +560,7 @@
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="tender_deadline_date"
-                                                    type="date"
+                                                    type="date" min="1900-01-01" max="9999-12-31"
                                                     class="form-control @error('tender_deadline_date')is-invalid @enderror"
                                                     id="tenderDeadlineDateInput" placeholder="Tender Deadline Date" />
                                                 <label for="tenderDeadlineDateInput">Tender/RFQ Deadline Date</label>
@@ -574,7 +575,7 @@
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="evaluation_start_date"
-                                                    type="date"
+                                                    type="date" min="1900-01-01" max="9999-12-31"
                                                     class="form-control @error('evaluation_start_date')is-invalid @enderror"
                                                     id="evaluationStartDateInput"
                                                     placeholder="Evaluation Start Date" />
@@ -588,7 +589,7 @@
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="evaluation_end_date"
-                                                    type="date"
+                                                    type="date" min="1900-01-01" max="9999-12-31"
                                                     class="form-control @error('evaluation_end_date')is-invalid @enderror"
                                                     id="evaluationEndDateInput" placeholder="Evaluation End Date" />
                                                 <label for="evaluationEndDateInput">Evaluation End Date</label>
@@ -637,6 +638,7 @@
                                         <div class="col">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="date_sent_dps" type="date"
+                                                    min="1900-01-01" max="{{ $this->today }}"
                                                     class="form-control @error('date_sent_dps')is-invalid @enderror"
                                                     id="floatingInput" aria-describedby="floatingInputHelp" />
                                                 <label for="floatingInput">Date sent to DPS</label>
@@ -669,7 +671,7 @@
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <input autocomplete="off" wire:model="ps_approval_date"
-                                                    type="date"
+                                                    type="date" min="1900-01-01" max="{{ $this->today }}"
                                                     class="form-control @error('ps_approval_date')is-invalid @enderror"
                                                     id="psApprovalDateInput" aria-describedby="floatingInputHelp" />
                                                 <label for="psApprovalDateInput">PS Approval Date</label>
@@ -742,7 +744,7 @@
                                         </template>
                                         @if (!$requisition->sent_to_cb)
                                             <button type="button"
-                                                @click="vendors.push({ vendor_name: '', vendor_items: '', amount: '' })"
+                                                @click="vendors.push({ id: null, vendor_name: '', vendor_items: '', amount: '', invoices: [], votes: [], ap: null, accordionView: 'hide' })"
                                                 class="btn rounded-pill btn-icon btn-primary mx-auto mt-2">
                                                 <span class="tf-icons ri-add-line ri-22px"></span>
                                             </button>
@@ -1048,19 +1050,19 @@
                                         </div>
                                     @endforelse
                                     @can('edit-requisition')
-                                        @if ($this->requisition->is_first_pass && count($vendors) > 0 && !$this->requisition->sent_to_vc_first_pass)
+                                        @if ($this->requisition->is_first_pass && $this->firstSavedVendorId && !$this->requisition->sent_to_vc_first_pass)
                                             <div class="row mt-8">
                                                 <button @disabled($this->isSendAllToVoteControlButtonDisabled)
                                                     wire:confirm="Are you sure you want to send to vote control?"
-                                                    wire:target="sendToVoteControl({{ $vendors[0]['id'] }})"
+                                                    wire:target="sendToVoteControl({{ $this->firstSavedVendorId }})"
                                                     wire:loading.attr="disabled" type="button"
-                                                    wire:click="sendToVoteControl({{ $vendors[0]['id'] }})"
+                                                    wire:click="sendToVoteControl({{ $this->firstSavedVendorId }})"
                                                     class="btn btn-success waves-effect waves-light m-auto"
                                                     style="width: 300px">
                                                     <span class="tf-icons ri-mail-send-line me-1_5"></span>Send to
                                                     Vote Control
                                                     <div wire:loading
-                                                        wire:target="sendToVoteControl({{ $vendors[0]['id'] }})"
+                                                        wire:target="sendToVoteControl({{ $this->firstSavedVendorId }})"
                                                         class="spinner-border spinner-border-lg text-white mx-2"
                                                         role="status">
                                                         <span class="visually-hidden">Loading...</span>
@@ -1085,7 +1087,7 @@
                                                         aria-expanded="true"
                                                         aria-controls="collapse{{ $index }}">
                                                         <strong>Vendor: {{ $vendor['vendor_name'] }} |
-                                                            ${{ number_format($vendor['amount'], 2) }}</strong>
+                                                            ${{ number_format((float) ($vendor['amount'] ?? 0), 2) }}</strong>
                                                     </button>
                                                 </h2>
                                                 <div id="collapse{{ $index }}"
@@ -1115,7 +1117,7 @@
                                                                 <div class="form-floating form-floating-outline">
                                                                     <input autocomplete="off"
                                                                         wire:model="vendors.{{ $index }}.eta"
-                                                                        type="date"
+                                                                        type="date" min="1900-01-01" max="9999-12-31"
                                                                         class="form-control @error('vendors.' . $index . '.eta')is-invalid @enderror"
                                                                         id="floatingInput"
                                                                         aria-describedby="floatingInputHelp" />
@@ -1133,7 +1135,7 @@
                                                                 <div class="form-floating form-floating-outline">
                                                                     <input autocomplete="off"
                                                                         wire:model="vendors.{{ $index }}.date_sent_commit"
-                                                                        type="date"
+                                                                        type="date" min="1900-01-01" max="9999-12-31"
                                                                         class="form-control @error('vendors.' . $index . '.date_sent_commit')is-invalid @enderror"
                                                                         id="floatingInput"
                                                                         aria-describedby="floatingInputHelp" />
@@ -1151,7 +1153,7 @@
                                                                     <div class="form-floating form-floating-outline">
                                                                         <input autocomplete="off"
                                                                             wire:model="vendors.{{ $index }}.date_sent_ap"
-                                                                            type="date"
+                                                                            type="date" min="1900-01-01" max="{{ $this->today }}"
                                                                             class="form-control @error('vendors.' . $index . '.date_sent_ap')is-invalid @enderror"
                                                                             id="floatingInput"
                                                                             aria-describedby="floatingInputHelp" />
